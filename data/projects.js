@@ -7,7 +7,7 @@
  *     title: 'PAPER: Full Title',             // required
  *     authors: ['pmh9960', 'Jane Doe (SNU)'], // required; ids link, plain strings do not
  *     venue: 'NeurIPS 2025',                  // optional, shown as a badge
- *     year: 2025,                             // required, sorts the grid (newest first)
+ *     year: 2025,                             // required, sorts the grid (newest first); use venue year if present, else arXiv posting year
  *     tags: ['manipulation', 'vla'],          // optional, drives the filter chips
  *     media: {                                // optional; omit until the file exists
  *       type: 'video',                        // 'video' | 'image'
@@ -33,7 +33,7 @@ window.PROJECTS = [
     title:
       '3D HAMSTER: Bridging Planning and Control in Hierarchical Vision Language Action Models through 3D Trajectory Guidance',
     authors: [
-      'Dongyoon Hwang',
+      'godnpeter',
       'Byungkun Lee',
       'Dongjin Kim',
       'Hyojin Jang',
@@ -63,9 +63,9 @@ window.PROJECTS = [
   {
     id: 'egox',
     title: 'EgoX: Egocentric Video Generation from a Single Exocentric Video',
-    authors: ['Taewoong Kang', 'Kinam Kim', 'Dohyeon Kim', 'pmh9960', 'Junha Hyung', 'jaegulchoo'],
+    authors: ['Taewoong Kang', 'Kinam Kim', 'Dohyeon Kim', 'pmh9960', 'junhahyung', 'jaegulchoo'],
     venue: 'CVPR 2026',
-    year: 2025,
+    year: 2026,
     tags: ['video generation', 'egocentric'],
     summary: {
       en:
@@ -87,7 +87,7 @@ window.PROJECTS = [
     authors: [
       'pmh9960',
       'Kinam Kim',
-      'Junha Hyung',
+      'junhahyung',
       'Hyojin Jang',
       'myyzzzoooo',
       'Jooyeol Yun',
@@ -95,7 +95,7 @@ window.PROJECTS = [
       'jaegulchoo',
     ],
     venue: 'ICRA 2026',
-    year: 2025,
+    year: 2026,
     tags: ['vla', 'manipulation', 'test-time guidance'],
     summary: {
       en:
@@ -120,7 +120,7 @@ window.PROJECTS = [
       'Youngdo Lee',
       'pmh9960',
       'Hyunseung Kim',
-      'Dongyoon Hwang',
+      'godnpeter',
       'Donghu Kim',
       'Hojoon Lee',
       'jaegulchoo',

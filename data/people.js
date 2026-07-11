@@ -10,7 +10,6 @@ window.PEOPLE = {
   pmh9960: { name: 'Minho Park', url: 'https://pmh9960.github.io' },
   kyungminn: { name: 'Kyungmin Lee', url: 'https://kyungminn.github.io/' },
   myyzzzoooo: { name: 'Hoiyeong Jin', url: 'https://myyzzzoooo.github.io/' },
-  // godnpeter (Dongyoon Hwang) and junhahyung (Junha Hyung) are omitted here:
-  // their GitHub profiles do not show a real display name, so they are
-  // written as plain-text authors in projects.js instead.
+  godnpeter: { name: 'Dongyoon Hwang', url: 'https://godnpeter.github.io' },
+  junhahyung: { name: 'Junha Hyung', url: 'https://junhahyung.github.io' },
 };
