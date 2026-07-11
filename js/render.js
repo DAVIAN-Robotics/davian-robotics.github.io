@@ -172,6 +172,15 @@
       .join('');
   }
 
+  // Module-scope observer state. Keyed by grid id so re-rendering one grid
+  // (e.g. research-grid on a chip click) disconnects only that grid's
+  // previous observer and never touches another grid's already-bound
+  // videos/cards. currentlyPlayingVideo is intentionally NOT keyed by grid —
+  // "one video at a time" is a page-wide guarantee, not a per-grid one.
+  var revealObservers = {};
+  var mediaObservers = {};
+  var currentlyPlayingVideo = null;
+
   function applyFilter(doc, tag) {
     var projects = sortProjects(validProjects(global.PROJECTS));
     var people = global.PEOPLE || {};
@@ -190,7 +199,7 @@
         chip.classList.toggle('chip--active', chip.getAttribute('data-tag') === tag);
       });
     }
-    attachMedia(doc);
+    attachMedia(doc, 'research-grid');
     attachReveal(doc, 'research-grid');
     if (global.I18N) global.I18N.apply(doc, doc.documentElement.lang || 'en');
   }
@@ -200,10 +209,16 @@
    * never gets that class (no IntersectionObserver, or reduced motion) just
    * leaves every card visible — never add .is-revealing without something
    * that will also add .is-visible back. Re-run per grid every time its
-   * cards are (re)rendered, since filtering replaces the grid's children. */
+   * cards are (re)rendered, since filtering replaces the grid's children.
+   * The previous observer for this grid (if any) is disconnected first, so
+   * repeated re-renders never accumulate observers on detached nodes. */
   function attachReveal(doc, gridId) {
     var grid = doc.getElementById(gridId);
     if (!grid) return;
+    if (revealObservers[gridId]) {
+      revealObservers[gridId].disconnect();
+      delete revealObservers[gridId];
+    }
     var reduce =
       typeof global.matchMedia === 'function' &&
       global.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -225,51 +240,83 @@
     Array.prototype.forEach.call(cards, function (card) {
       observer.observe(card);
     });
+    revealObservers[gridId] = observer;
   }
 
-  /* Cards play on hover on the desktop and one-at-a-time in the viewport on
-   * mobile. Reduced motion pins every card to its poster. */
-  function attachMedia(doc) {
+  /* Exactly one playback path is attached per device, scoped to the grid
+   * being (re)rendered: hover-capable devices get play-on-hover; devices
+   * with no hover (matchMedia('(hover: none)') — chosen over
+   * (pointer: coarse) because it asks the actual question this code cares
+   * about, hover capability, rather than pointer precision, which also
+   * covers coarse-pointer-but-hover-capable hybrids like some touchscreen
+   * laptops) get one-at-a-time playback driven by scroll position. Reduced
+   * motion pins every card to its poster regardless of device. The previous
+   * media observer for this grid is disconnected first, same as
+   * attachReveal, so re-filtering never stacks observers. */
+  function attachMedia(doc, gridId) {
+    var grid = doc.getElementById(gridId);
+    if (!grid) return;
+    if (mediaObservers[gridId]) {
+      mediaObservers[gridId].disconnect();
+      delete mediaObservers[gridId];
+    }
     var reduce =
       typeof global.matchMedia === 'function' &&
       global.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var videos = doc.querySelectorAll ? doc.querySelectorAll('.card video') : [];
+    var videos = grid.querySelectorAll ? grid.querySelectorAll('.card video') : [];
     if (reduce) {
       Array.prototype.forEach.call(videos, function (video) {
         if (video.pause) video.pause();
       });
       return;
     }
-    Array.prototype.forEach.call(videos, function (video) {
-      var card = video.closest ? video.closest('.card') : null;
-      if (!card || (card.dataset && card.dataset.mediaBound)) return;
-      if (card.dataset) card.dataset.mediaBound = '1';
-      card.addEventListener('mouseenter', function () {
-        var playing = video.play();
-        if (playing && playing.catch) playing.catch(function () {});
+    var noHover =
+      typeof global.matchMedia === 'function' && global.matchMedia('(hover: none)').matches;
+    if (!noHover) {
+      Array.prototype.forEach.call(videos, function (video) {
+        var card = video.closest ? video.closest('.card') : null;
+        if (!card) return;
+        card.addEventListener('mouseenter', function () {
+          var playing = video.play();
+          if (playing && playing.catch) playing.catch(function () {});
+        });
+        card.addEventListener('mouseleave', function () {
+          video.pause();
+        });
       });
-      card.addEventListener('mouseleave', function () {
-        video.pause();
-      });
-    });
+      return;
+    }
     if (typeof global.IntersectionObserver !== 'function') return;
     var observer = new global.IntersectionObserver(
       function (entries) {
+        // Pick the single highest-ratio qualifying entry from THIS callback
+        // batch. Anything not the winner gets paused (if it was the one
+        // playing); the winner plays only if it isn't already playing.
+        var winner = null;
         entries.forEach(function (entry) {
-          var video = entry.target;
           if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
-            var playing = video.play();
-            if (playing && playing.catch) playing.catch(function () {});
-          } else if (video.pause) {
-            video.pause();
+            if (!winner || entry.intersectionRatio > winner.intersectionRatio) {
+              winner = entry;
+            }
           }
         });
+        var winnerVideo = winner ? winner.target : null;
+        if (currentlyPlayingVideo && currentlyPlayingVideo !== winnerVideo) {
+          if (currentlyPlayingVideo.pause) currentlyPlayingVideo.pause();
+          currentlyPlayingVideo = null;
+        }
+        if (winnerVideo && winnerVideo !== currentlyPlayingVideo) {
+          var playing = winnerVideo.play();
+          if (playing && playing.catch) playing.catch(function () {});
+          currentlyPlayingVideo = winnerVideo;
+        }
       },
       { threshold: [0, 0.6] }
     );
     Array.prototype.forEach.call(videos, function (video) {
       observer.observe(video);
     });
+    mediaObservers[gridId] = observer;
   }
 
   function mount(doc) {
@@ -290,14 +337,23 @@
     renderInto(doc, 'filter-chips', chipsHTML(collectTags(projects)));
     renderInto(doc, 'team-list', teamHTML(people));
     applyFilter(doc, 'all');
+    attachMedia(doc, 'highlights-grid');
+    attachReveal(doc, 'highlights-grid');
+    // Bind once: without this guard, a second mount() on the same
+    // #filter-chips node would stack a second click listener and every chip
+    // click would run applyFilter twice.
     var chips = doc.getElementById('filter-chips');
-    if (chips && chips.addEventListener) {
+    if (chips && chips.addEventListener && !(chips.dataset && chips.dataset.filterBound)) {
       chips.addEventListener('click', function (event) {
-        var tag = event.target && event.target.getAttribute && event.target.getAttribute('data-tag');
+        // closest('.chip'), not a direct getAttribute on event.target: the
+        // click target can be a child of the chip button (e.g. an i18n
+        // <span> wrapping its label), which has no data-tag of its own.
+        var chip = event.target && event.target.closest && event.target.closest('.chip');
+        var tag = chip && chip.getAttribute && chip.getAttribute('data-tag');
         if (tag) applyFilter(doc, tag);
       });
+      if (chips.dataset) chips.dataset.filterBound = '1';
     }
-    attachReveal(doc, 'highlights-grid');
   }
 
   global.DR = {
