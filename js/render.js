@@ -140,6 +140,132 @@
     );
   }
 
+  function renderInto(doc, id, html) {
+    var node = doc.getElementById(id);
+    if (!node) return null;
+    node.innerHTML = html;
+    return node;
+  }
+
+  function chipsHTML(tags) {
+    var all = '<button class="chip chip--active" data-tag="all" data-i18n="filter.all">All</button>';
+    return (
+      all +
+      tags
+        .map(function (tag) {
+          return '<button class="chip" data-tag="' + escapeHTML(tag) + '">' + escapeHTML(tag) + '</button>';
+        })
+        .join('')
+    );
+  }
+
+  function teamHTML(people) {
+    return Object.keys(people || {})
+      .map(function (id) {
+        var person = people[id];
+        return (
+          '<li><a href="' + escapeHTML(person.url) + '" target="_blank" rel="noopener">' +
+          escapeHTML(person.name) +
+          '</a></li>'
+        );
+      })
+      .join('');
+  }
+
+  function applyFilter(doc, tag) {
+    var projects = sortProjects(validProjects(global.PROJECTS));
+    var people = global.PEOPLE || {};
+    renderInto(
+      doc,
+      'research-grid',
+      filterProjects(projects, tag)
+        .map(function (project) {
+          return cardHTML(project, people, {});
+        })
+        .join('')
+    );
+    var chips = doc.getElementById('filter-chips');
+    if (chips && chips.querySelectorAll) {
+      Array.prototype.forEach.call(chips.querySelectorAll('.chip'), function (chip) {
+        chip.classList.toggle('chip--active', chip.getAttribute('data-tag') === tag);
+      });
+    }
+    attachMedia(doc);
+    if (global.I18N) global.I18N.apply(doc, doc.documentElement.lang || 'en');
+  }
+
+  /* Cards play on hover on the desktop and one-at-a-time in the viewport on
+   * mobile. Reduced motion pins every card to its poster. */
+  function attachMedia(doc) {
+    var reduce =
+      typeof global.matchMedia === 'function' &&
+      global.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var videos = doc.querySelectorAll ? doc.querySelectorAll('.card video') : [];
+    if (reduce) {
+      Array.prototype.forEach.call(videos, function (video) {
+        if (video.pause) video.pause();
+      });
+      return;
+    }
+    Array.prototype.forEach.call(videos, function (video) {
+      var card = video.closest ? video.closest('.card') : null;
+      if (!card || (card.dataset && card.dataset.mediaBound)) return;
+      if (card.dataset) card.dataset.mediaBound = '1';
+      card.addEventListener('mouseenter', function () {
+        var playing = video.play();
+        if (playing && playing.catch) playing.catch(function () {});
+      });
+      card.addEventListener('mouseleave', function () {
+        video.pause();
+      });
+    });
+    if (typeof global.IntersectionObserver !== 'function') return;
+    var observer = new global.IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          var video = entry.target;
+          if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+            var playing = video.play();
+            if (playing && playing.catch) playing.catch(function () {});
+          } else if (video.pause) {
+            video.pause();
+          }
+        });
+      },
+      { threshold: [0, 0.6] }
+    );
+    Array.prototype.forEach.call(videos, function (video) {
+      observer.observe(video);
+    });
+  }
+
+  function mount(doc) {
+    var people = global.PEOPLE || {};
+    var projects = sortProjects(validProjects(global.PROJECTS));
+    renderInto(
+      doc,
+      'highlights-grid',
+      projects
+        .filter(function (project) {
+          return project.featured;
+        })
+        .map(function (project) {
+          return cardHTML(project, people, { featured: true });
+        })
+        .join('')
+    );
+    renderInto(doc, 'filter-chips', chipsHTML(collectTags(projects)));
+    renderInto(doc, 'team-list', teamHTML(people));
+    applyFilter(doc, 'all');
+    var chips = doc.getElementById('filter-chips');
+    if (chips && chips.addEventListener) {
+      chips.addEventListener('click', function (event) {
+        var tag = event.target && event.target.getAttribute && event.target.getAttribute('data-tag');
+        if (tag) applyFilter(doc, tag);
+      });
+    }
+  }
+
   global.DR = {
     escapeHTML: escapeHTML,
     validateProject: validateProject,
@@ -151,6 +277,8 @@
     linksHTML: linksHTML,
     mediaHTML: mediaHTML,
     cardHTML: cardHTML,
+    mount: mount,
+    applyFilter: applyFilter,
   };
 
   // Browser boot: reveal the hero video once it has real frames. 'loadeddata'
@@ -177,5 +305,9 @@
     // synchronously, on top of (not instead of) the listener.
     var hero = document.querySelector('.hero__video');
     if (hero && hero.readyState >= 2) hero.classList.add('is-loaded');
+
+    document.addEventListener('DOMContentLoaded', function () {
+      mount(document);
+    });
   }
 })(typeof window !== 'undefined' ? window : globalThis);
