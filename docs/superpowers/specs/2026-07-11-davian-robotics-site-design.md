@@ -44,6 +44,7 @@ data/people.js      window.PEOPLE   — id → { name, url } dictionary
 data/projects.js    window.PROJECTS — array of projects (the file people edit)
 data/strings.js     window.STRINGS  — Korean translations of static copy
 assets/media/       Demo videos, poster images
+assets/logo/        Brand assets (see §6)
 README.md           How to add a project (English)
 ```
 
@@ -124,8 +125,9 @@ window.STRINGS = {
 
 One scrolling page, in this order.
 
-**Header** (sticky, thin). Left: a breadcrumb `DAVIAN Lab / Robotics` where `DAVIAN Lab` links to
-davian.kaist.ac.kr — affiliation is visually obvious and traffic flows back to the parent. Right:
+**Header** (sticky, thin). Left: the horizontal logo (height ~32px), linking to the top of the page,
+followed by a small text link to davian.kaist.ac.kr — affiliation stays visible and traffic flows back
+to the parent lab. The logo already reads "DAVIAN ROBOTICS", so no wordmark is typeset beside it. Right:
 anchor links (Research, Releases, Team, Join), GitHub and HuggingFace icons, and an `EN | KR`
 toggle. On mobile the anchors collapse; the icons and the toggle remain.
 
@@ -157,11 +159,37 @@ The sub-group's membership is fluid, so the site deliberately avoids asserting a
 
 ## 6. Visual system
 
-**Color.** White base (`#ffffff`), tinted section band (`#f7f8f9`), body text (`#16181d`), muted text
-(`#6b7280`), hairline borders (`#e5e7eb`). A single accent — **KAIST blue `#004191`** — used only for
-links, the active filter chip, button hover, and small section markers. Constraining the accent to one
-hue keeps the page calm even though the video thumbnails are individually busy. All values are declared
-as CSS custom properties (`--accent`, `--bg`, `--fg`, ...) so a rebrand is a one-line change.
+### Brand assets
+
+The group has an existing logo, committed at:
+
+- `assets/logo/davian-robotics-horizontal.png` (2247×921, transparent) — header wordmark
+- `assets/logo/davian-robotics-square.png` (376×376, transparent) — favicon and Open Graph image
+- `assets/logo/kaist-ai.svg` — KAIST AI mark, footer affiliation only (the only vector asset, so it
+  stays crisp at any size)
+
+The logo is a node-and-link graph in deep purple, pink, salmon, and sand, above a `DAVIAN` wordmark
+whose letters carry those same four hues, with `ROBOTICS` beneath. The node-link motif is reused as a
+subtle section marker and as a faint background pattern behind the hero's typographic half, so the
+brand extends into the layout instead of sitting on it as a sticker.
+
+### Color
+
+White base (`#ffffff`), tinted section band (`#f7f8f9`), body text (`#16181d`), muted text (`#6b7280`),
+hairline borders (`#e5e7eb`).
+
+A single accent — **the logo's deep purple `#4A3372`** — used only for links, the active filter chip,
+button hover, and section markers. The accent is taken from the logo rather than from KAIST's
+institutional blue: the logo contains no blue at all, and a blue accent beside a purple/pink/salmon
+wordmark in a permanently visible header reads as two brands stapled together. KAIST blue appears
+nowhere on the site except inside the KAIST AI logo in the footer, where it belongs.
+
+The logo's salmon and sand are held in reserve. They are not part of the interactive palette; at most
+they tint a decorative node in the hero motif. Restricting interaction to one hue keeps the page calm
+even though the video thumbnails are individually busy.
+
+All values are declared as CSS custom properties (`--accent`, `--bg`, `--fg`, ...) so a rebrand is a
+one-line change.
 
 **Typography.** A single sans-serif family (Inter with a system fallback stack) for both headings and
 body. Serif was rejected: it reads as generic-academic against robotics demos, and Korean serif
