@@ -213,9 +213,28 @@
       currentlyPlayingVideo = null;
     }
     if (winnerVideo && winnerVideo !== currentlyPlayingVideo) {
-      var playing = winnerVideo.play();
-      if (playing && playing.catch) playing.catch(function () {});
-      currentlyPlayingVideo = winnerVideo;
+      var playPromise = winnerVideo.play();
+      if (playPromise && typeof playPromise.then === 'function') {
+        // play() returns a Promise that can reject (iOS Low Power Mode,
+        // data-saver, a preload="none" source that failed to load). Only
+        // record the video as playing once that Promise actually resolves
+        // — recording it unconditionally would leave a false "this is
+        // playing" entry that the winnerVideo !== currentlyPlayingVideo
+        // guard above then refuses to ever retry. A rejection is normal
+        // autoplay-policy behavior, not an error worth logging.
+        playPromise.then(
+          function () {
+            currentlyPlayingVideo = winnerVideo;
+          },
+          function () {
+            if (currentlyPlayingVideo === winnerVideo) currentlyPlayingVideo = null;
+          }
+        );
+      } else {
+        // Older browsers: play() returns undefined synchronously — that IS
+        // the success path, so record it right away.
+        currentlyPlayingVideo = winnerVideo;
+      }
     }
   }
 

@@ -63,7 +63,12 @@ function makeDocument(ids) {
 
 // --- media/reveal test doubles -------------------------------------------
 
-function makeVideo() {
+// play() returns a real Promise by default (like every real browser), so the
+// rejected-play path — a real possibility (iOS Low Power Mode, data-saver, a
+// preload="none" source that failed to load) — is representable at all.
+// Pass { rejectPlay: true } for that path.
+function makeVideo(options) {
+  const opts = options || {};
   return {
     playCalls: 0,
     pauseCalls: 0,
@@ -72,13 +77,25 @@ function makeVideo() {
     play() {
       this.playCalls += 1;
       this.paused = false;
-      return undefined;
+      return opts.rejectPlay
+        ? Promise.reject(new Error('play() rejected (test double)'))
+        : Promise.resolve();
     },
     pause() {
       this.pauseCalls += 1;
       this.paused = true;
     },
   };
+}
+
+// One microtask tick — enough to let a .then()/.catch() attached directly to
+// an already-settled Promise (which is what render.js does) actually run,
+// since Promise reactions never run synchronously even for a pre-settled
+// Promise. Await this between firing a callback that triggers play() and
+// firing a subsequent callback/assertion that depends on the outcome having
+// been recorded.
+function flushMicrotask() {
+  return Promise.resolve();
 }
 
 function makeCard(video) {
@@ -350,7 +367,7 @@ test('re-rendering the research grid does not disconnect the highlights grid obs
   });
 });
 
-test('exactly one video plays when two cards clear the intersection threshold at once', () => {
+test('exactly one video plays when two cards clear the intersection threshold at once', async () => {
   const sandbox = load();
   const Observer = makeObserverFactory();
   sandbox.IntersectionObserver = Observer;
@@ -375,6 +392,7 @@ test('exactly one video plays when two cards clear the intersection threshold at
   assert.strictEqual(videoB.playCalls, 1, 'the higher-ratio video plays');
   assert.strictEqual(videoA.playCalls, 0, 'the lower-ratio video never plays');
   assert.strictEqual(videoB.paused, false);
+  await flushMicrotask(); // let B's resolved play() Promise record it as playing
 
   // Scroll on: only A still clears the threshold now.
   mediaObserver.callback([
@@ -385,7 +403,7 @@ test('exactly one video plays when two cards clear the intersection threshold at
   assert.ok(videoB.pauseCalls >= 1, 'the previous winner is paused');
 });
 
-test('a delta batch that omits the playing video must not pause it — a real observer only reports what changed', () => {
+test('a delta batch that omits the playing video must not pause it — a real observer only reports what changed', async () => {
   const sandbox = load();
   const Observer = makeObserverFactory();
   sandbox.IntersectionObserver = Observer;
@@ -408,16 +426,18 @@ test('a delta batch that omits the playing video must not pause it — a real ob
   // it again.
   mediaObserver.callback([{ target: videoA, isIntersecting: true, intersectionRatio: 0.9 }]);
   assert.strictEqual(videoA.playCalls, 1);
+  await flushMicrotask(); // let A's resolved play() Promise record it as playing
 
   // A later batch about a DIFFERENT, non-qualifying video — no entry for A
   // at all. This must be a no-op for A: still playing, not paused again.
   mediaObserver.callback([{ target: videoB, isIntersecting: true, intersectionRatio: 0.3 }]);
   assert.strictEqual(videoA.pauseCalls, 0, 'A must not be paused by a batch that never mentions it');
+  assert.strictEqual(videoA.playCalls, 1, 'A, already recorded as playing, must not be re-played either');
   assert.strictEqual(videoA.paused, false, 'A must still be the one playing');
   assert.strictEqual(videoB.playCalls, 0, 'B never qualified, so it must never play');
 });
 
-test('a video whose ratio later drops below threshold IS paused (the fix must not stop pausing altogether)', () => {
+test('a video whose ratio later drops below threshold IS paused (the fix must not stop pausing altogether)', async () => {
   const sandbox = load();
   const Observer = makeObserverFactory();
   sandbox.IntersectionObserver = Observer;
@@ -432,6 +452,7 @@ test('a video whose ratio later drops below threshold IS paused (the fix must no
 
   mediaObserver.callback([{ target: video, isIntersecting: true, intersectionRatio: 0.9 }]);
   assert.strictEqual(video.playCalls, 1);
+  await flushMicrotask(); // let the resolved play() Promise record it as playing
 
   // The SAME video reports a drop below threshold — must be paused.
   mediaObserver.callback([{ target: video, isIntersecting: true, intersectionRatio: 0.4 }]);
@@ -439,7 +460,62 @@ test('a video whose ratio later drops below threshold IS paused (the fix must no
   assert.strictEqual(video.paused, true);
 });
 
-test('the two grids share one page-wide winner — a highlights-only batch must not pause a research video that is on screen', () => {
+test('a successful play() IS recorded as playing, so a later no-op batch does not call play() again', async () => {
+  const sandbox = load();
+  const Observer = makeObserverFactory();
+  sandbox.IntersectionObserver = Observer;
+  sandbox.matchMedia = makeMatchMedia({ '(hover: none)': true });
+  const doc = makeDocument(IDS);
+  const videoA = makeVideo();
+  const cardA = makeCard(videoA);
+  const videoB = makeVideo();
+  const cardB = makeCard(videoB);
+  doc.elements['research-grid'] = makeGrid(
+    [{ card: cardA, video: videoA }, { card: cardB, video: videoB }],
+    'research-grid'
+  );
+
+  sandbox.DR.applyFilter(doc, 'all');
+  const mediaObserver = Observer.instances.filter(isMediaObserver).pop();
+
+  mediaObserver.callback([{ target: videoA, isIntersecting: true, intersectionRatio: 0.9 }]);
+  assert.strictEqual(videoA.playCalls, 1);
+  await flushMicrotask(); // let the resolved play() Promise record A as playing
+
+  // A different, non-qualifying video shows up in a later batch. If the
+  // success hadn't been recorded, currentlyPlayingVideo would still be
+  // null and A — still the only qualifying entry — would get play() called
+  // on it a second time here.
+  mediaObserver.callback([{ target: videoB, isIntersecting: true, intersectionRatio: 0.2 }]);
+  assert.strictEqual(videoA.playCalls, 1, 'a recorded, still-qualifying winner must not be re-played');
+  assert.strictEqual(videoA.pauseCalls, 0);
+});
+
+test('a rejected play() is not recorded as playing, so a subsequent callback retries it', async () => {
+  const sandbox = load();
+  const Observer = makeObserverFactory();
+  sandbox.IntersectionObserver = Observer;
+  sandbox.matchMedia = makeMatchMedia({ '(hover: none)': true });
+  const doc = makeDocument(IDS);
+  const video = makeVideo({ rejectPlay: true });
+  const card = makeCard(video);
+  doc.elements['research-grid'] = makeGrid([{ card, video }], 'research-grid');
+
+  sandbox.DR.applyFilter(doc, 'all');
+  const mediaObserver = Observer.instances.filter(isMediaObserver).pop();
+
+  mediaObserver.callback([{ target: video, isIntersecting: true, intersectionRatio: 0.9 }]);
+  assert.strictEqual(video.playCalls, 1);
+  await flushMicrotask(); // let the rejected play() Promise clear the false "playing" record
+
+  // The same video is still the top-ratio entry in a later batch. Since the
+  // previous attempt was never recorded as playing, this must retry — a
+  // frozen poster that never plays again would be the bug.
+  mediaObserver.callback([{ target: video, isIntersecting: true, intersectionRatio: 0.9 }]);
+  assert.strictEqual(video.playCalls, 2, 'a rejected play must be retried on the next qualifying callback, not frozen');
+});
+
+test('the two grids share one page-wide winner — a highlights-only batch must not pause a research video that is on screen', async () => {
   const sandbox = load();
   const Observer = makeObserverFactory();
   sandbox.IntersectionObserver = Observer;
@@ -466,6 +542,7 @@ test('the two grids share one page-wide winner — a highlights-only batch must 
   // The research video is fully on screen and playing.
   researchObserver.callback([{ target: researchVideo, isIntersecting: true, intersectionRatio: 1 }]);
   assert.strictEqual(researchVideo.playCalls, 1);
+  await flushMicrotask(); // let the resolved play() Promise record it as playing
 
   // The user has scrolled away from highlights-grid; its observer fires
   // with a single non-qualifying entry. This must not touch the research
@@ -476,7 +553,7 @@ test('the two grids share one page-wide winner — a highlights-only batch must 
   assert.strictEqual(highlightsVideo.playCalls, 0, 'the non-qualifying highlights video must never play');
 });
 
-test('re-rendering a grid purges its stale videos from the page-wide ratio state', () => {
+test('re-rendering a grid purges its stale videos from the page-wide ratio state', async () => {
   const sandbox = load();
   const Observer = makeObserverFactory();
   sandbox.IntersectionObserver = Observer;
@@ -494,6 +571,7 @@ test('re-rendering a grid purges its stale videos from the page-wide ratio state
   // ratio.
   firstObserver.callback([{ target: videoA, isIntersecting: true, intersectionRatio: 0.9 }]);
   assert.strictEqual(videoA.playCalls, 1);
+  await flushMicrotask(); // confirm A is genuinely, fully recorded as playing before it gets torn down
 
   // Re-render research-grid with a brand new video in the same slot.
   const videoC = makeVideo();
