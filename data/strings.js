@@ -6,6 +6,8 @@
  */
 window.STRINGS = {
   ko: {
+    'a11y.skipLink': '본문으로 건너뛰기',
+    'toggle.lang': 'EN | KR 언어 전환, 현재 한국어',
     'hero.tagline': 'KAIST AI의 Vision-Language-Action 모델 및 로봇 조작 연구 그룹',
     'hero.blurb':
       'DAVIAN Robotics는 비전-언어-행동 모델, 강화학습, 인간형 로봇 보행을 아우르는 로봇 조작 연구를 수행합니다.',

@@ -25,7 +25,7 @@
   </head>
 
   <body>
-    <a class="skip-link" href="#main">Skip to main content</a>
+    <a class="skip-link" href="#main" data-i18n="a11y.skipLink">Skip to main content</a>
 
     <header class="site-header">
       <div class="container site-header__inner">
@@ -99,12 +99,19 @@
           <!-- js/i18n.js (Task 5): no aria-pressed to keep in sync here — the
                control's state is already exposed via document.documentElement.lang,
                which Task 5 sets on the <html> element, so a screen reader already
-               knows the page language without an invented ARIA state. -->
+               knows the page language without an invented ARIA state. The
+               aria-label itself is translated via data-i18n-aria (same
+               restore/swap mechanism as data-i18n, applied to an attribute
+               instead of textContent) and names which language is currently
+               active; it keeps the literal visible text "EN | KR" in both
+               languages so the accessible name still contains the visible
+               label (WCAG 2.5.3). -->
           <button
             id="lang-toggle"
             class="lang-toggle"
             type="button"
-            aria-label="EN | KR — switch language"
+            data-i18n-aria="toggle.lang"
+            aria-label="EN | KR language toggle, currently English"
           >
             <span class="lang-toggle__on">EN</span>
             <span class="lang-toggle__sep" aria-hidden="true">|</span>
