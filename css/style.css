@@ -18,7 +18,8 @@
   /* --border is ~1.24:1 against white (WCAG relative-luminance formula) — too
      faint to be the only affordance boundary on an interactive control.
      --border-control is a neutral grey (equal R/G/B, so no hue at all) at
-     3.36:1, used only on .btn--outline and the inactive .chip; card and
+     3.36:1, used on every border-only interactive control (.btn incl.
+     .btn--outline/.btn--link, .chip, .lang-toggle, .team-list a); card and
      container borders stay on --border. */
   --border-control: #8c8c8c;
   --mask-solid: #000;
@@ -286,7 +287,7 @@ button {
   gap: 5px;
   height: 32px;
   padding: 0 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   border-radius: 8px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -438,7 +439,7 @@ button {
   align-items: center;
   gap: 6px;
   padding: 9px 18px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   border-radius: 999px;
   font-size: 0.875rem;
   font-weight: 550;
@@ -743,7 +744,7 @@ button {
 .team-list a {
   display: inline-block;
   padding: 8px 16px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   border-radius: 999px;
   font-size: 0.9375rem;
   font-weight: 550;

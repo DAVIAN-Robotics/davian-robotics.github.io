@@ -96,14 +96,15 @@
               />
             </svg>
           </a>
-          <!-- js/i18n.js (Task 5) must keep aria-pressed in sync: "true" once
-               it has switched document.documentElement.lang to Korean. -->
+          <!-- js/i18n.js (Task 5): no aria-pressed to keep in sync here — the
+               control's state is already exposed via document.documentElement.lang,
+               which Task 5 sets on the <html> element, so a screen reader already
+               knows the page language without an invented ARIA state. -->
           <button
             id="lang-toggle"
             class="lang-toggle"
             type="button"
-            aria-label="Switch language between English and Korean"
-            aria-pressed="false"
+            aria-label="EN | KR — switch language"
           >
             <span class="lang-toggle__on">EN</span>
             <span class="lang-toggle__sep" aria-hidden="true">|</span>
@@ -305,7 +306,7 @@
           <div class="join__actions">
             <a
               class="btn btn--solid"
-              href="https://davian.kaist.ac.kr/join"
+              href="https://davian.kaist.ac.kr/joinus"
               target="_blank"
               rel="noopener"
               data-i18n="join.cta"

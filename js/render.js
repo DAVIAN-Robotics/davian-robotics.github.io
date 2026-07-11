@@ -168,5 +168,14 @@
       },
       true
     );
+
+    // The listener above only catches the event firing after this script
+    // runs. Since the script tag is at the end of <body>, a video served
+    // from a warm cache or file:// can already be past HAVE_CURRENT_DATA
+    // by the time we get here, in which case 'loadeddata' has already fired
+    // and nothing above will ever add .is-loaded. Sweep for that case once,
+    // synchronously, on top of (not instead of) the listener.
+    var hero = document.querySelector('.hero__video');
+    if (hero && hero.readyState >= 2) hero.classList.add('is-loaded');
   }
 })(typeof window !== 'undefined' ? window : globalThis);
