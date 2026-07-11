@@ -18,6 +18,8 @@ window.PEOPLE = {
   keh0t0: { name: 'Taewoong Kang', url: 'https://keh0t0.github.io/' },
   kinam0252: { name: 'Kinam Kim', url: 'https://kinam0252.github.io/' },
   yeolj00: { name: 'Jooyeol Yun', url: 'https://yeolj00.github.io/' },
+  // No personal homepage; the ACG README links her GitHub profile, so that is what we link.
+  whit3snow: { name: 'Hyojin Jang', url: 'https://github.com/Whit3Snow' },
   sibisibi: { name: 'Sibeen Kim', url: 'https://sibisibi.github.io/' },
   leeyngdo: { name: 'Youngdo Lee', url: 'https://leeyngdo.github.io/' },
   iamproto: { name: 'Donghu Kim', url: 'https://i-am-proto.github.io/' },
