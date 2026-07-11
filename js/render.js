@@ -191,7 +191,40 @@
       });
     }
     attachMedia(doc);
+    attachReveal(doc, 'research-grid');
     if (global.I18N) global.I18N.apply(doc, doc.documentElement.lang || 'en');
+  }
+
+  /* Cards fade in as they enter the viewport. Fail-safe by construction: CSS
+   * only hides a card once its grid carries .is-revealing, so a grid that
+   * never gets that class (no IntersectionObserver, or reduced motion) just
+   * leaves every card visible — never add .is-revealing without something
+   * that will also add .is-visible back. Re-run per grid every time its
+   * cards are (re)rendered, since filtering replaces the grid's children. */
+  function attachReveal(doc, gridId) {
+    var grid = doc.getElementById(gridId);
+    if (!grid) return;
+    var reduce =
+      typeof global.matchMedia === 'function' &&
+      global.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || typeof global.IntersectionObserver !== 'function') return;
+    grid.classList.add('is-revealing');
+    var cards = grid.querySelectorAll ? grid.querySelectorAll('.card') : [];
+    var observer = new global.IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    });
+    // A target that is already on screen when observe() is called still
+    // fires once with isIntersecting: true (per spec, on the next callback
+    // turn), so cards visible at first paint reveal immediately — no
+    // separate "already visible" check needed here.
+    Array.prototype.forEach.call(cards, function (card) {
+      observer.observe(card);
+    });
   }
 
   /* Cards play on hover on the desktop and one-at-a-time in the viewport on
@@ -264,6 +297,7 @@
         if (tag) applyFilter(doc, tag);
       });
     }
+    attachReveal(doc, 'highlights-grid');
   }
 
   global.DR = {

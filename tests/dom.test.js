@@ -11,7 +11,16 @@ function makeElement(id) {
     id: id,
     innerHTML: '',
     children: [],
-    classList: { add() {}, remove() {}, toggle() {} },
+    // add() records what was added (in addition to the brief's no-op
+    // behavior) so tests can assert a class was, or was not, applied —
+    // needed for the scroll-reveal fail-safe test below.
+    classList: {
+      add(cls) {
+        (this._added = this._added || []).push(cls);
+      },
+      remove() {},
+      toggle() {},
+    },
     addEventListener(type, handler) {
       (this.handlers = this.handlers || {})[type] = handler;
     },
@@ -119,4 +128,30 @@ test('mount survives a page that is missing a container', () => {
   const sandbox = load();
   const doc = makeDocument(['research-grid']);
   assert.doesNotThrow(() => sandbox.DR.mount(doc));
+});
+
+test('with no IntersectionObserver, grids never get .is-revealing — cards stay visible', () => {
+  const sandbox = load();
+  delete sandbox.IntersectionObserver;
+  const doc = makeDocument(IDS);
+  sandbox.DR.mount(doc);
+  assert.ok(!(doc.elements['highlights-grid'].classList._added || []).includes('is-revealing'));
+  assert.ok(!(doc.elements['research-grid'].classList._added || []).includes('is-revealing'));
+});
+
+test('under prefers-reduced-motion, grids never get .is-revealing either', () => {
+  const sandbox = load();
+  sandbox.matchMedia = () => ({ matches: true, addEventListener() {} });
+  const doc = makeDocument(IDS);
+  sandbox.DR.mount(doc);
+  assert.ok(!(doc.elements['highlights-grid'].classList._added || []).includes('is-revealing'));
+  assert.ok(!(doc.elements['research-grid'].classList._added || []).includes('is-revealing'));
+});
+
+test('with IntersectionObserver available, grids that exist do get .is-revealing', () => {
+  const sandbox = load();
+  const doc = makeDocument(IDS);
+  sandbox.DR.mount(doc);
+  assert.ok((doc.elements['highlights-grid'].classList._added || []).includes('is-revealing'));
+  assert.ok((doc.elements['research-grid'].classList._added || []).includes('is-revealing'));
 });
