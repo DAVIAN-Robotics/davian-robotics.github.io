@@ -1,0 +1,929 @@
+/* DAVIAN Robotics — design system.
+ *
+ * Every value below reads from the custom properties in :root. No hard-coded
+ * hex appears past this block. The single accent is the logo's deep purple;
+ * blue exists nowhere on the page except inside the footer's KAIST AI mark.
+ *
+ * The look is a lab plate: white paper, hairline rules, tracked micro-labels,
+ * tabular figures, and the logo's node-and-link graph used as the one recurring
+ * ornament — the hero's floor and the texture of a card that has no video yet.
+ */
+
+:root {
+  --bg: #ffffff;
+  --bg-band: #f7f8f9;
+  --fg: #16181d;
+  --fg-muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #4a3372;
+  --accent-hover: #5d4390;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --container: 1200px;
+  --radius: 10px;
+
+  /* Derived tokens — all built from the five values above. */
+  --accent-tint: color-mix(in srgb, var(--accent) 4%, var(--bg));
+  --accent-tint-strong: color-mix(in srgb, var(--accent) 8%, var(--bg));
+  --accent-line: color-mix(in srgb, var(--accent) 22%, transparent);
+  --accent-faint: color-mix(in srgb, var(--accent) 12%, transparent);
+  --accent-hair: color-mix(in srgb, var(--accent) 9%, transparent);
+  --header-h: 60px;
+  --gap: 24px;
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+/* Reset ------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 16px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+figure {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.skip-link:focus {
+  left: 12px;
+  top: 12px;
+}
+
+/* Layout ------------------------------------------------------------------ */
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding: 88px 0;
+}
+
+.band {
+  background: var(--bg-band);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+/* The section marker: a short accent rule above every heading. It is the one
+ * place the accent is allowed to act as pure ornament. */
+.section__head {
+  margin-bottom: 40px;
+}
+
+.section__title {
+  position: relative;
+  padding-top: 18px;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 1.875rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.section__title::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 2px;
+  background: var(--accent);
+}
+
+.section__lede {
+  max-width: 60ch;
+  margin-top: 10px;
+  color: var(--fg-muted);
+}
+
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+/* Header ------------------------------------------------------------------ */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: var(--header-h);
+}
+
+.site-header__logo img {
+  height: 32px;
+  width: auto;
+}
+
+.site-header__parent {
+  padding-left: 20px;
+  border-left: 1px solid var(--border);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+
+.site-header__parent:hover {
+  color: var(--accent);
+}
+
+.site-nav {
+  display: flex;
+  gap: 22px;
+  margin-left: auto;
+}
+
+.site-nav a {
+  position: relative;
+  padding: 4px 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.site-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s var(--ease);
+}
+
+.site-nav a:hover {
+  color: var(--accent);
+}
+
+.site-nav a:hover::after {
+  transform: scaleX(1);
+}
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 18px;
+  border-left: 1px solid var(--border);
+}
+
+.icon-link {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--fg-muted);
+  transition: color 0.18s var(--ease), background-color 0.18s var(--ease);
+}
+
+.icon-link svg {
+  width: 18px;
+  height: 18px;
+}
+
+.icon-link:hover {
+  color: var(--accent);
+  background: var(--accent-tint-strong);
+}
+
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  transition: border-color 0.18s var(--ease);
+}
+
+.lang-toggle:hover {
+  border-color: var(--accent);
+}
+
+/* The active language is the solid one; the other sits back. js/i18n.js flips
+ * [data-lang] on <html>, so the control reads correctly in either state. */
+.lang-toggle__on {
+  color: var(--accent);
+}
+
+.lang-toggle__sep {
+  color: var(--border);
+}
+
+:root[lang='ko'] .lang-toggle__on {
+  color: var(--fg-muted);
+}
+
+:root[lang='ko'] .lang-toggle__off {
+  color: var(--accent);
+}
+
+/* Hero -------------------------------------------------------------------- */
+
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero__media {
+  position: relative;
+  min-height: 460px;
+  overflow: hidden;
+  background: var(--bg-band);
+  border-right: 1px solid var(--border);
+}
+
+/* The motif is the floor of the media panel. With no hero.mp4 committed the
+ * <video> paints nothing and the graph reads as the intended artwork; once a
+ * video exists it covers the graph. js/render.js adds .is-missing on a failed
+ * load, which removes the element outright. */
+.hero__motif {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero__motif-links path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  opacity: 0.28;
+}
+
+.hero__motif-nodes circle {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  opacity: 0.5;
+}
+
+.hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero__video.is-missing {
+  display: none;
+}
+
+.hero__body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 64px;
+  overflow: hidden;
+}
+
+/* A faint node field behind the copy — the same graph language as the panel,
+ * reduced to its nodes so it never competes with the text. */
+.hero__body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--accent-faint) 1.5px, transparent 1.6px);
+  background-size: 34px 34px;
+  -webkit-mask-image: radial-gradient(120% 90% at 85% 15%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(120% 90% at 85% 15%, #000 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero__body > * {
+  position: relative;
+}
+
+.hero__title {
+  font-size: clamp(2.25rem, 1.6rem + 2.4vw, 3.25rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.hero__tagline {
+  max-width: 34ch;
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--fg);
+}
+
+.hero__blurb {
+  max-width: 46ch;
+  color: var(--fg-muted);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* Buttons ----------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 550;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease),
+    color 0.18s var(--ease);
+}
+
+.btn--solid {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.btn--solid:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--bg);
+}
+
+.btn--outline {
+  color: var(--fg);
+}
+
+.btn--outline:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* The per-card link row: quieter than the hero buttons, same family. */
+.btn--link {
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 0.8125rem;
+  font-weight: 550;
+  color: var(--fg-muted);
+}
+
+.btn--link:hover {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+
+.link-arrow {
+  display: inline-block;
+  margin-top: 28px;
+  font-size: 0.9375rem;
+  font-weight: 550;
+  border-bottom: 1px solid var(--accent-line);
+  padding-bottom: 2px;
+  transition: border-color 0.18s var(--ease);
+}
+
+.link-arrow:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* Chips ------------------------------------------------------------------- */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.chip {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 550;
+  color: var(--fg-muted);
+  transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease),
+    color 0.18s var(--ease);
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chip--active,
+.chip--active:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+/* Grid and cards ---------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--gap);
+  counter-reset: plate;
+}
+
+.grid--featured {
+  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  counter-increment: plate;
+  transition: border-color 0.2s var(--ease), opacity 0.5s var(--ease),
+    transform 0.5s var(--ease);
+}
+
+.card:hover {
+  border-color: var(--accent);
+}
+
+/* Scroll reveal. Cards are visible by default; js/render.js opts a grid in by
+ * setting .is-revealing on it and .is-visible per card as it enters view, so a
+ * page with JS off or an observer that never fires still shows every card. */
+.grid.is-revealing .card {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.grid.is-revealing .card.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.card__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--bg-band);
+  border-bottom: 1px solid var(--border);
+}
+
+.card__media img,
+.card__media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The plate. No project has a video yet, so this is what every card renders
+ * today, and it has to look like a decision rather than a hole. Two moves make
+ * it one: it is shorter than a 16/9 video well, so it reads as a header band
+ * and not as a frame waiting for content; and it carries the same node-and-link
+ * field as the hero — a dot lattice crossed by two shallow diagonals — plus the
+ * card's index set like a figure number. The title is deliberately NOT drawn
+ * here: render.js passes it in for the accessible name, but printing it would
+ * repeat the <h3> sitting 20px below it. */
+.card__fallback {
+  aspect-ratio: 3 / 1;
+  background-color: var(--accent-tint);
+  background-image: radial-gradient(var(--accent-faint) 1.6px, transparent 1.7px),
+    repeating-linear-gradient(26deg, var(--accent-hair) 0 1px, transparent 1px 78px),
+    repeating-linear-gradient(-26deg, var(--accent-hair) 0 1px, transparent 1px 94px);
+  background-size: 26px 26px, auto, auto;
+  transition: background-color 0.2s var(--ease);
+}
+
+/* The lattice is offset per card so five plates in a column do not stamp. */
+.card:nth-child(3n + 2) .card__fallback {
+  background-position: 9px 13px, 0 0, 0 0;
+}
+
+.card:nth-child(3n) .card__fallback {
+  background-position: 17px 5px, 0 0, 0 0;
+}
+
+.card:hover .card__fallback {
+  background-color: var(--accent-tint-strong);
+}
+
+.card__fallback span {
+  display: none;
+}
+
+.card__fallback::after {
+  content: counter(plate, decimal-leading-zero);
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+  padding: 22px;
+}
+
+.card__title {
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+}
+
+.card--featured .card__title {
+  font-size: 1.1875rem;
+}
+
+/* Venue badge: a micro-label, not a pill of color. */
+.card__venue {
+  padding: 3px 8px;
+  border: 1px solid var(--accent-line);
+  border-radius: 5px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.card__authors {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--fg-muted);
+}
+
+.author {
+  color: var(--fg);
+  border-bottom: 1px solid var(--border);
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.author:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.card__summary {
+  font-size: 0.9375rem;
+  color: var(--fg-muted);
+}
+
+.card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+/* Releases ---------------------------------------------------------------- */
+
+.counts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+}
+
+.count {
+  border-top: 2px solid var(--accent);
+}
+
+.count__link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 20px 0 4px;
+  color: var(--fg);
+}
+
+.count__value {
+  font-size: clamp(2.25rem, 1.8rem + 1.8vw, 3rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.count__label {
+  margin-top: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.count__where {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  transition: color 0.18s var(--ease);
+}
+
+.count__link:hover .count__where {
+  color: var(--accent);
+}
+
+/* Team -------------------------------------------------------------------- */
+
+.team-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+
+.team-list a {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 550;
+  color: var(--fg);
+  transition: border-color 0.18s var(--ease), color 0.18s var(--ease),
+    background-color 0.18s var(--ease);
+}
+
+.team-list a:hover {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+
+/* Join -------------------------------------------------------------------- */
+
+.join__body {
+  max-width: 62ch;
+  font-size: 1.0625rem;
+  color: var(--fg-muted);
+}
+
+.join__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+/* Footer ------------------------------------------------------------------ */
+
+.site-footer {
+  padding: 44px 0;
+  border-top: 1px solid var(--border);
+}
+
+.site-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 28px;
+}
+
+.site-footer__kaist img {
+  height: 28px;
+  width: auto;
+}
+
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-left: auto;
+}
+
+.site-footer__links a {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+}
+
+.site-footer__links a:hover {
+  color: var(--accent);
+}
+
+.site-footer__note {
+  flex-basis: 100%;
+  font-size: 0.8125rem;
+  color: var(--fg-muted);
+}
+
+/* Breakpoints ------------------------------------------------------------- */
+
+/* Tablet: the hero stacks with the media panel first, and the featured grid
+ * drops to the same single-column rhythm as the rest of the page. */
+@media (max-width: 1023px) {
+  .section {
+    padding: 64px 0;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__media {
+    min-height: 300px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero__body {
+    padding: 48px 24px 56px;
+  }
+
+  .grid--featured {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+
+  .site-header__parent {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .site-header__inner {
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .site-nav {
+    order: 3;
+    flex-basis: 100%;
+    gap: 18px;
+    margin-left: 0;
+    overflow-x: auto;
+  }
+
+  .site-header__actions {
+    margin-left: auto;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  html {
+    scroll-padding-top: 110px;
+  }
+}
+
+/* Mobile: one column everywhere. minmax(320px, 1fr) would still overflow a
+ * 375px viewport once padding is counted, so the track floor is released. */
+@media (max-width: 640px) {
+  .section {
+    padding: 52px 0;
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+
+  .grid,
+  .grid--featured {
+    grid-template-columns: 1fr;
+  }
+
+  .counts {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .hero__media {
+    min-height: 220px;
+  }
+
+  .btn,
+  .team-list a {
+    white-space: normal;
+  }
+
+  .site-footer__links {
+    margin-left: 0;
+  }
+}
+
+/* Motion ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

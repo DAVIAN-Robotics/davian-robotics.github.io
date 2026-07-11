@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" id="top">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DAVIAN Robotics — KAIST AI</title>
+    <meta
+      name="description"
+      content="DAVIAN Robotics is a robotics research group at KAIST AI working on vision-language-action models, robot manipulation, reinforcement learning, and humanoid locomotion."
+    />
+    <link rel="icon" href="assets/logo/davian-robotics-square.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DAVIAN Robotics — KAIST AI" />
+    <meta
+      property="og:description"
+      content="Vision-language-action models, robot manipulation, reinforcement learning, and humanoid locomotion at KAIST AI."
+    />
+    <meta property="og:image" content="assets/logo/davian-robotics-square.png" />
+    <meta property="og:url" content="https://davian-robotics.github.io" />
+
+    <!-- Type is the system sans stack with Inter first: no webfont is committed, and the
+         page must render identically offline and from file://, so no font CDN is loaded. -->
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#research">Skip to research</a>
+
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="site-header__logo" href="#top">
+          <img
+            src="assets/logo/davian-robotics-horizontal.png"
+            alt="DAVIAN Robotics"
+            height="32"
+          />
+        </a>
+
+        <a
+          class="site-header__parent"
+          href="https://davian.kaist.ac.kr/"
+          target="_blank"
+          rel="noopener"
+          >DAVIAN Lab</a
+        >
+
+        <nav class="site-nav" aria-label="Sections">
+          <a href="#research" data-i18n="nav.research">Research</a>
+          <a href="#releases" data-i18n="nav.releases">Releases</a>
+          <a href="#team" data-i18n="nav.team">Team</a>
+          <a href="#join" data-i18n="nav.join">Join</a>
+        </nav>
+
+        <div class="site-header__actions">
+          <a
+            class="icon-link"
+            href="https://github.com/DAVIAN-Robotics"
+            target="_blank"
+            rel="noopener"
+            aria-label="DAVIAN Robotics on GitHub"
+            title="GitHub"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <path
+                fill="currentColor"
+                d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38l-.01-1.34c-2.23.48-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.83-2.15-.09-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.52.56.83 1.28.83 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48l-.01 2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0Z"
+              />
+            </svg>
+          </a>
+          <a
+            class="icon-link"
+            href="https://huggingface.co/DAVIAN-Robotics"
+            target="_blank"
+            rel="noopener"
+            aria-label="DAVIAN Robotics on Hugging Face"
+            title="Hugging Face"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <circle
+                cx="8"
+                cy="8"
+                r="6.4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2"
+              />
+              <circle cx="5.8" cy="6.6" r="0.95" fill="currentColor" />
+              <circle cx="10.2" cy="6.6" r="0.95" fill="currentColor" />
+              <path
+                d="M5.2 9.6a3.1 3.1 0 0 0 5.6 0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+          <button id="lang-toggle" class="lang-toggle" type="button">
+            <span class="lang-toggle__on">EN</span>
+            <span class="lang-toggle__sep" aria-hidden="true">|</span>
+            <span class="lang-toggle__off">KR</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero__media">
+          <video
+            class="hero__video"
+            src="assets/media/hero.mp4"
+            poster="assets/media/hero.jpg"
+            preload="metadata"
+            muted
+            loop
+            playsinline
+            autoplay
+          ></video>
+
+          <!-- The motif is the logo's node-and-link graph, redrawn as vector.
+               It is the hero's floor: it shows through while the video is absent
+               (js/render.js flags a failed load with .hero__video.is-missing) and
+               sits behind the video once one is committed. -->
+          <svg
+            class="hero__motif"
+            viewBox="0 0 400 300"
+            preserveAspectRatio="xMidYMid slice"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <g class="hero__motif-links">
+              <path d="M64 62 L196 88" />
+              <path d="M64 62 L44 174" />
+              <path d="M44 174 L168 232" />
+              <path d="M196 88 L232 150" />
+              <path d="M232 150 L168 232" />
+              <path d="M196 88 L318 54" />
+              <path d="M318 54 L356 148" />
+              <path d="M232 150 L356 148" />
+              <path d="M356 148 L296 244" />
+              <path d="M168 232 L296 244" />
+            </g>
+            <g class="hero__motif-nodes">
+              <circle cx="64" cy="62" r="13" />
+              <circle cx="196" cy="88" r="17" />
+              <circle cx="44" cy="174" r="15" />
+              <circle cx="232" cy="150" r="9" />
+              <circle cx="168" cy="232" r="16" />
+              <circle cx="318" cy="54" r="9" />
+              <circle cx="356" cy="148" r="12" />
+              <circle cx="296" cy="244" r="10" />
+            </g>
+          </svg>
+        </div>
+
+        <div class="hero__body">
+          <p class="eyebrow">KAIST AI · DAVIAN Lab</p>
+          <h1 class="hero__title">DAVIAN Robotics</h1>
+          <p class="hero__tagline" data-i18n="hero.tagline">
+            A vision-language-action and robot manipulation research group at KAIST AI.
+          </p>
+          <p class="hero__blurb" data-i18n="hero.blurb">
+            DAVIAN Robotics studies robot manipulation across vision-language-action models,
+            reinforcement learning, and humanoid locomotion.
+          </p>
+          <div class="hero__actions">
+            <a
+              class="btn btn--solid"
+              href="https://github.com/DAVIAN-Robotics"
+              target="_blank"
+              rel="noopener"
+              >GitHub</a
+            >
+            <a
+              class="btn btn--outline"
+              href="https://huggingface.co/DAVIAN-Robotics"
+              target="_blank"
+              rel="noopener"
+              >Hugging Face</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section id="highlights" class="section">
+        <div class="container">
+          <header class="section__head">
+            <h2 class="section__title" data-i18n="section.highlights">Highlights</h2>
+          </header>
+          <!-- Filled by js/render.js from window.PROJECTS (featured only). -->
+          <div id="highlights-grid" class="grid grid--featured"></div>
+        </div>
+      </section>
+
+      <section id="research" class="section">
+        <div class="container">
+          <header class="section__head">
+            <h2 class="section__title" data-i18n="section.research">Research</h2>
+          </header>
+          <!-- Chips and cards are both rendered by js/render.js. -->
+          <div id="filter-chips" class="chips"></div>
+          <div id="research-grid" class="grid"></div>
+        </div>
+      </section>
+
+      <section id="releases" class="section band">
+        <div class="container">
+          <header class="section__head">
+            <h2 class="section__title" data-i18n="section.releases">Releases</h2>
+            <p class="section__lede" data-i18n="releases.lede">
+              Code, model weights, and datasets from our papers are public.
+            </p>
+          </header>
+
+          <!-- These three counts are refreshed by hand. Last checked 2026-07-11 against
+               github.com/DAVIAN-Robotics and huggingface.co/DAVIAN-Robotics. -->
+          <ul class="counts">
+            <li class="count">
+              <a
+                class="count__link"
+                href="https://github.com/DAVIAN-Robotics"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="count__value">5</span>
+                <span class="count__label" data-i18n="releases.code">Code releases</span>
+                <span class="count__where">GitHub</span>
+              </a>
+            </li>
+            <li class="count">
+              <a
+                class="count__link"
+                href="https://huggingface.co/DAVIAN-Robotics"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="count__value">6</span>
+                <span class="count__label" data-i18n="releases.models">Models</span>
+                <span class="count__where">Hugging Face</span>
+              </a>
+            </li>
+            <li class="count">
+              <a
+                class="count__link"
+                href="https://huggingface.co/DAVIAN-Robotics"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="count__value">59</span>
+                <span class="count__label" data-i18n="releases.datasets">Datasets</span>
+                <span class="count__where">Hugging Face</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="team" class="section">
+        <div class="container">
+          <header class="section__head">
+            <h2 class="section__title" data-i18n="section.team">Team</h2>
+            <p class="section__lede" data-i18n="team.lede">
+              DAVIAN Robotics is the robotics group of DAVIAN Lab, led by Prof. Jaegul Choo.
+            </p>
+          </header>
+          <!-- Filled by js/render.js from window.PEOPLE. -->
+          <ul id="team-list" class="team-list"></ul>
+          <a
+            class="link-arrow"
+            href="https://davian.kaist.ac.kr/people"
+            target="_blank"
+            rel="noopener"
+            data-i18n="team.more"
+            >See the full DAVIAN Lab team →</a
+          >
+        </div>
+      </section>
+
+      <section id="join" class="section band">
+        <div class="container join">
+          <header class="section__head">
+            <h2 class="section__title" data-i18n="section.join">Join us</h2>
+          </header>
+          <p class="join__body" data-i18n="join.body">
+            We are looking for graduate students and collaborators interested in
+            vision-language-action models and robot manipulation. Admission runs through
+            DAVIAN Lab at KAIST AI.
+          </p>
+          <div class="join__actions">
+            <a
+              class="btn btn--solid"
+              href="https://davian.kaist.ac.kr/join"
+              target="_blank"
+              rel="noopener"
+              data-i18n="join.cta"
+              >DAVIAN Lab — Join us</a
+            >
+            <!-- TODO: confirm the group's public contact address before launch. -->
+            <a class="btn btn--outline" href="mailto:davian.robotics@kaist.ac.kr"
+              >davian.robotics@kaist.ac.kr</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <a
+          class="site-footer__kaist"
+          href="https://gsai.kaist.ac.kr/"
+          target="_blank"
+          rel="noopener"
+        >
+          <img src="assets/logo/kaist-ai.svg" alt="KAIST AI" height="28" />
+        </a>
+
+        <nav class="site-footer__links" aria-label="Elsewhere">
+          <a href="https://davian.kaist.ac.kr/" target="_blank" rel="noopener">DAVIAN Lab</a>
+          <a href="https://github.com/DAVIAN-Robotics" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://huggingface.co/DAVIAN-Robotics" target="_blank" rel="noopener"
+            >Hugging Face</a
+          >
+        </nav>
+
+        <p class="site-footer__note">
+          DAVIAN Robotics, DAVIAN Lab, Kim Jaechul Graduate School of AI, KAIST.
+        </p>
+      </div>
+    </footer>
+
+    <script src="data/people.js"></script>
+    <script src="data/projects.js"></script>
+    <script src="data/strings.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/i18n.js"></script>
+  </body>
+</html>
