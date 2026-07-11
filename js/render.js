@@ -152,4 +152,21 @@
     mediaHTML: mediaHTML,
     cardHTML: cardHTML,
   };
+
+  // Browser boot: reveal the hero video once it has real frames. 'loadeddata'
+  // does not bubble, so the listener is registered on the capture phase at
+  // the document root instead of on the (not-yet-rendered) element directly.
+  // Guarded so this file stays loadable under Node for the test suite above.
+  if (typeof document !== 'undefined') {
+    document.addEventListener(
+      'loadeddata',
+      function (event) {
+        var target = event.target;
+        if (target && target.classList && target.classList.contains('hero__video')) {
+          target.classList.add('is-loaded');
+        }
+      },
+      true
+    );
+  }
 })(typeof window !== 'undefined' ? window : globalThis);

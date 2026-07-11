@@ -15,6 +15,13 @@
   --fg: #16181d;
   --fg-muted: #6b7280;
   --border: #e5e7eb;
+  /* --border is ~1.24:1 against white (WCAG relative-luminance formula) — too
+     faint to be the only affordance boundary on an interactive control.
+     --border-control is a neutral grey (equal R/G/B, so no hue at all) at
+     3.36:1, used only on .btn--outline and the inactive .chip; card and
+     container borders stay on --border. */
+  --border-control: #8c8c8c;
+  --mask-solid: #000;
   --accent: #4a3372;
   --accent-hover: #5d4390;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
@@ -55,7 +62,6 @@ body {
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
 }
 
 img,
@@ -99,7 +105,6 @@ button {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 .skip-link {
@@ -294,8 +299,10 @@ button {
   border-color: var(--accent);
 }
 
-/* The active language is the solid one; the other sits back. js/i18n.js flips
- * [data-lang] on <html>, so the control reads correctly in either state. */
+/* The active language is the solid one; the other sits back. js/i18n.js
+ * (Task 5) sets document.documentElement.lang, i.e. the lang attribute on
+ * <html>, so the :root[lang='ko'] selector below reads correctly in either
+ * state. */
 .lang-toggle__on {
   color: var(--accent);
 }
@@ -329,10 +336,11 @@ button {
   border-right: 1px solid var(--border);
 }
 
-/* The motif is the floor of the media panel. With no hero.mp4 committed the
- * <video> paints nothing and the graph reads as the intended artwork; once a
- * video exists it covers the graph. js/render.js adds .is-missing on a failed
- * load, which removes the element outright. */
+/* The motif is the floor of the media panel. The <video> is hidden by
+ * default (see .hero__video below) so the graph reads as the intended
+ * artwork whether hero.mp4 is missing or JS is off; js/render.js listens
+ * for the video's loadeddata event and adds .is-loaded once real frames
+ * exist, which reveals the video over the graph. */
 .hero__motif {
   position: absolute;
   inset: 0;
@@ -361,10 +369,11 @@ button {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: none;
 }
 
-.hero__video.is-missing {
-  display: none;
+.hero__video.is-loaded {
+  display: block;
 }
 
 .hero__body {
@@ -386,8 +395,8 @@ button {
   inset: 0;
   background-image: radial-gradient(var(--accent-faint) 1.5px, transparent 1.6px);
   background-size: 34px 34px;
-  -webkit-mask-image: radial-gradient(120% 90% at 85% 15%, #000 0%, transparent 70%);
-  mask-image: radial-gradient(120% 90% at 85% 15%, #000 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(120% 90% at 85% 15%, var(--mask-solid) 0%, transparent 70%);
+  mask-image: radial-gradient(120% 90% at 85% 15%, var(--mask-solid) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -453,6 +462,7 @@ button {
 
 .btn--outline {
   color: var(--fg);
+  border-color: var(--border-control);
 }
 
 .btn--outline:hover {
@@ -500,7 +510,7 @@ button {
 
 .chip {
   padding: 6px 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   border-radius: 999px;
   font-size: 0.8125rem;
   font-weight: 550;
@@ -527,7 +537,6 @@ button {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: var(--gap);
-  counter-reset: plate;
 }
 
 .grid--featured {
@@ -541,7 +550,6 @@ button {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  counter-increment: plate;
   transition: border-color 0.2s var(--ease), opacity 0.5s var(--ease),
     transform 0.5s var(--ease);
 }
@@ -582,10 +590,10 @@ button {
  * today, and it has to look like a decision rather than a hole. Two moves make
  * it one: it is shorter than a 16/9 video well, so it reads as a header band
  * and not as a frame waiting for content; and it carries the same node-and-link
- * field as the hero — a dot lattice crossed by two shallow diagonals — plus the
- * card's index set like a figure number. The title is deliberately NOT drawn
- * here: render.js passes it in for the accessible name, but printing it would
- * repeat the <h3> sitting 20px below it. */
+ * field as the hero — a dot lattice crossed by two shallow diagonals. The
+ * title is deliberately NOT drawn here: render.js passes it in for the
+ * accessible name, but printing it would repeat the <h3> sitting 20px below
+ * it. */
 .card__fallback {
   aspect-ratio: 3 / 1;
   background-color: var(--accent-tint);
@@ -611,18 +619,6 @@ button {
 
 .card__fallback span {
   display: none;
-}
-
-.card__fallback::after {
-  content: counter(plate, decimal-leading-zero);
-  position: absolute;
-  top: 14px;
-  right: 18px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.08em;
-  color: color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 .card__body {

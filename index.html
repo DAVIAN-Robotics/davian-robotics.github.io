@@ -25,7 +25,7 @@
   </head>
 
   <body>
-    <a class="skip-link" href="#research">Skip to research</a>
+    <a class="skip-link" href="#main">Skip to main content</a>
 
     <header class="site-header">
       <div class="container site-header__inner">
@@ -96,7 +96,15 @@
               />
             </svg>
           </a>
-          <button id="lang-toggle" class="lang-toggle" type="button">
+          <!-- js/i18n.js (Task 5) must keep aria-pressed in sync: "true" once
+               it has switched document.documentElement.lang to Korean. -->
+          <button
+            id="lang-toggle"
+            class="lang-toggle"
+            type="button"
+            aria-label="Switch language between English and Korean"
+            aria-pressed="false"
+          >
             <span class="lang-toggle__on">EN</span>
             <span class="lang-toggle__sep" aria-hidden="true">|</span>
             <span class="lang-toggle__off">KR</span>
@@ -105,7 +113,7 @@
       </div>
     </header>
 
-    <main>
+    <main id="main" tabindex="-1">
       <section class="hero">
         <div class="hero__media">
           <video
@@ -117,12 +125,14 @@
             loop
             playsinline
             autoplay
+            aria-hidden="true"
           ></video>
 
           <!-- The motif is the logo's node-and-link graph, redrawn as vector.
-               It is the hero's floor: it shows through while the video is absent
-               (js/render.js flags a failed load with .hero__video.is-missing) and
-               sits behind the video once one is committed. -->
+               It is the hero's floor: the <video> is hidden until it has real
+               frames, at which point js/render.js's loadeddata listener adds
+               .is-loaded to .hero__video and the video covers the graph. This
+               is correct with no video committed and with JS disabled too. -->
           <svg
             class="hero__motif"
             viewBox="0 0 400 300"
@@ -214,8 +224,12 @@
             </p>
           </header>
 
-          <!-- These three counts are refreshed by hand. Last checked 2026-07-11 against
-               github.com/DAVIAN-Robotics and huggingface.co/DAVIAN-Robotics. -->
+          <!-- These three counts are refreshed by hand, not fetched at build time.
+               Code releases (5): first-party repositories under
+               https://github.com/DAVIAN-Robotics — EgoX, PHUMA, SimbaV2, ACG,
+               3D_HAMSTER; forks are excluded from this count. Models (6) and
+               Datasets (59): the tab counters on the org page at
+               https://huggingface.co/DAVIAN-Robotics. Last checked 2026-07-11. -->
           <ul class="counts">
             <li class="count">
               <a
@@ -296,10 +310,6 @@
               rel="noopener"
               data-i18n="join.cta"
               >DAVIAN Lab — Join us</a
-            >
-            <!-- TODO: confirm the group's public contact address before launch. -->
-            <a class="btn btn--outline" href="mailto:davian.robotics@kaist.ac.kr"
-              >davian.robotics@kaist.ac.kr</a
             >
           </div>
         </div>
