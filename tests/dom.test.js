@@ -385,6 +385,131 @@ test('exactly one video plays when two cards clear the intersection threshold at
   assert.ok(videoB.pauseCalls >= 1, 'the previous winner is paused');
 });
 
+test('a delta batch that omits the playing video must not pause it — a real observer only reports what changed', () => {
+  const sandbox = load();
+  const Observer = makeObserverFactory();
+  sandbox.IntersectionObserver = Observer;
+  sandbox.matchMedia = makeMatchMedia({ '(hover: none)': true });
+  const doc = makeDocument(IDS);
+  const videoA = makeVideo();
+  const cardA = makeCard(videoA);
+  const videoB = makeVideo();
+  const cardB = makeCard(videoB);
+  doc.elements['research-grid'] = makeGrid(
+    [{ card: cardA, video: videoA }, { card: cardB, video: videoB }],
+    'research-grid'
+  );
+
+  sandbox.DR.applyFilter(doc, 'all');
+  const mediaObserver = Observer.instances.filter(isMediaObserver).pop();
+
+  // A is parked dead-centre and clears the threshold. Nothing about A
+  // changes afterward, so a real IntersectionObserver would never mention
+  // it again.
+  mediaObserver.callback([{ target: videoA, isIntersecting: true, intersectionRatio: 0.9 }]);
+  assert.strictEqual(videoA.playCalls, 1);
+
+  // A later batch about a DIFFERENT, non-qualifying video — no entry for A
+  // at all. This must be a no-op for A: still playing, not paused again.
+  mediaObserver.callback([{ target: videoB, isIntersecting: true, intersectionRatio: 0.3 }]);
+  assert.strictEqual(videoA.pauseCalls, 0, 'A must not be paused by a batch that never mentions it');
+  assert.strictEqual(videoA.paused, false, 'A must still be the one playing');
+  assert.strictEqual(videoB.playCalls, 0, 'B never qualified, so it must never play');
+});
+
+test('a video whose ratio later drops below threshold IS paused (the fix must not stop pausing altogether)', () => {
+  const sandbox = load();
+  const Observer = makeObserverFactory();
+  sandbox.IntersectionObserver = Observer;
+  sandbox.matchMedia = makeMatchMedia({ '(hover: none)': true });
+  const doc = makeDocument(IDS);
+  const video = makeVideo();
+  const card = makeCard(video);
+  doc.elements['research-grid'] = makeGrid([{ card, video }], 'research-grid');
+
+  sandbox.DR.applyFilter(doc, 'all');
+  const mediaObserver = Observer.instances.filter(isMediaObserver).pop();
+
+  mediaObserver.callback([{ target: video, isIntersecting: true, intersectionRatio: 0.9 }]);
+  assert.strictEqual(video.playCalls, 1);
+
+  // The SAME video reports a drop below threshold — must be paused.
+  mediaObserver.callback([{ target: video, isIntersecting: true, intersectionRatio: 0.4 }]);
+  assert.strictEqual(video.pauseCalls, 1, 'a genuine ratio drop for the playing video must pause it');
+  assert.strictEqual(video.paused, true);
+});
+
+test('the two grids share one page-wide winner — a highlights-only batch must not pause a research video that is on screen', () => {
+  const sandbox = load();
+  const Observer = makeObserverFactory();
+  sandbox.IntersectionObserver = Observer;
+  sandbox.matchMedia = makeMatchMedia({ '(hover: none)': true });
+  const doc = makeDocument(IDS);
+  const highlightsVideo = makeVideo();
+  const highlightsCard = makeCard(highlightsVideo);
+  doc.elements['highlights-grid'] = makeGrid(
+    [{ card: highlightsCard, video: highlightsVideo }],
+    'highlights-grid'
+  );
+  const researchVideo = makeVideo();
+  const researchCard = makeCard(researchVideo);
+  doc.elements['research-grid'] = makeGrid(
+    [{ card: researchCard, video: researchVideo }],
+    'research-grid'
+  );
+
+  sandbox.DR.mount(doc);
+  const highlightsObserver = Observer.instances.find((o) => isMediaObserver(o) && o.observed.includes(highlightsVideo));
+  const researchObserver = Observer.instances.find((o) => isMediaObserver(o) && o.observed.includes(researchVideo));
+  assert.ok(highlightsObserver && researchObserver && highlightsObserver !== researchObserver);
+
+  // The research video is fully on screen and playing.
+  researchObserver.callback([{ target: researchVideo, isIntersecting: true, intersectionRatio: 1 }]);
+  assert.strictEqual(researchVideo.playCalls, 1);
+
+  // The user has scrolled away from highlights-grid; its observer fires
+  // with a single non-qualifying entry. This must not touch the research
+  // video at all — the two grids share one page-wide winner, not one each.
+  highlightsObserver.callback([{ target: highlightsVideo, isIntersecting: true, intersectionRatio: 0.1 }]);
+  assert.strictEqual(researchVideo.pauseCalls, 0, 'the research video must not be paused by a highlights-grid batch');
+  assert.strictEqual(researchVideo.paused, false);
+  assert.strictEqual(highlightsVideo.playCalls, 0, 'the non-qualifying highlights video must never play');
+});
+
+test('re-rendering a grid purges its stale videos from the page-wide ratio state', () => {
+  const sandbox = load();
+  const Observer = makeObserverFactory();
+  sandbox.IntersectionObserver = Observer;
+  sandbox.matchMedia = makeMatchMedia({ '(hover: none)': true });
+  const doc = makeDocument(IDS);
+  const videoA = makeVideo();
+  const cardA = makeCard(videoA);
+  doc.elements['research-grid'] = makeGrid([{ card: cardA, video: videoA }], 'research-grid');
+
+  sandbox.DR.applyFilter(doc, 'all');
+  const firstObserver = Observer.instances.filter(isMediaObserver).pop();
+  // Old video A is at a HIGH ratio (0.9) when the grid gets re-rendered out
+  // from under it — the worst case for a stale entry, since it would
+  // outrank a genuinely-on-screen replacement at a lower-but-qualifying
+  // ratio.
+  firstObserver.callback([{ target: videoA, isIntersecting: true, intersectionRatio: 0.9 }]);
+  assert.strictEqual(videoA.playCalls, 1);
+
+  // Re-render research-grid with a brand new video in the same slot.
+  const videoC = makeVideo();
+  const cardC = makeCard(videoC);
+  doc.elements['research-grid'] = makeGrid([{ card: cardC, video: videoC }], 'research-grid');
+  sandbox.DR.applyFilter(doc, 'all');
+  const secondObserver = Observer.instances.filter(isMediaObserver).pop();
+
+  // videoC qualifies (0.7 > 0.6) but is lower than videoA's stale 0.9. If
+  // videoA were not purged from videoRatios on re-render, it would still
+  // "win" (higher ratio) and videoC would never play — even though videoA
+  // is a detached node no observer will ever report on again.
+  secondObserver.callback([{ target: videoC, isIntersecting: true, intersectionRatio: 0.7 }]);
+  assert.strictEqual(videoC.playCalls, 1, 'the new video must play — the old grid\'s stale entry must not block it');
+});
+
 test('hover-capable device attaches hover listeners, not the media IntersectionObserver', () => {
   const sandbox = load();
   const Observer = makeObserverFactory();

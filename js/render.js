@@ -175,11 +175,49 @@
   // Module-scope observer state. Keyed by grid id so re-rendering one grid
   // (e.g. research-grid on a chip click) disconnects only that grid's
   // previous observer and never touches another grid's already-bound
-  // videos/cards. currentlyPlayingVideo is intentionally NOT keyed by grid —
-  // "one video at a time" is a page-wide guarantee, not a per-grid one.
+  // videos/cards.
   var revealObservers = {};
   var mediaObservers = {};
+  // videoRatios and currentlyPlayingVideo are intentionally page-wide, not
+  // keyed by grid: "one video at a time" is a page-wide guarantee, and
+  // IntersectionObserver only delivers entries for targets whose ratio
+  // CHANGED, so the winner must be picked from the last known ratio of
+  // EVERY tracked video, not just the videos mentioned in one callback
+  // batch — a batch about an unrelated video must never look like "nothing
+  // qualifies" for the video the user is actually looking at.
+  var videoRatios = new Map(); // video element -> last known intersection ratio
   var currentlyPlayingVideo = null;
+  // gridId -> videos that grid's last attachMedia call is tracking in
+  // videoRatios, so the next re-render can purge exactly those entries
+  // (and clear currentlyPlayingVideo if it was one of them) instead of
+  // leaking references to nodes applyFilter already replaced via innerHTML.
+  var mediaVideosByGrid = {};
+
+  function handleMediaIntersect(entries) {
+    entries.forEach(function (entry) {
+      videoRatios.set(entry.target, entry.isIntersecting ? entry.intersectionRatio : 0);
+    });
+    // Pick the global max ratio that clears the threshold, reading the
+    // whole page-wide map — not just this batch — so a video that hasn't
+    // changed (and therefore isn't in this batch at all) still counts.
+    var winnerVideo = null;
+    var winnerRatio = 0.6;
+    videoRatios.forEach(function (ratio, video) {
+      if (ratio > winnerRatio) {
+        winnerRatio = ratio;
+        winnerVideo = video;
+      }
+    });
+    if (currentlyPlayingVideo && currentlyPlayingVideo !== winnerVideo) {
+      if (currentlyPlayingVideo.pause) currentlyPlayingVideo.pause();
+      currentlyPlayingVideo = null;
+    }
+    if (winnerVideo && winnerVideo !== currentlyPlayingVideo) {
+      var playing = winnerVideo.play();
+      if (playing && playing.catch) playing.catch(function () {});
+      currentlyPlayingVideo = winnerVideo;
+    }
+  }
 
   function applyFilter(doc, tag) {
     var projects = sortProjects(validProjects(global.PROJECTS));
@@ -260,6 +298,15 @@
       mediaObservers[gridId].disconnect();
       delete mediaObservers[gridId];
     }
+    // applyFilter already replaced this grid's innerHTML before calling us,
+    // so any videos this grid tracked last time are now detached nodes —
+    // drop them from the page-wide ratio map (and the playing slot) before
+    // they can outlive their DOM nodes.
+    (mediaVideosByGrid[gridId] || []).forEach(function (video) {
+      videoRatios.delete(video);
+      if (currentlyPlayingVideo === video) currentlyPlayingVideo = null;
+    });
+    delete mediaVideosByGrid[gridId];
     var reduce =
       typeof global.matchMedia === 'function' &&
       global.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -287,36 +334,16 @@
       return;
     }
     if (typeof global.IntersectionObserver !== 'function') return;
-    var observer = new global.IntersectionObserver(
-      function (entries) {
-        // Pick the single highest-ratio qualifying entry from THIS callback
-        // batch. Anything not the winner gets paused (if it was the one
-        // playing); the winner plays only if it isn't already playing.
-        var winner = null;
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
-            if (!winner || entry.intersectionRatio > winner.intersectionRatio) {
-              winner = entry;
-            }
-          }
-        });
-        var winnerVideo = winner ? winner.target : null;
-        if (currentlyPlayingVideo && currentlyPlayingVideo !== winnerVideo) {
-          if (currentlyPlayingVideo.pause) currentlyPlayingVideo.pause();
-          currentlyPlayingVideo = null;
-        }
-        if (winnerVideo && winnerVideo !== currentlyPlayingVideo) {
-          var playing = winnerVideo.play();
-          if (playing && playing.catch) playing.catch(function () {});
-          currentlyPlayingVideo = winnerVideo;
-        }
-      },
-      { threshold: [0, 0.6] }
-    );
+    // Both grids' media observers share this one callback (and the
+    // page-wide videoRatios / currentlyPlayingVideo state it reads and
+    // writes) — see handleMediaIntersect above for why the winner can't be
+    // computed from one observer's own batch alone.
+    var observer = new global.IntersectionObserver(handleMediaIntersect, { threshold: [0, 0.6] });
     Array.prototype.forEach.call(videos, function (video) {
       observer.observe(video);
     });
     mediaObservers[gridId] = observer;
+    mediaVideosByGrid[gridId] = Array.prototype.slice.call(videos);
   }
 
   function mount(doc) {
