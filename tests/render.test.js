@@ -179,15 +179,27 @@ test('news sorts newest date first, across years and within one, keeping the aut
   ]);
 });
 
-test('a news item renders its date as a machine-readable <time>, a linked title, both languages of its text, and a kind badge', () => {
+test('a news item renders its date as a machine-readable <time>, its title, both languages of its text, and a kind badge', () => {
   const { DR } = loadRenderer();
   const html = DR.newsHTML([NEWS_ITEM]);
   assert.match(html, /data-news-id="simbav2-icml-2025"/);
   assert.match(html, /<time class="news__date" datetime="2025-05">2025-05<\/time>/);
-  assert.match(html, /<a href="https:\/\/arxiv\.org\/abs\/2502\.15280"[^>]*>SimbaV2<\/a>/);
+  assert.match(html, /<h3 class="news__title">SimbaV2<\/h3>/);
   assert.match(html, /data-news-en="Accepted to ICML 2025 as a spotlight\."/);
   assert.match(html, /data-news-ko="ICML 2025에 spotlight으로 채택되었습니다\."/);
   assert.match(html, /data-i18n="news.kind.acceptance">Accepted</);
+});
+
+// The row is the link. An <a> may not contain another <a>, so a title that
+// re-grew its own anchor would be invalid markup and a second focus stop.
+test('the whole row is one link and nothing inside it is a second link', () => {
+  const { DR } = loadRenderer();
+  const html = DR.newsHTML([NEWS_ITEM]);
+  assert.match(
+    html,
+    /<a class="news__link" href="https:\/\/arxiv\.org\/abs\/2502\.15280"[^>]*rel="noopener">/
+  );
+  assert.strictEqual((html.match(/<a /g) || []).length, 1, 'exactly one anchor per row');
 });
 
 test('a news item with no Korean text still renders, with an empty ko attribute', () => {

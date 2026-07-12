@@ -89,22 +89,22 @@
         // <time datetime> carries the same 'YYYY-MM' string it prints: a valid
         // month value, and the machine-readable form of exactly the precision we
         // are willing to claim.
+        // One <a> wraps the whole row, so the entire line is the target and one
+        // focus stop covers it. Nothing inside may be interactive — an <a> may
+        // not contain another — which is why the title is a bare heading here.
         return (
           '<li class="news__item" data-news-id="' + escapeHTML(item.id) + '">' +
+          '<a class="news__link" href="' + escapeHTML(item.link) + '" target="_blank" rel="noopener">' +
           '<time class="news__date" datetime="' + escapeHTML(item.date) + '">' +
           escapeHTML(item.date) +
           '</time>' +
-          '<div class="news__body">' +
-          '<h3 class="news__title">' +
-          '<a href="' + escapeHTML(item.link) + '" target="_blank" rel="noopener">' +
-          escapeHTML(item.title) +
-          '</a></h3>' +
+          '<h3 class="news__title">' + escapeHTML(item.title) + '</h3>' +
           '<p class="news__text" data-news-en="' + escapeHTML(item.text.en) + '" ' +
           'data-news-ko="' + escapeHTML((item.text && item.text.ko) || '') + '">' +
           escapeHTML(item.text.en) +
           '</p>' +
-          '</div>' +
           badge +
+          '</a>' +
           '</li>'
         );
       })

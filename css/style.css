@@ -596,20 +596,53 @@ button {
 
 /* News -------------------------------------------------------------------- */
 
-/* An index, not a feed: year in the margin, the project as the entry, the
- * event as the line under it. Hairline rules do the separating — the band is
- * already tinted, so a card here would be a box inside a box. */
+/* An index, not a feed: one line per item — date, project, what happened —
+ * with the dates in a fixed column so the list scans down its left edge.
+ * Hairline rules do the separating; the band is already tinted, so a card here
+ * would be a box inside a box.
+ *
+ * The whole row is one <a>, so hover and focus belong to the row, not to the
+ * title inside it. The 5.5rem date track is set in rem, not px: it must hold
+ * 'YYYY-MM' at whatever size the user's root font is. */
+/* The reset clears list-style on ul only, and the news list is an <ol> — the
+ * items are ordered, newest first, and that order is the content. */
+.news {
+  padding: 0;
+  list-style: none;
+}
+
+/* The row is inset 12px so the hover fill has room to breathe around the text,
+ * and pulled back out by the same 12px so the date column still lines up with
+ * the section heading. The rules overhang the text by that 12px on both sides,
+ * which is the point — they read as an index's rules, not as a box. */
 .news__item {
-  display: grid;
-  grid-template-columns: 84px minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 4px 20px;
-  padding: 20px 0;
+  margin: 0 -12px;
   border-top: 1px solid var(--border);
 }
 
 .news__item:last-child {
   border-bottom: 1px solid var(--border);
+}
+
+.news__link {
+  display: grid;
+  grid-template-columns: 5.5rem max-content minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 20px;
+  padding: 13px 12px;
+  color: var(--fg);
+  transition: background-color 0.15s var(--ease);
+}
+
+/* The row sits on the tinted band, so the 4% tint used on white cards is
+ * invisible here — the hover fill has to be the stronger one to register. */
+.news__link:hover {
+  background: var(--accent-tint-strong);
+  color: var(--fg);
+}
+
+.news__link:focus-visible {
+  outline-offset: -2px;
 }
 
 .news__date {
@@ -621,26 +654,23 @@ button {
 }
 
 .news__title {
-  font-size: 1.0625rem;
+  font-size: 1rem;
   font-weight: 650;
   letter-spacing: -0.015em;
-  line-height: 1.35;
-}
-
-.news__title a {
-  color: var(--fg);
-  border-bottom: 1px solid var(--accent-line);
+  line-height: 1.45;
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
   transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
 }
 
-.news__title a:hover {
+.news__link:hover .news__title {
   color: var(--accent);
   border-bottom-color: var(--accent);
 }
 
 .news__text {
-  margin-top: 4px;
   font-size: 0.9375rem;
+  line-height: 1.45;
   color: var(--fg-muted);
 }
 
@@ -1004,27 +1034,33 @@ button {
     min-height: 300px;
   }
 
-  /* The year and the kind badge stop being margins and become a label row
-   * above the entry — 84px of gutter is a quarter of a 375px viewport. */
-  .news__item {
-    grid-template-columns: auto 1fr;
-    gap: 8px 12px;
+  /* One line does not fit a 375px viewport, so the row folds — deliberately,
+   * not raggedly: date, title and badge stay on the first line, and the text
+   * drops to a second line indented to the title's left edge, so the date
+   * column still runs straight down the list. */
+  .news__link {
+    grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+    gap: 4px 12px;
   }
 
-  .news__date {
+  .news__title {
     grid-row: 1;
-    grid-column: 1;
+    grid-column: 2;
+    /* Shrink to the text: the title's column is 1fr here, and its hover
+       underline is a border on the element, so a stretched title would
+       underline the empty space out to the badge. */
+    justify-self: start;
+    white-space: normal;
   }
 
   .news__kind {
     grid-row: 1;
-    grid-column: 2;
-    justify-self: start;
+    grid-column: 3;
   }
 
-  .news__body {
+  .news__text {
     grid-row: 2;
-    grid-column: 1 / -1;
+    grid-column: 2 / -1;
   }
 
   .btn {
