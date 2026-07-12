@@ -169,12 +169,6 @@ button {
   background: var(--accent);
 }
 
-.section__lede {
-  max-width: 60ch;
-  margin-top: 10px;
-  color: var(--fg-muted);
-}
-
 /* Header ------------------------------------------------------------------ */
 
 .site-header {
@@ -864,54 +858,6 @@ button {
   padding-top: 6px;
 }
 
-/* Releases ---------------------------------------------------------------- */
-
-.counts {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--gap);
-}
-
-.count {
-  border-top: 2px solid var(--accent);
-}
-
-.count__link {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 20px 0 4px;
-  color: var(--fg);
-}
-
-.count__value {
-  font-size: clamp(2.25rem, 1.8rem + 1.8vw, 3rem);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  color: var(--accent);
-}
-
-.count__label {
-  margin-top: 8px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-}
-
-.count__where {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--fg-muted);
-  transition: color 0.18s var(--ease);
-}
-
-.count__link:hover .count__where {
-  color: var(--accent);
-}
-
 /* Footer ------------------------------------------------------------------ */
 
 .site-footer {
@@ -1023,11 +969,6 @@ button {
 
   .grid {
     grid-template-columns: 1fr;
-  }
-
-  .counts {
-    grid-template-columns: 1fr;
-    gap: 20px;
   }
 
   .hero__media {

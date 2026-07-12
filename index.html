@@ -48,7 +48,6 @@
         <nav class="site-nav" aria-label="Sections">
           <a href="#news" data-i18n="nav.news">News</a>
           <a href="#research" data-i18n="nav.research">Research</a>
-          <a href="#releases" data-i18n="nav.releases">Releases</a>
         </nav>
 
         <div class="site-header__actions">
@@ -258,7 +257,7 @@
           <header class="section__head">
             <h2 class="section__title" data-i18n="section.news">News</h2>
           </header>
-          <!-- Filled by js/render.js from window.NEWS (newest year first). -->
+          <!-- Filled by js/render.js from window.NEWS (newest date first). -->
           <ol id="news-list" class="news"></ol>
         </div>
       </section>
@@ -273,63 +272,6 @@
           <div id="research-grid" class="grid"></div>
         </div>
       </section>
-
-      <section id="releases" class="section band">
-        <div class="container">
-          <header class="section__head">
-            <h2 class="section__title" data-i18n="section.releases">Releases</h2>
-            <p class="section__lede" data-i18n="releases.lede">
-              Code, model weights, and datasets from our papers are public.
-            </p>
-          </header>
-
-          <!-- These three counts are refreshed by hand, not fetched at build time.
-               Code releases (5): first-party repositories under
-               https://github.com/DAVIAN-Robotics — EgoX, PHUMA, SimbaV2, ACG,
-               3D_HAMSTER; forks are excluded from this count. Models (6) and
-               Datasets (59): the tab counters on the org page at
-               https://huggingface.co/DAVIAN-Robotics. Last checked 2026-07-11. -->
-          <ul class="counts">
-            <li class="count">
-              <a
-                class="count__link"
-                href="https://github.com/DAVIAN-Robotics"
-                target="_blank"
-                rel="noopener"
-              >
-                <span class="count__value">5</span>
-                <span class="count__label" data-i18n="releases.code">Code releases</span>
-                <span class="count__where">GitHub</span>
-              </a>
-            </li>
-            <li class="count">
-              <a
-                class="count__link"
-                href="https://huggingface.co/DAVIAN-Robotics"
-                target="_blank"
-                rel="noopener"
-              >
-                <span class="count__value">6</span>
-                <span class="count__label" data-i18n="releases.models">Models</span>
-                <span class="count__where">Hugging Face</span>
-              </a>
-            </li>
-            <li class="count">
-              <a
-                class="count__link"
-                href="https://huggingface.co/DAVIAN-Robotics"
-                target="_blank"
-                rel="noopener"
-              >
-                <span class="count__value">59</span>
-                <span class="count__label" data-i18n="releases.datasets">Datasets</span>
-                <span class="count__where">Hugging Face</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
     </main>
 
     <footer class="site-footer">
