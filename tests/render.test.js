@@ -137,7 +137,7 @@ test('user-supplied text is escaped, so a stray angle bracket cannot inject mark
 
 const NEWS_ITEM = {
   id: 'simbav2-icml-2025',
-  year: 2025,
+  date: '2025-05',
   kind: 'acceptance',
   title: 'SimbaV2',
   text: { en: 'Accepted to ICML 2025 as a spotlight.', ko: 'ICML 2025에 spotlight으로 채택되었습니다.' },
@@ -149,7 +149,7 @@ test('a complete news item validates, and an incomplete one reports every missin
   assert.deepStrictEqual(DR.validateNews(NEWS_ITEM), { ok: true, missing: [] });
   const result = DR.validateNews({ id: 'x', title: 'X' });
   assert.strictEqual(result.ok, false);
-  assert.deepStrictEqual(result.missing.sort(), ['link', 'text.en', 'year']);
+  assert.deepStrictEqual(result.missing.sort(), ['date', 'link', 'text.en']);
 });
 
 test('an invalid news item is skipped and warned about, and the valid ones survive', () => {
@@ -161,21 +161,29 @@ test('an invalid news item is skipped and warned about, and the valid ones survi
   assert.match(warnings[0], /link/);
 });
 
-test('news sorts newest year first and keeps the authored order within a year', () => {
+test('news sorts newest date first, across years and within one, keeping the authored order in a tie', () => {
   const { DR } = loadRenderer();
   const sorted = DR.sortNews([
-    { ...NEWS_ITEM, id: 'old', year: 2025 },
-    { ...NEWS_ITEM, id: 'first-of-2026', year: 2026 },
-    { ...NEWS_ITEM, id: 'second-of-2026', year: 2026 },
+    { ...NEWS_ITEM, id: 'oldest', date: '2025-05' },
+    { ...NEWS_ITEM, id: 'jan-2026', date: '2026-01' },
+    { ...NEWS_ITEM, id: 'jun-2026', date: '2026-06' },
+    { ...NEWS_ITEM, id: 'also-jun-2026', date: '2026-06' },
+    { ...NEWS_ITEM, id: 'oct-2025', date: '2025-10' },
   ]);
-  assert.deepStrictEqual(sorted.map((n) => n.id), ['first-of-2026', 'second-of-2026', 'old']);
+  assert.deepStrictEqual(sorted.map((n) => n.id), [
+    'jun-2026',
+    'also-jun-2026',
+    'jan-2026',
+    'oct-2025',
+    'oldest',
+  ]);
 });
 
-test('a news item renders its year, a linked title, both languages of its text, and a kind badge', () => {
+test('a news item renders its date as a machine-readable <time>, a linked title, both languages of its text, and a kind badge', () => {
   const { DR } = loadRenderer();
   const html = DR.newsHTML([NEWS_ITEM]);
   assert.match(html, /data-news-id="simbav2-icml-2025"/);
-  assert.match(html, /news__year">2025</);
+  assert.match(html, /<time class="news__date" datetime="2025-05">2025-05<\/time>/);
   assert.match(html, /<a href="https:\/\/arxiv\.org\/abs\/2502\.15280"[^>]*>SimbaV2<\/a>/);
   assert.match(html, /data-news-en="Accepted to ICML 2025 as a spotlight\."/);
   assert.match(html, /data-news-ko="ICML 2025에 spotlight으로 채택되었습니다\."/);

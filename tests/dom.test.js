@@ -195,9 +195,9 @@ function load() {
     { id: 'broken', title: 'Broken' },
   ];
   fakeWindow.NEWS = [
-    { id: 'old', year: 2025, kind: 'release', title: 'Old',
+    { id: 'old', date: '2025-10', kind: 'release', title: 'Old',
       text: { en: 'Released.' }, link: 'https://example.org/old' },
-    { id: 'new', year: 2026, kind: 'acceptance', title: 'New',
+    { id: 'new', date: '2026-06', kind: 'acceptance', title: 'New',
       text: { en: 'Accepted.' }, link: 'https://example.org/new' },
   ];
   return fakeWindow;
@@ -205,7 +205,7 @@ function load() {
 
 const IDS = ['research-grid', 'filter-chips', 'news-list'];
 
-test('mount renders the news list, newest year first', () => {
+test('mount renders the news list, newest date first', () => {
   const sandbox = load();
   const doc = makeDocument(IDS);
   sandbox.DR.mount(doc);

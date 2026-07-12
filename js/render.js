@@ -7,7 +7,7 @@
   var REQUIRED = ['id', 'title', 'authors', 'year', 'summary.en'];
   var LINK_LABELS = { paper: 'Paper', code: 'Code', model: 'Model', data: 'Data', project: 'Project' };
   var LINK_ORDER = ['paper', 'code', 'model', 'data', 'project'];
-  var NEWS_REQUIRED = ['id', 'title', 'year', 'link', 'text.en'];
+  var NEWS_REQUIRED = ['id', 'title', 'date', 'link', 'text.en'];
   var NEWS_KINDS = { acceptance: 'Accepted', release: 'Released' };
 
   function escapeHTML(value) {
@@ -68,12 +68,14 @@
     return keepValid(items, NEWS_REQUIRED, 'news item');
   }
 
-  /* Year descending. Array.prototype.sort is stable (ES2019), so items that
-   * share a year keep the order they were written in data/news.js — which is
-   * the only ordering we have, since no acceptance date is sourced. */
+  /* Newest first. Dates are 'YYYY-MM' (month precision — see the header of
+   * data/news.js for why the day is deliberately not published), and that
+   * format sorts correctly as a plain string. Array.prototype.sort is stable
+   * (ES2019), so items sharing a month keep their order in the file. */
   function sortNews(items) {
     return items.slice().sort(function (a, b) {
-      return b.year - a.year;
+      if (a.date === b.date) return 0;
+      return a.date < b.date ? 1 : -1;
     });
   }
 
@@ -84,9 +86,14 @@
         var badge = kind
           ? '<span class="news__kind" data-i18n="news.kind.' + kind + '">' + NEWS_KINDS[kind] + '</span>'
           : '';
+        // <time datetime> carries the same 'YYYY-MM' string it prints: a valid
+        // month value, and the machine-readable form of exactly the precision we
+        // are willing to claim.
         return (
           '<li class="news__item" data-news-id="' + escapeHTML(item.id) + '">' +
-          '<span class="news__year">' + escapeHTML(item.year) + '</span>' +
+          '<time class="news__date" datetime="' + escapeHTML(item.date) + '">' +
+          escapeHTML(item.date) +
+          '</time>' +
           '<div class="news__body">' +
           '<h3 class="news__title">' +
           '<a href="' + escapeHTML(item.link) + '" target="_blank" rel="noopener">' +

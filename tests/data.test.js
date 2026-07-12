@@ -74,7 +74,7 @@ test('every news item has the required fields, a known kind, and an absolute lin
   const { NEWS } = loadData();
   assert.ok(NEWS.length > 0, 'NEWS is empty');
   for (const item of NEWS) {
-    for (const field of ['id', 'title', 'year', 'kind', 'link']) {
+    for (const field of ['id', 'title', 'date', 'kind', 'link']) {
       assert.ok(item[field] !== undefined && item[field] !== null, `${item.id}: missing ${field}`);
     }
     assert.ok(['acceptance', 'release'].includes(item.kind), `${item.id}: kind must be acceptance or release`);
@@ -89,12 +89,14 @@ test('news ids are unique', () => {
   assert.strictEqual(new Set(ids).size, ids.length, 'duplicate news id');
 });
 
-// No dates are printed anywhere on the news list — none are sourced. A news
-// item that grows a date field would put an unsourced claim on the page.
-test('no news item carries a date', () => {
+// An acceptance item's date is the VENUE'S author-notification date, not this
+// paper's — see the header of data/news.js. Month precision is the whole point:
+// a 'YYYY-MM-DD' here would publish the venue's notification day as if we knew it
+// was the day this paper was accepted, which we do not.
+test('every news date is month precision — YYYY-MM, never a day', () => {
   const { NEWS } = loadData();
   for (const item of NEWS) {
-    assert.strictEqual(item.date, undefined, `${item.id}: news items must not carry a date`);
+    assert.match(item.date, /^\d{4}-(0[1-9]|1[0-2])$/, `${item.id}: date must be 'YYYY-MM'`);
   }
 });
 
