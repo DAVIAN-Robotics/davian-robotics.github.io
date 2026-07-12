@@ -157,8 +157,8 @@ window.PROJECTS = [
     links: {
       paper: 'https://arxiv.org/abs/2502.15280',
       code: 'https://github.com/DAVIAN-Robotics/SimbaV2',
-      data: 'https://dojeon-ai.github.io/SimbaV2/dataset/',
-      project: 'https://dojeon-ai.github.io/SimbaV2/',
+      // The README still points at dojeon-ai.github.io/SimbaV2/ for a project page and a dataset,
+      // but that site now 404s, so those buttons are omitted rather than shipped dead.
     },
     featured: true,
   },
