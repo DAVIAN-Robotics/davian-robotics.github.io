@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" id="top">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DAVIAN Robotics — KAIST AI</title>
+    <meta
+      name="description"
+      content="DAVIAN Robotics is a robotics research group at KAIST AI working on vision-language-action models, robot manipulation, reinforcement learning, and humanoid locomotion."
+    />
+    <link rel="icon" href="assets/logo/davian-robotics-square.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DAVIAN Robotics — KAIST AI" />
+    <meta
+      property="og:description"
+      content="Vision-language-action models, robot manipulation, reinforcement learning, and humanoid locomotion at KAIST AI."
+    />
+    <meta property="og:image" content="assets/logo/davian-robotics-square.png" />
+    <meta property="og:url" content="https://davian-robotics.github.io" />
+
+    <!-- Type is the system sans stack with Inter first: no webfont is committed, and the
+         page must render identically offline and from file://, so no font CDN is loaded. -->
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main" data-i18n="a11y.skipLink">Skip to main content</a>
+
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <!-- The <a> is the crop window; the <img> inside is oversized and pulled
+             up/left so only the inked lockup shows. The file carries ~10% of its
+             own width and ~12% of its height as empty margin (alpha bbox is
+             25,22 → 2023,807 of 2247x921), which is what made the wordmark look
+             small and soft at a header size — the height was being spent on
+             nothing. Sizing is driven entirely by --logo-h in css/style.css; the
+             file itself is untouched. -->
+        <a class="site-header__logo" href="#top">
+          <img
+            src="assets/logo/davian-robotics-horizontal.png"
+            alt="DAVIAN Robotics"
+            width="2247"
+            height="921"
+          />
+        </a>
+
+        <a
+          class="site-header__parent"
+          href="https://davian.kaist.ac.kr/"
+          >DAVIAN Lab</a
+        >
+
+        <nav class="site-nav" aria-label="Sections">
+          <a href="#news" data-i18n="nav.news">News</a>
+          <a href="#research" data-i18n="nav.research">Research</a>
+        </nav>
+
+        <div class="site-header__actions">
+          <a
+            class="icon-link"
+            href="https://github.com/DAVIAN-Robotics"
+            aria-label="DAVIAN Robotics on GitHub"
+            title="GitHub"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <path
+                fill="currentColor"
+                d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38l-.01-1.34c-2.23.48-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.83-2.15-.09-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.52.56.83 1.28.83 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48l-.01 2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0Z"
+              />
+            </svg>
+          </a>
+          <a
+            class="icon-link"
+            href="https://huggingface.co/DAVIAN-Robotics"
+            aria-label="DAVIAN Robotics on Hugging Face"
+            title="Hugging Face"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <circle
+                cx="8"
+                cy="8"
+                r="6.4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2"
+              />
+              <circle cx="5.8" cy="6.6" r="0.95" fill="currentColor" />
+              <circle cx="10.2" cy="6.6" r="0.95" fill="currentColor" />
+              <path
+                d="M5.2 9.6a3.1 3.1 0 0 0 5.6 0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </a>
+          <!-- js/i18n.js (Task 5): no aria-pressed to keep in sync here — the
+               control's state is already exposed via document.documentElement.lang,
+               which Task 5 sets on the <html> element, so a screen reader already
+               knows the page language without an invented ARIA state. The
+               aria-label itself is translated via data-i18n-aria (same
+               restore/swap mechanism as data-i18n, applied to an attribute
+               instead of textContent) and names which language is currently
+               active; it keeps the literal visible text "EN | KR" in both
+               languages so the accessible name still contains the visible
+               label (WCAG 2.5.3). -->
+          <button
+            id="lang-toggle"
+            class="lang-toggle"
+            type="button"
+            data-i18n-aria="toggle.lang"
+            aria-label="EN | KR language toggle, currently English"
+          >
+            <span class="lang-toggle__on">EN</span>
+            <span class="lang-toggle__sep" aria-hidden="true">|</span>
+            <span class="lang-toggle__off">KR</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section class="hero">
+        <div class="hero__media">
+          <video
+            class="hero__video"
+            src="assets/media/hero.mp4"
+            poster="assets/media/hero.jpg"
+            preload="metadata"
+            muted
+            loop
+            playsinline
+            autoplay
+            aria-hidden="true"
+          ></video>
+
+          <!-- The plate is what the media panel shows until hero.mp4 has real
+               frames — js/render.js's loadeddata listener adds .is-loaded to
+               the <video>, and CSS then hides the plate (a sibling selector,
+               which is why the plate must stay AFTER the video here). It has
+               to hold the panel on its own, so it is drawn as a figure rather
+               than an ornament: a reach envelope, a planned end-effector
+               trajectory with its waypoints, and the object it closes on,
+               captioned like a plate in a paper. Correct with no video
+               committed and with JS off. -->
+          <figure class="hero__plate">
+            <svg
+              class="hero__plate-fig"
+              viewBox="0 0 400 300"
+              preserveAspectRatio="xMidYMid meet"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <!-- Registration marks: the plate's corners. -->
+              <g class="hero__plate-marks">
+                <path d="M24 40 L24 24 L40 24" />
+                <path d="M360 24 L376 24 L376 40" />
+                <path d="M376 260 L376 276 L360 276" />
+                <path d="M40 276 L24 276 L24 260" />
+              </g>
+
+              <!-- Workspace: the floor the arm works over, ticked like an axis. -->
+              <g class="hero__plate-rules">
+                <path d="M40 250 L360 250" />
+                <path
+                  d="M72 250 L72 256 M112 250 L112 256 M152 250 L152 256 M192 250 L192 256
+                     M232 250 L232 256 M272 250 L272 256 M312 250 L312 256 M352 250 L352 256"
+                />
+              </g>
+
+              <!-- Base, and the mast the trajectory leaves from. -->
+              <g class="hero__plate-base">
+                <path d="M58 250 L58 236 L94 236 L94 250" />
+                <path d="M76 236 L76 214" />
+              </g>
+
+              <!-- The object, and the gripper straddling it at the end of the plan:
+                   a stem down from the trajectory's last point, a palm, and two
+                   fingers open just wider than the object they close on. -->
+              <g class="hero__plate-target">
+                <path d="M314 250 L314 222 L342 222 L342 250" />
+                <path
+                  class="hero__plate-gripper"
+                  d="M328 186 L328 198 M308 198 L348 198 M308 198 L308 212 M348 198 L348 212"
+                />
+              </g>
+
+              <!-- The planned trajectory: it leaves the mast and terminates at the
+                   gripper, which is what closes on the object. -->
+              <path
+                class="hero__plate-path"
+                d="M76 214 C 100 126, 172 80, 232 100 C 290 120, 314 156, 328 186"
+              />
+              <!-- Dropped from the trajectory's apex to the floor: the one
+                   measurement the plate makes, and the reason the floor is ticked.
+                   Its x is the apex of the curve above, not an eyeballed centre. -->
+              <path class="hero__plate-drop" d="M203.3 95.4 L203.3 250" />
+              <!-- Every waypoint is a point evaluated ON the two cubics above
+                   (t = 0.35 / 0.70 of each), so they sit on the line rather than
+                   near it. Moving the path means recomputing these. -->
+              <g class="hero__plate-waypoints">
+                <circle cx="76" cy="214" r="3.5" />
+                <circle cx="116.3" cy="138.1" r="3.5" />
+                <circle cx="176.4" cy="99.2" r="3.5" />
+                <circle cx="281.4" cy="125.9" r="3.5" />
+                <circle cx="312.1" cy="158" r="3.5" />
+              </g>
+              <circle class="hero__plate-goal" cx="328" cy="186" r="6" />
+            </svg>
+
+            <figcaption class="hero__plate-caption">
+              <span data-i18n="hero.figure">Fig. 1 — planned end-effector trajectory</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="hero__body">
+          <!-- The space before the span is load-bearing: .hero__title-line is a
+               block, so it collapses visually, but without it the accessible
+               name of the heading is "DAVIANRobotics". -->
+          <h1 class="hero__title">
+            DAVIAN <span class="hero__title-line">Robotics</span>
+          </h1>
+          <p class="hero__lead" data-i18n="hero.lead">
+            We study robot manipulation across vision-language-action models, reinforcement
+            learning, and humanoid locomotion.
+          </p>
+          <!-- Split across spans because js/i18n.js translates by assigning
+               textContent, which would wipe out a child <a>. Each span is
+               translated on its own and the link between them is left alone. -->
+          <p class="hero__affiliation">
+            <span data-i18n="hero.affiliation.pre">The robotics group of</span>
+            <a href="https://davian.kaist.ac.kr/">DAVIAN Lab</a>
+            <span data-i18n="hero.affiliation.post">(Prof. Jaegul Choo) at KAIST AI.</span>
+          </p>
+          <div class="hero__actions">
+            <a
+              class="btn btn--solid"
+              href="https://github.com/DAVIAN-Robotics"
+              >GitHub</a
+            >
+            <a
+              class="btn btn--outline"
+              href="https://huggingface.co/DAVIAN-Robotics"
+              >Hugging Face</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section id="news" class="section band">
+        <div class="container">
+          <header class="section__head">
+            <h2 class="section__title" data-i18n="section.news">News</h2>
+          </header>
+          <!-- Filled by js/render.js from window.NEWS (newest date first). -->
+          <ol id="news-list" class="news"></ol>
+        </div>
+      </section>
+
+      <section id="research" class="section">
+        <div class="container">
+          <header class="section__head">
+            <h2 class="section__title" data-i18n="section.research">Research</h2>
+          </header>
+          <!-- The tag filter is SHELVED, not removed: six projects are not worth
+               filtering, and each card now carries its own tags as labels. The
+               logic is still in js/render.js and still tested. To bring it back,
+               uncomment the row below, the two blocks in mount() in js/render.js,
+               and the .chips / .chip rules in css/style.css. -->
+          <!-- <div id="filter-chips" class="chips"></div> -->
+
+          <!-- Cards are rendered by js/render.js. -->
+          <div id="research-grid" class="grid"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <a
+          class="site-footer__kaist"
+          href="https://gsai.kaist.ac.kr/"
+        >
+          <img src="assets/logo/kaist-ai.svg" alt="KAIST AI" height="28" />
+        </a>
+
+        <nav class="site-footer__links" aria-label="Elsewhere">
+          <a href="https://davian.kaist.ac.kr/">DAVIAN Lab</a>
+          <a href="https://github.com/DAVIAN-Robotics">GitHub</a>
+          <a href="https://huggingface.co/DAVIAN-Robotics"
+            >Hugging Face</a
+          >
+        </nav>
+
+        <p class="site-footer__note">
+          DAVIAN Robotics, DAVIAN Lab, Kim Jaechul Graduate School of AI, KAIST.
+        </p>
+      </div>
+    </footer>
+
+    <script src="data/people.js"></script>
+    <script src="data/projects.js"></script>
+    <script src="data/news.js"></script>
+    <script src="data/strings.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/i18n.js"></script>
+  </body>
+</html>

@@ -1,0 +1,1333 @@
+/* DAVIAN Robotics — design system.
+ *
+ * Every value below reads from the custom properties in :root. No hard-coded
+ * hex appears past this block. The single accent is the logo's deep purple;
+ * blue exists nowhere on the page except inside the footer's KAIST AI mark.
+ *
+ * The look is a lab plate: white paper, hairline rules, tracked micro-labels,
+ * tabular figures. The one recurring drawing is technical, not decorative — the
+ * hero's figure of a planned end-effector trajectory, and the ruled lattice on
+ * a card that has no video yet.
+ */
+
+:root {
+  --bg: #ffffff;
+  --bg-band: #f7f8f9;
+  --fg: #16181d;
+  --fg-muted: #6b7280;
+  --border: #e5e7eb;
+  /* --border is ~1.24:1 against white (WCAG relative-luminance formula) — too
+     faint to be the only affordance boundary on an interactive control.
+     --border-control is a neutral grey (equal R/G/B, so no hue at all) at
+     3.36:1, used on every border-only interactive control (.btn incl.
+     .btn--outline/.btn--link, .chip, .lang-toggle); card and container
+     borders stay on --border. */
+  --border-control: #8c8c8c;
+  --mask-solid: #000;
+  --accent: #4a3372;
+  --accent-hover: #5d4390;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --container: 1200px;
+  --radius: 10px;
+
+  /* Derived tokens — all built from the five values above. */
+  --accent-tint: color-mix(in srgb, var(--accent) 4%, var(--bg));
+  --accent-tint-strong: color-mix(in srgb, var(--accent) 8%, var(--bg));
+  --accent-line: color-mix(in srgb, var(--accent) 22%, transparent);
+  --accent-faint: color-mix(in srgb, var(--accent) 12%, transparent);
+  /* Tag chips are the one place on the page that spends more than the single
+     accent, and the four hues are the logo's own: deep purple, pink, salmon,
+     sand. The pale two (salmon, sand) are unreadable as text at their logo
+     values, so each tone is stored as a DARKENED ink and worn as a 9% tint of
+     itself — measured against its own tint, the four inks land at 9.0, 5.8, 5.2
+     and 5.8:1, all past AA. They are tints, not fills, on purpose: the demo
+     video is still the loudest thing on a card and a row of solid chips would
+     out-shout it. No blue, here or anywhere. js/render.js's tagTone() hashes a
+     tag onto one of these four, so a tag keeps its colour everywhere. */
+  --tag-1-ink: #4a3372;
+  --tag-2-ink: #9c3572;
+  --tag-3-ink: #a8442a;
+  --tag-4-ink: #7a5712;
+  --tag-1-bg: color-mix(in srgb, var(--tag-1-ink) 9%, var(--bg));
+  --tag-2-bg: color-mix(in srgb, var(--tag-2-ink) 9%, var(--bg));
+  --tag-3-bg: color-mix(in srgb, var(--tag-3-ink) 9%, var(--bg));
+  --tag-4-bg: color-mix(in srgb, var(--tag-4-ink) 9%, var(--bg));
+  --accent-hair: color-mix(in srgb, var(--accent) 9%, transparent);
+  /* Tall enough for the 46px logo lockup plus breathing room. Everything that
+     has to clear the sticky header — the scroll-padding above, .site-header__inner
+     — reads this, so the logo size and the header height stay in step. */
+  --header-h: 76px;
+  /* The card's body track (see .card). It has to clear the TALLEST clamped body —
+     title 2 lines + venue + authors 2 lines + summary 5 lines + the tag row + the
+     button row — because anything past it is clipped. One value covers every
+     breakpoint and both languages: measured against the real six projects at
+     1440 / 1024 / 768 / 640 / 375, in English and Korean, nothing clips. Raise it
+     if a card ever starts eating its own buttons. */
+  --card-body-h: 396px;
+  --gap: 24px;
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+/* Reset ------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 16px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+figure {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.skip-link:focus {
+  left: 12px;
+  top: 12px;
+}
+
+/* Layout ------------------------------------------------------------------ */
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding: 88px 0;
+}
+
+.band {
+  background: var(--bg-band);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+/* The section marker: a short accent rule above every heading. It is the one
+ * place the accent is allowed to act as pure ornament. */
+.section__head {
+  margin-bottom: 40px;
+}
+
+.section__title {
+  position: relative;
+  padding-top: 18px;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 1.875rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.section__title::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 2px;
+  background: var(--accent);
+}
+
+/* Header ------------------------------------------------------------------ */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: var(--header-h);
+}
+
+/* The logo is cropped to its own ink, in CSS, without touching the file.
+ *
+ * davian-robotics-horizontal.png is 2247x921 but its alpha bounding box is
+ * 25,22 → 2023,807 — an inked lockup of 1998x785 sitting in ~10% horizontal and
+ * ~12% vertical padding. Constraining the FILE to a header height therefore
+ * spends that height on empty pixels and leaves the "ROBOTICS" line too small to
+ * read. So the <a> is a crop window sized to the INK (--logo-h is the height of
+ * the lockup, not of the file), and the <img> is scaled up by the file/ink ratio
+ * and pulled up and left by the padding. Every number below is one of those four
+ * bbox values — recrop only if the asset is replaced.
+ *
+ * The source is 2247px wide, so at 46px tall it is still ~10x oversampled: the
+ * mark stays crisp. */
+.site-header__logo {
+  --logo-h: 46px;
+  display: block;
+  width: calc(var(--logo-h) * 1998 / 785);
+  height: var(--logo-h);
+  overflow: hidden;
+}
+
+.site-header__logo img {
+  height: calc(var(--logo-h) * 921 / 785);
+  width: auto;
+  /* The reset caps images at max-width: 100%; this one must overflow its box —
+     that is the crop. */
+  max-width: none;
+  margin: calc(var(--logo-h) * -22 / 785) 0 0 calc(var(--logo-h) * -25 / 785);
+}
+
+.site-header__parent {
+  padding-left: 20px;
+  border-left: 1px solid var(--border);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+
+.site-header__parent:hover {
+  color: var(--accent);
+}
+
+.site-nav {
+  display: flex;
+  gap: 22px;
+  margin-left: auto;
+}
+
+.site-nav a {
+  position: relative;
+  padding: 4px 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.site-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s var(--ease);
+}
+
+.site-nav a:hover {
+  color: var(--accent);
+}
+
+.site-nav a:hover::after {
+  transform: scaleX(1);
+}
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 18px;
+  border-left: 1px solid var(--border);
+}
+
+.icon-link {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--fg-muted);
+  transition: color 0.18s var(--ease), background-color 0.18s var(--ease);
+}
+
+.icon-link svg {
+  width: 18px;
+  height: 18px;
+}
+
+.icon-link:hover {
+  color: var(--accent);
+  background: var(--accent-tint-strong);
+}
+
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border-control);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  transition: border-color 0.18s var(--ease);
+}
+
+.lang-toggle:hover {
+  border-color: var(--accent);
+}
+
+/* The active language is the solid one; the other sits back. js/i18n.js
+ * (Task 5) sets document.documentElement.lang, i.e. the lang attribute on
+ * <html>, so the :root[lang='ko'] selector below reads correctly in either
+ * state. */
+.lang-toggle__on {
+  color: var(--accent);
+}
+
+.lang-toggle__sep {
+  color: var(--border);
+}
+
+:root[lang='ko'] .lang-toggle__on {
+  color: var(--fg-muted);
+}
+
+:root[lang='ko'] .lang-toggle__off {
+  color: var(--accent);
+}
+
+/* Hero -------------------------------------------------------------------- */
+
+/* Two panels, not two halves: the copy side is given the wider track so the
+ * sentence that says what the lab does gets the first fixation, and the media
+ * side reads as a plate mounted next to it. */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero__media {
+  position: relative;
+  min-height: 480px;
+  overflow: hidden;
+  background: var(--bg-band);
+  border-right: 1px solid var(--border);
+}
+
+.hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.hero__video.is-loaded {
+  display: block;
+}
+
+/* The plate holds the media panel until the demo loop exists. It is a figure:
+ * graph paper, a reach envelope, a planned trajectory, a caption. The sibling
+ * selector below is why index.html keeps the <video> before it — once
+ * js/render.js marks the video .is-loaded, the plate steps aside completely. */
+.hero__plate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  background-image: linear-gradient(var(--accent-hair) 1px, transparent 1px),
+    linear-gradient(90deg, var(--accent-hair) 1px, transparent 1px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(130% 100% at 50% 45%, var(--mask-solid) 45%, transparent 100%);
+  mask-image: radial-gradient(130% 100% at 50% 45%, var(--mask-solid) 45%, transparent 100%);
+}
+
+.hero__video.is-loaded ~ .hero__plate {
+  display: none;
+}
+
+.hero__plate-fig {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  padding: 24px;
+}
+
+/* One ink, four weights of presence: the drawn plan is the darkest thing on
+ * the plate, everything that merely frames it sits back. */
+.hero__plate-fig path,
+.hero__plate-fig circle {
+  fill: none;
+  stroke: var(--accent);
+  vector-effect: non-scaling-stroke;
+}
+
+.hero__plate-marks path {
+  stroke-width: 1;
+  opacity: 0.35;
+}
+
+.hero__plate-rules path {
+  stroke-width: 1;
+  opacity: 0.3;
+}
+
+.hero__plate-drop {
+  stroke-width: 1;
+  stroke-dasharray: 3 6;
+  opacity: 0.45;
+  animation: plate-fade 0.6s var(--ease) 1.1s both;
+}
+
+.hero__plate-base path,
+.hero__plate-target path {
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  opacity: 0.5;
+}
+
+.hero__plate-gripper {
+  stroke-width: 2;
+  opacity: 0.75;
+}
+
+.hero__plate-path {
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  /* Base state is the finished drawing, so prefers-reduced-motion (which kills
+   * the animation outright) leaves a complete trajectory, not an empty panel. */
+  stroke-dasharray: 620;
+  stroke-dashoffset: 0;
+  animation: plate-draw 1.7s var(--ease) both;
+}
+
+.hero__plate-waypoints circle {
+  fill: var(--bg-band);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: plate-pop 0.45s var(--ease) both;
+}
+
+.hero__plate-waypoints circle:nth-child(1) {
+  animation-delay: 0.15s;
+}
+.hero__plate-waypoints circle:nth-child(2) {
+  animation-delay: 0.45s;
+}
+.hero__plate-waypoints circle:nth-child(3) {
+  animation-delay: 0.75s;
+}
+.hero__plate-waypoints circle:nth-child(4) {
+  animation-delay: 1.05s;
+}
+.hero__plate-waypoints circle:nth-child(5) {
+  animation-delay: 1.35s;
+}
+
+.hero__plate-goal {
+  fill: var(--bg-band);
+  stroke-width: 2.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: plate-pop 0.5s var(--ease) 1.6s both;
+}
+
+.hero__plate-caption {
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+@keyframes plate-draw {
+  from {
+    stroke-dashoffset: 620;
+  }
+}
+
+@keyframes plate-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+@keyframes plate-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.hero__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  padding: 88px 64px;
+}
+
+/* The name reads as a lockup: the discipline sits under the lab, in the ink
+ * the whole page uses for emphasis. */
+.hero__title {
+  font-size: clamp(2.5rem, 1.7rem + 2.8vw, 3.75rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.hero__title-line {
+  display: block;
+  color: var(--accent);
+}
+
+.hero__lead {
+  max-width: 32ch;
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.hero__affiliation {
+  max-width: 46ch;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  font-size: 0.9375rem;
+  color: var(--fg-muted);
+}
+
+.hero__affiliation a {
+  font-weight: 600;
+  border-bottom: 1px solid var(--accent-line);
+  transition: border-color 0.18s var(--ease);
+}
+
+.hero__affiliation a:hover {
+  border-bottom-color: var(--accent);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Buttons ----------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border: 1px solid var(--border-control);
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 550;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease),
+    color 0.18s var(--ease);
+}
+
+.btn--solid {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.btn--solid:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--bg);
+}
+
+.btn--outline {
+  color: var(--fg);
+  border-color: var(--border-control);
+}
+
+.btn--outline:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* The per-card link row: quieter than the hero buttons, same family. */
+.btn--link {
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 0.8125rem;
+  font-weight: 550;
+  color: var(--fg-muted);
+}
+
+.btn--link:hover {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+
+/* News -------------------------------------------------------------------- */
+
+/* An index, not a feed: one line per item — date, project, what happened —
+ * with the dates in a fixed column so the list scans down its left edge.
+ * Hairline rules do the separating; the band is already tinted, so a card here
+ * would be a box inside a box.
+ *
+ * The whole row is one <a>, so hover and focus belong to the row, not to the
+ * title inside it. The 5.5rem date track is set in rem, not px: it must hold
+ * 'YYYY-MM' at whatever size the user's root font is. */
+/* The reset clears list-style on ul only, and the news list is an <ol> — the
+ * items are ordered, newest first, and that order is the content. */
+.news {
+  padding: 0;
+  list-style: none;
+}
+
+/* The row is inset 12px so the hover fill has room to breathe around the text,
+ * and pulled back out by the same 12px so the date column still lines up with
+ * the section heading. The rules overhang the text by that 12px on both sides,
+ * which is the point — they read as an index's rules, not as a box. */
+.news__item {
+  margin: 0 -12px;
+  border-top: 1px solid var(--border);
+}
+
+.news__item:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.news__link {
+  display: grid;
+  grid-template-columns: 5.5rem max-content minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 20px;
+  padding: 13px 12px;
+  color: var(--fg);
+  transition: background-color 0.15s var(--ease);
+}
+
+/* The row sits on the tinted band, so the 4% tint used on white cards is
+ * invisible here — the hover fill has to be the stronger one to register. */
+.news__link:hover {
+  background: var(--accent-tint-strong);
+  color: var(--fg);
+}
+
+/* A news item whose project has nowhere to point renders as a <div>, not an <a>
+ * with a dead href. It must not pretend to be clickable either: no hover fill,
+ * no underline, no pointer. */
+.news__link--static {
+  cursor: default;
+}
+
+.news__link--static:hover {
+  background: none;
+}
+
+.news__link--static:hover .news__title {
+  color: var(--fg);
+  border-bottom-color: transparent;
+}
+
+.news__link:focus-visible {
+  outline-offset: -2px;
+}
+
+.news__date {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+}
+
+.news__title {
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.45;
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.news__link:hover .news__title {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.news__text {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--fg-muted);
+}
+
+.news__kind {
+  justify-self: end;
+  padding: 3px 8px;
+  border: 1px solid var(--accent-line);
+  border-radius: 5px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--accent);
+}
+
+/* Chips (the tag FILTER) --------------------------------------------------- */
+
+/* SHELVED, not deleted: six projects are not worth filtering. Uncomment this
+ * block together with #filter-chips in index.html and the two blocks in mount()
+ * in js/render.js — nothing else has to change. Not to be confused with .tag
+ * below, which is the per-card label and is very much live.
+ *
+ * .chips {
+ *   display: flex;
+ *   flex-wrap: wrap;
+ *   gap: 8px;
+ *   margin-bottom: 28px;
+ * }
+ *
+ * .chip {
+ *   padding: 6px 14px;
+ *   border: 1px solid var(--border-control);
+ *   border-radius: 999px;
+ *   font-size: 0.8125rem;
+ *   font-weight: 550;
+ *   color: var(--fg-muted);
+ *   transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease),
+ *     color 0.18s var(--ease);
+ * }
+ *
+ * .chip:hover {
+ *   border-color: var(--accent);
+ *   color: var(--accent);
+ * }
+ *
+ * .chip--active,
+ * .chip--active:hover {
+ *   background: var(--accent);
+ *   border-color: var(--accent);
+ *   color: var(--bg);
+ * }
+ */
+
+/* Grid and cards ---------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--gap);
+}
+
+/* THE CARD IS A GRID, AND THAT IS WHAT MAKES THE HOVER EXPANSION FREE OF JANK.
+ *
+ * Two rows: the media (auto, an aspect-ratio box) and the body — and the body's
+ * track is a FIXED LENGTH, --card-body-h. A grid item that overflows a fixed
+ * track does not resize that track. So a card's height is `media + --card-body-h`
+ * and nothing else: it does not depend on how long the title, the author list or
+ * the summary happen to be. Every card in a row is the same height, the row is
+ * the same height whatever is hovered, and when the clamps come off below, the
+ * text overflows the body downward over the cards beneath INSTEAD of growing the
+ * row. Neighbours cannot move, by construction — there is no length in the flow
+ * for them to react to.
+ *
+ * The cost is that --card-body-h has to be big enough for the tallest clamped
+ * body at each breakpoint (measured, see the media queries), and content past it
+ * would be clipped. The clamps are what keep that bounded. */
+.card {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto var(--card-body-h);
+  overflow: hidden;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s var(--ease), opacity 0.5s var(--ease),
+    transform 0.5s var(--ease);
+}
+
+.card:hover {
+  border-color: var(--accent);
+}
+
+/* The whole card opens its project page (or its arXiv abstract) — see cardHref
+ * in js/render.js. The card is NOT wrapped in an <a>: it already contains
+ * anchors (link buttons, author names), and nested anchors are invalid HTML that
+ * browsers silently restructure. Instead the title is the anchor and its ::after
+ * is stretched over the card, with the real inner links raised back above it.
+ * .card--linked is only on cards that actually have a destination, so a card
+ * with neither a project page nor a paper still reads as static. */
+.card--linked {
+  cursor: pointer;
+}
+
+.card__link {
+  color: inherit;
+}
+
+.card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--radius);
+}
+
+.card--linked:hover .card__title {
+  color: var(--accent);
+}
+
+/* The focus ring belongs to the CARD, not to the few words of the title: the
+ * stretched ::after is card-sized, so outlining it is what makes a keyboard user
+ * see which card they are on. The link's own ring is suppressed because it would
+ * draw a second, wrong-looking box around the title text. */
+.card__link:focus-visible {
+  outline: none;
+}
+
+/* The offset is INWARD: .card is overflow: hidden, so an outward ring on an
+ * inset-0 pseudo-element is clipped away by the card's own rounded corners. */
+.card__link:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Above the overlay, so they keep their own destinations and their own hover. */
+.card__authors,
+.card__links {
+  position: relative;
+  z-index: 1;
+}
+
+/* Also above it — but for a different reason: an element under the overlay
+ * cannot be selected with the mouse, and the summary is the one block of prose
+ * on the card someone might want to copy. The cost is that a click on the
+ * summary text itself does not navigate (the media, title, venue, and all the
+ * card's empty space still do), which is the cheaper half of this trade. */
+.card__summary {
+  position: relative;
+  z-index: 1;
+}
+
+/* THE REVEAL. On hover and on keyboard focus, every clamp on the card comes off
+ * and the body runs to its full length, spilling out of the card's box and over
+ * whatever is beneath it. The card's own height never changes (see the fixed body
+ * track above), so nothing in the grid moves.
+ *
+ * What each declaration is load-bearing for:
+ *  - z-index on the card raises the WHOLE card above its neighbours, so the
+ *    spilling body paints over the cards below rather than under them.
+ *  - overflow: visible lets the body escape the card. .card__media carries its
+ *    own top corner radius (below) precisely because the card can no longer clip
+ *    it while overflow is visible.
+ *  - the body's opaque background is what makes the spilled text readable — it is
+ *    covering another card, not empty page.
+ *  - height: auto lets the body outgrow its fixed track; min-height keeps a short
+ *    card's body filling it.
+ *  - the 1px accent border (no shadow — that rule still stands) continues the
+ *    card's own outline around the spilled part; the negative margins line it up
+ *    with the card's border rather than sitting 1px inside it.
+ *
+ * Hover is gated behind (hover: hover) so a touch device never gets a sticky
+ * expanded card; focus-within is not gated, because that is how a keyboard
+ * reaches it — tabbing to the title link (or to a link button, or to an author
+ * clipped by the author clamp) expands the card and brings the text into view. */
+.card__body {
+  overflow: hidden;
+}
+
+.card:focus-within {
+  z-index: 5;
+  overflow: visible;
+  border-color: var(--accent);
+}
+
+.card:focus-within .card__body {
+  /* align-self: start is what actually frees it: a grid item is stretched to its
+     track by default, and `height: auto` on a STRETCHED item still resolves to the
+     TRACK's height — so without this the body stays exactly --card-body-h, the
+     clamps come off into a box that cannot grow, and nothing is revealed. */
+  align-self: start;
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
+  margin: 0 -1px -1px;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-top: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.card:focus-within .card__title,
+.card:focus-within .card__authors,
+.card:focus-within .card__summary {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    z-index: 5;
+    overflow: visible;
+  }
+
+  .card:hover .card__body {
+    align-self: start;
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+    margin: 0 -1px -1px;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-top: 0;
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+
+  .card:hover .card__title,
+  .card:hover .card__authors,
+  .card:hover .card__summary {
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+  }
+}
+
+/* Scroll reveal. Cards are visible by default; js/render.js opts a grid in by
+ * setting .is-revealing on it and .is-visible per card as it enters view, so a
+ * page with JS off or an observer that never fires still shows every card. */
+.grid.is-revealing .card {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.grid.is-revealing .card.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* The top corners are rounded HERE, not by the card clipping them: the card
+ * turns overflow: visible while it is expanded, so it can no longer clip its own
+ * media. Radius less the 1px border, so it sits inside the card's outline. */
+.card__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--bg-band);
+  border-bottom: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+}
+
+.card__media img,
+.card__media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The plate. No project has a video yet, so this is what every card renders
+ * today, and it has to look like a decision rather than a hole. Two moves make
+ * it one: it is shorter than a 16/9 video well, so it reads as a header band
+ * and not as a frame waiting for content; and it carries the same node-and-link
+ * field as the hero — a dot lattice crossed by two shallow diagonals. The
+ * title is deliberately NOT drawn here: render.js passes it in for the
+ * accessible name, but printing it would repeat the <h3> sitting 20px below
+ * it. */
+.card__fallback {
+  aspect-ratio: 3 / 1;
+  background-color: var(--accent-tint);
+  background-image: radial-gradient(var(--accent-faint) 1.6px, transparent 1.7px),
+    repeating-linear-gradient(26deg, var(--accent-hair) 0 1px, transparent 1px 78px),
+    repeating-linear-gradient(-26deg, var(--accent-hair) 0 1px, transparent 1px 94px);
+  background-size: 26px 26px, auto, auto;
+  transition: background-color 0.2s var(--ease);
+}
+
+/* The lattice is offset per card so five plates in a column do not stamp. */
+.card:nth-child(3n + 2) .card__fallback {
+  background-position: 9px 13px, 0 0, 0 0;
+}
+
+.card:nth-child(3n) .card__fallback {
+  background-position: 17px 5px, 0 0, 0 0;
+}
+
+.card:hover .card__fallback {
+  background-color: var(--accent-tint-strong);
+}
+
+.card__fallback span {
+  display: none;
+}
+
+.card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+  padding: 22px;
+}
+
+/* The clamps are what make the grid a grid. Without them one 446-character
+ * summary (FlashSAC's) drags its whole row 190px taller than the next, and every
+ * card is a different shape. Read from the data: five of the six summaries run
+ * 5-6 lines, so 5 is the line at which clamping is the exception; titles run
+ * 2-5 lines, so 2. The full text of both is in a `title` attribute, so a clamped
+ * card can still be read in place on hover, and the card links to the paper's
+ * own page anyway. */
+.card__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  transition: color 0.18s var(--ease);
+}
+
+/* Venue badge: a micro-label, not a pill of color. */
+.card__venue {
+  padding: 3px 8px;
+  border: 1px solid var(--accent-line);
+  border-radius: 5px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Clamped for the same reason as the title and the summary: the body's track is
+ * a fixed length, so a ten-author list cannot be allowed to push the summary and
+ * the buttons out of it. Two lines is enough for most, and the clamp comes off on
+ * hover/focus with everything else — so an author link hidden by the clamp is
+ * still reachable: tabbing to it expands the card and brings it into view. */
+.card__authors {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--fg-muted);
+}
+
+.author {
+  color: var(--fg);
+  border-bottom: 1px solid var(--border);
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.author:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.card__summary {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  overflow: hidden;
+  font-size: 0.9375rem;
+  color: var(--fg-muted);
+}
+
+/* Tag chips: labels, not controls. No border, no pointer, no hover — the only
+ * thing on this card that looks tappable and is not would be a lie, so they are
+ * flat tinted text. They sit UNDER the card's stretched link (unlike the author
+ * links and the button row, which are raised above it), so clicking one opens
+ * the project page like clicking any other part of the card. */
+.card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.tag {
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.tag--1 {
+  background: var(--tag-1-bg);
+  color: var(--tag-1-ink);
+}
+
+.tag--2 {
+  background: var(--tag-2-bg);
+  color: var(--tag-2-ink);
+}
+
+.tag--3 {
+  background: var(--tag-3-bg);
+  color: var(--tag-3-ink);
+}
+
+.tag--4 {
+  background: var(--tag-4-bg);
+  color: var(--tag-4-ink);
+}
+
+.card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+/* Footer ------------------------------------------------------------------ */
+
+.site-footer {
+  padding: 44px 0;
+  border-top: 1px solid var(--border);
+}
+
+.site-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 28px;
+}
+
+.site-footer__kaist img {
+  height: 28px;
+  width: auto;
+}
+
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-left: auto;
+}
+
+.site-footer__links a {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+}
+
+.site-footer__links a:hover {
+  color: var(--accent);
+}
+
+.site-footer__note {
+  flex-basis: 100%;
+  font-size: 0.8125rem;
+  color: var(--fg-muted);
+}
+
+/* Breakpoints ------------------------------------------------------------- */
+
+/* Tablet: the hero stacks. The copy leads — a stacked plate above the headline
+ * would push the one sentence that says what the lab does below the fold. */
+@media (max-width: 1023px) {
+  .section {
+    padding: 64px 0;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__body {
+    order: -1;
+    padding: 56px 24px;
+  }
+
+  .hero__media {
+    min-height: 340px;
+    border-right: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .site-header__parent {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .site-header__inner {
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .site-nav {
+    order: 3;
+    flex-basis: 100%;
+    gap: 18px;
+    margin-left: 0;
+    overflow-x: auto;
+  }
+
+  .site-header__actions {
+    margin-left: auto;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  html {
+    scroll-padding-top: 110px;
+  }
+}
+
+/* Mobile: one column everywhere. minmax(320px, 1fr) would still overflow a
+ * 375px viewport once padding is counted, so the track floor is released. */
+@media (max-width: 640px) {
+  .section {
+    padding: 52px 0;
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__media {
+    min-height: 300px;
+  }
+
+  /* One line does not fit a 375px viewport, so the row folds — deliberately,
+   * not raggedly: date, title and badge stay on the first line, and the text
+   * drops to a second line indented to the title's left edge, so the date
+   * column still runs straight down the list. */
+  .news__link {
+    grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+    gap: 4px 12px;
+  }
+
+  .news__title {
+    grid-row: 1;
+    grid-column: 2;
+    /* Shrink to the text: the title's column is 1fr here, and its hover
+       underline is a border on the element, so a stretched title would
+       underline the empty space out to the badge. */
+    justify-self: start;
+    white-space: normal;
+  }
+
+  .news__kind {
+    grid-row: 1;
+    grid-column: 3;
+  }
+
+  .news__text {
+    grid-row: 2;
+    grid-column: 2 / -1;
+  }
+
+  .btn {
+    white-space: normal;
+  }
+
+  .site-footer__links {
+    margin-left: 0;
+  }
+}
+
+/* Motion ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
