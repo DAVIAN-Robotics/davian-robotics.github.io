@@ -12,7 +12,7 @@ function loadData() {
   const sandbox = {};
   sandbox.window = sandbox;
   vm.createContext(sandbox);
-  for (const file of ['data/people.js', 'data/projects.js', 'data/strings.js']) {
+  for (const file of ['data/people.js', 'data/projects.js', 'data/news.js', 'data/strings.js']) {
     const code = fs.readFileSync(path.join(ROOT, file), 'utf8');
     vm.runInContext(code, sandbox, { filename: file });
   }
@@ -70,10 +70,32 @@ test('every link is an absolute url', () => {
   }
 });
 
-test('exactly the featured projects are marked, and there are three or four', () => {
-  const { PROJECTS } = loadData();
-  const featured = PROJECTS.filter((p) => p.featured);
-  assert.ok(featured.length >= 3 && featured.length <= 4, `expected 3-4 featured projects, got ${featured.length}`);
+test('every news item has the required fields, a known kind, and an absolute link', () => {
+  const { NEWS } = loadData();
+  assert.ok(NEWS.length > 0, 'NEWS is empty');
+  for (const item of NEWS) {
+    for (const field of ['id', 'title', 'year', 'kind', 'link']) {
+      assert.ok(item[field] !== undefined && item[field] !== null, `${item.id}: missing ${field}`);
+    }
+    assert.ok(['acceptance', 'release'].includes(item.kind), `${item.id}: kind must be acceptance or release`);
+    assert.match(item.link, /^https?:\/\//, `${item.id}: link must be absolute`);
+    assert.ok(typeof item.text.en === 'string' && item.text.en.length > 0, `${item.id}: text.en is required`);
+  }
+});
+
+test('news ids are unique', () => {
+  const { NEWS } = loadData();
+  const ids = NEWS.map((n) => n.id);
+  assert.strictEqual(new Set(ids).size, ids.length, 'duplicate news id');
+});
+
+// No dates are printed anywhere on the news list — none are sourced. A news
+// item that grows a date field would put an unsourced claim on the page.
+test('no news item carries a date', () => {
+  const { NEWS } = loadData();
+  for (const item of NEWS) {
+    assert.strictEqual(item.date, undefined, `${item.id}: news items must not carry a date`);
+  }
 });
 
 test('every Korean string key is a string', () => {

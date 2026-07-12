@@ -39,13 +39,22 @@
         lang === 'en' || !translated ? node.dataset.i18nAriaEn : translated
       );
     });
-    var summaries = doc.querySelectorAll('.card__summary');
-    Array.prototype.forEach.call(summaries, function (node) {
-      var ko = node.getAttribute('data-summary-ko');
-      var en = node.getAttribute('data-summary-en');
+    // Text that js/render.js generated from a data file carries both
+    // languages on the node itself instead of a STRINGS key, since the copy
+    // lives in data/projects.js and data/news.js. An empty Korean value falls
+    // back to English rather than blanking the node.
+    swapPairs(doc, '.card__summary', 'data-summary-en', 'data-summary-ko', lang);
+    swapPairs(doc, '.news__text', 'data-news-en', 'data-news-ko', lang);
+    if (doc.documentElement) doc.documentElement.lang = lang;
+  }
+
+  function swapPairs(doc, selector, enAttr, koAttr, lang) {
+    var nodes = doc.querySelectorAll(selector);
+    Array.prototype.forEach.call(nodes, function (node) {
+      var ko = node.getAttribute(koAttr);
+      var en = node.getAttribute(enAttr);
       node.textContent = lang === 'ko' && ko ? ko : en;
     });
-    if (doc.documentElement) doc.documentElement.lang = lang;
   }
 
   function persist(lang) {

@@ -46,10 +46,9 @@
         >
 
         <nav class="site-nav" aria-label="Sections">
+          <a href="#news" data-i18n="nav.news">News</a>
           <a href="#research" data-i18n="nav.research">Research</a>
           <a href="#releases" data-i18n="nav.releases">Releases</a>
-          <a href="#team" data-i18n="nav.team">Team</a>
-          <a href="#join" data-i18n="nav.join">Join</a>
         </nav>
 
         <div class="site-header__actions">
@@ -136,52 +135,104 @@
             aria-hidden="true"
           ></video>
 
-          <!-- The motif is the logo's node-and-link graph, redrawn as vector.
-               It is the hero's floor: the <video> is hidden until it has real
-               frames, at which point js/render.js's loadeddata listener adds
-               .is-loaded to .hero__video and the video covers the graph. This
-               is correct with no video committed and with JS disabled too. -->
-          <svg
-            class="hero__motif"
-            viewBox="0 0 400 300"
-            preserveAspectRatio="xMidYMid slice"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <g class="hero__motif-links">
-              <path d="M64 62 L196 88" />
-              <path d="M64 62 L44 174" />
-              <path d="M44 174 L168 232" />
-              <path d="M196 88 L232 150" />
-              <path d="M232 150 L168 232" />
-              <path d="M196 88 L318 54" />
-              <path d="M318 54 L356 148" />
-              <path d="M232 150 L356 148" />
-              <path d="M356 148 L296 244" />
-              <path d="M168 232 L296 244" />
-            </g>
-            <g class="hero__motif-nodes">
-              <circle cx="64" cy="62" r="13" />
-              <circle cx="196" cy="88" r="17" />
-              <circle cx="44" cy="174" r="15" />
-              <circle cx="232" cy="150" r="9" />
-              <circle cx="168" cy="232" r="16" />
-              <circle cx="318" cy="54" r="9" />
-              <circle cx="356" cy="148" r="12" />
-              <circle cx="296" cy="244" r="10" />
-            </g>
-          </svg>
+          <!-- The plate is what the media panel shows until hero.mp4 has real
+               frames — js/render.js's loadeddata listener adds .is-loaded to
+               the <video>, and CSS then hides the plate (a sibling selector,
+               which is why the plate must stay AFTER the video here). It has
+               to hold the panel on its own, so it is drawn as a figure rather
+               than an ornament: a reach envelope, a planned end-effector
+               trajectory with its waypoints, and the object it closes on,
+               captioned like a plate in a paper. Correct with no video
+               committed and with JS off. -->
+          <figure class="hero__plate">
+            <svg
+              class="hero__plate-fig"
+              viewBox="0 0 400 300"
+              preserveAspectRatio="xMidYMid meet"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <!-- Registration marks: the plate's corners. -->
+              <g class="hero__plate-marks">
+                <path d="M24 40 L24 24 L40 24" />
+                <path d="M360 24 L376 24 L376 40" />
+                <path d="M376 260 L376 276 L360 276" />
+                <path d="M40 276 L24 276 L24 260" />
+              </g>
+
+              <!-- Workspace: the floor the arm works over, ticked like an axis. -->
+              <g class="hero__plate-rules">
+                <path d="M40 250 L360 250" />
+                <path
+                  d="M72 250 L72 256 M112 250 L112 256 M152 250 L152 256 M192 250 L192 256
+                     M232 250 L232 256 M272 250 L272 256 M312 250 L312 256 M352 250 L352 256"
+                />
+              </g>
+
+              <!-- Base, and the mast the trajectory leaves from. -->
+              <g class="hero__plate-base">
+                <path d="M58 250 L58 236 L94 236 L94 250" />
+                <path d="M76 236 L76 214" />
+              </g>
+
+              <!-- The object, and the gripper straddling it at the end of the plan:
+                   a stem down from the trajectory's last point, a palm, and two
+                   fingers open just wider than the object they close on. -->
+              <g class="hero__plate-target">
+                <path d="M314 250 L314 222 L342 222 L342 250" />
+                <path
+                  class="hero__plate-gripper"
+                  d="M328 186 L328 198 M308 198 L348 198 M308 198 L308 212 M348 198 L348 212"
+                />
+              </g>
+
+              <!-- The planned trajectory: it leaves the mast and terminates at the
+                   gripper, which is what closes on the object. -->
+              <path
+                class="hero__plate-path"
+                d="M76 214 C 100 126, 172 80, 232 100 C 290 120, 314 156, 328 186"
+              />
+              <!-- Dropped from the trajectory's apex to the floor: the one
+                   measurement the plate makes, and the reason the floor is ticked.
+                   Its x is the apex of the curve above, not an eyeballed centre. -->
+              <path class="hero__plate-drop" d="M203.3 95.4 L203.3 250" />
+              <!-- Every waypoint is a point evaluated ON the two cubics above
+                   (t = 0.35 / 0.70 of each), so they sit on the line rather than
+                   near it. Moving the path means recomputing these. -->
+              <g class="hero__plate-waypoints">
+                <circle cx="76" cy="214" r="3.5" />
+                <circle cx="116.3" cy="138.1" r="3.5" />
+                <circle cx="176.4" cy="99.2" r="3.5" />
+                <circle cx="281.4" cy="125.9" r="3.5" />
+                <circle cx="312.1" cy="158" r="3.5" />
+              </g>
+              <circle class="hero__plate-goal" cx="328" cy="186" r="6" />
+            </svg>
+
+            <figcaption class="hero__plate-caption">
+              <span data-i18n="hero.figure">Fig. 1 — planned end-effector trajectory</span>
+            </figcaption>
+          </figure>
         </div>
 
         <div class="hero__body">
-          <p class="eyebrow">KAIST AI · DAVIAN Lab</p>
-          <h1 class="hero__title">DAVIAN Robotics</h1>
-          <p class="hero__tagline" data-i18n="hero.tagline">
-            A vision-language-action and robot manipulation research group at KAIST AI.
+          <!-- The space before the span is load-bearing: .hero__title-line is a
+               block, so it collapses visually, but without it the accessible
+               name of the heading is "DAVIANRobotics". -->
+          <h1 class="hero__title">
+            DAVIAN <span class="hero__title-line">Robotics</span>
+          </h1>
+          <p class="hero__lead" data-i18n="hero.lead">
+            We study robot manipulation across vision-language-action models, reinforcement
+            learning, and humanoid locomotion.
           </p>
-          <p class="hero__blurb" data-i18n="hero.blurb">
-            DAVIAN Robotics studies robot manipulation across vision-language-action models,
-            reinforcement learning, and humanoid locomotion.
+          <!-- Split across spans because js/i18n.js translates by assigning
+               textContent, which would wipe out a child <a>. Each span is
+               translated on its own and the link between them is left alone. -->
+          <p class="hero__affiliation">
+            <span data-i18n="hero.affiliation.pre">The robotics group of</span>
+            <a href="https://davian.kaist.ac.kr/" target="_blank" rel="noopener">DAVIAN Lab</a>
+            <span data-i18n="hero.affiliation.post">(Prof. Jaegul Choo) at KAIST AI.</span>
           </p>
           <div class="hero__actions">
             <a
@@ -202,13 +253,13 @@
         </div>
       </section>
 
-      <section id="highlights" class="section">
+      <section id="news" class="section band">
         <div class="container">
           <header class="section__head">
-            <h2 class="section__title" data-i18n="section.highlights">Highlights</h2>
+            <h2 class="section__title" data-i18n="section.news">News</h2>
           </header>
-          <!-- Filled by js/render.js from window.PROJECTS (featured only). -->
-          <div id="highlights-grid" class="grid grid--featured"></div>
+          <!-- Filled by js/render.js from window.NEWS (newest year first). -->
+          <ol id="news-list" class="news"></ol>
         </div>
       </section>
 
@@ -279,49 +330,6 @@
         </div>
       </section>
 
-      <section id="team" class="section">
-        <div class="container">
-          <header class="section__head">
-            <h2 class="section__title" data-i18n="section.team">Team</h2>
-            <p class="section__lede" data-i18n="team.lede">
-              DAVIAN Robotics is the robotics group of DAVIAN Lab, led by Prof. Jaegul Choo.
-            </p>
-          </header>
-          <!-- Filled by js/render.js from window.PEOPLE. -->
-          <ul id="team-list" class="team-list"></ul>
-          <a
-            class="link-arrow"
-            href="https://davian.kaist.ac.kr/people"
-            target="_blank"
-            rel="noopener"
-            data-i18n="team.more"
-            >See the full DAVIAN Lab team →</a
-          >
-        </div>
-      </section>
-
-      <section id="join" class="section band">
-        <div class="container join">
-          <header class="section__head">
-            <h2 class="section__title" data-i18n="section.join">Join us</h2>
-          </header>
-          <p class="join__body" data-i18n="join.body">
-            We are looking for graduate students and collaborators interested in
-            vision-language-action models and robot manipulation. Admission runs through
-            DAVIAN Lab at KAIST AI.
-          </p>
-          <div class="join__actions">
-            <a
-              class="btn btn--solid"
-              href="https://davian.kaist.ac.kr/joinus"
-              target="_blank"
-              rel="noopener"
-              data-i18n="join.cta"
-              >DAVIAN Lab — Join us</a
-            >
-          </div>
-        </div>
-      </section>
     </main>
 
     <footer class="site-footer">
@@ -351,6 +359,7 @@
 
     <script src="data/people.js"></script>
     <script src="data/projects.js"></script>
+    <script src="data/news.js"></script>
     <script src="data/strings.js"></script>
     <script src="js/render.js"></script>
     <script src="js/i18n.js"></script>

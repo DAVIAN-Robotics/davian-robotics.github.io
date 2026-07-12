@@ -156,6 +156,31 @@ test('the card summary pass swaps to Korean, restores to English, and falls back
   assert.strictEqual(noKorean.textContent, 'Still English only.');
 });
 
+// --- .news__text coverage ---------------------------------------------------
+// Same node-carried mechanism as .card__summary, on the text js/render.js
+// generates from data/news.js.
+
+test('the news text pass swaps to Korean, restores to English, and falls back to English when the Korean text is empty', () => {
+  const sandbox = load();
+  const translated = makeAttrNode(
+    { 'data-news-en': 'Accepted to RSS 2026.', 'data-news-ko': 'RSS 2026에 채택되었습니다.' },
+    { textContent: 'Accepted to RSS 2026.' }
+  );
+  const noKorean = makeAttrNode(
+    { 'data-news-en': 'Released.', 'data-news-ko': '' },
+    { textContent: 'Released.' }
+  );
+  const doc = {
+    querySelectorAll: (selector) => (selector === '.news__text' ? [translated, noKorean] : []),
+    documentElement: {},
+  };
+  sandbox.I18N.apply(doc, 'ko');
+  assert.strictEqual(translated.textContent, 'RSS 2026에 채택되었습니다.');
+  assert.strictEqual(noKorean.textContent, 'Released.', 'an empty Korean text must not blank the item');
+  sandbox.I18N.apply(doc, 'en');
+  assert.strictEqual(translated.textContent, 'Accepted to RSS 2026.');
+});
+
 // --- init() coverage ---------------------------------------------------------
 // Previously uncovered: the localStorage read/write, the private-mode
 // try/catch, and the click wiring — five tests exercised resolveLang three

@@ -189,24 +189,29 @@ function load() {
   fakeWindow.PEOPLE = { pmh9960: { name: 'Minho Park', url: 'https://pmh9960.github.io' } };
   fakeWindow.PROJECTS = [
     { id: 'a', title: 'A', authors: ['pmh9960'], year: 2026, tags: ['vla'],
-      summary: { en: 'Alpha.' }, featured: true },
+      summary: { en: 'Alpha.' } },
     { id: 'b', title: 'B', authors: ['pmh9960'], year: 2025, tags: ['humanoid'],
       summary: { en: 'Beta.' } },
     { id: 'broken', title: 'Broken' },
   ];
+  fakeWindow.NEWS = [
+    { id: 'old', year: 2025, kind: 'release', title: 'Old',
+      text: { en: 'Released.' }, link: 'https://example.org/old' },
+    { id: 'new', year: 2026, kind: 'acceptance', title: 'New',
+      text: { en: 'Accepted.' }, link: 'https://example.org/new' },
+  ];
   return fakeWindow;
 }
 
-const IDS = ['highlights-grid', 'research-grid', 'filter-chips', 'team-list'];
+const IDS = ['research-grid', 'filter-chips', 'news-list'];
 
-test('mount renders featured projects into the highlights grid only', () => {
+test('mount renders the news list, newest year first', () => {
   const sandbox = load();
   const doc = makeDocument(IDS);
   sandbox.DR.mount(doc);
-  const html = doc.elements['highlights-grid'].innerHTML;
-  assert.match(html, /data-project-id="a"/);
-  assert.doesNotMatch(html, /data-project-id="b"/);
-  assert.match(html, /card--featured/);
+  const html = doc.elements['news-list'].innerHTML;
+  assert.ok(html.indexOf('data-news-id="new"') < html.indexOf('data-news-id="old"'));
+  assert.match(html, /https:\/\/example\.org\/new/);
 });
 
 test('mount renders every valid project into the research grid, newest first', () => {
@@ -238,14 +243,6 @@ test('applyFilter re-renders the grid with only the matching projects', () => {
   assert.doesNotMatch(html, /data-project-id="a"/);
 });
 
-test('mount renders the team list from PEOPLE', () => {
-  const sandbox = load();
-  const doc = makeDocument(IDS);
-  sandbox.DR.mount(doc);
-  assert.match(doc.elements['team-list'].innerHTML, /Minho Park/);
-  assert.match(doc.elements['team-list'].innerHTML, /https:\/\/pmh9960\.github\.io/);
-});
-
 test('mount is idempotent — running it twice does not duplicate cards', () => {
   const sandbox = load();
   const doc = makeDocument(IDS);
@@ -266,7 +263,6 @@ test('with no IntersectionObserver, grids never get .is-revealing — cards stay
   delete sandbox.IntersectionObserver;
   const doc = makeDocument(IDS);
   sandbox.DR.mount(doc);
-  assert.ok(!(doc.elements['highlights-grid'].classList._added || []).includes('is-revealing'));
   assert.ok(!(doc.elements['research-grid'].classList._added || []).includes('is-revealing'));
 });
 
@@ -275,11 +271,10 @@ test('under prefers-reduced-motion, grids never get .is-revealing either', () =>
   sandbox.matchMedia = () => ({ matches: true, addEventListener() {} });
   const doc = makeDocument(IDS);
   sandbox.DR.mount(doc);
-  assert.ok(!(doc.elements['highlights-grid'].classList._added || []).includes('is-revealing'));
   assert.ok(!(doc.elements['research-grid'].classList._added || []).includes('is-revealing'));
 });
 
-test('with IntersectionObserver available, grids that exist do get .is-revealing, and cards actually become visible', () => {
+test('with IntersectionObserver available, a grid that exists does get .is-revealing, and its cards actually become visible', () => {
   const sandbox = load();
   // A positive control: fires the observer callback synchronously on
   // observe(), same as a real IntersectionObserver does for a target that
@@ -295,15 +290,11 @@ test('with IntersectionObserver available, grids that exist do get .is-revealing
     };
   };
   const doc = makeDocument(IDS);
-  const cardA = makeCard();
-  const cardB = makeCard();
-  doc.elements['highlights-grid'] = makeGrid([{ card: cardA }], 'highlights-grid');
-  doc.elements['research-grid'] = makeGrid([{ card: cardB }], 'research-grid');
+  const card = makeCard();
+  doc.elements['research-grid'] = makeGrid([{ card }], 'research-grid');
   sandbox.DR.mount(doc);
-  assert.ok((doc.elements['highlights-grid'].classList._added || []).includes('is-revealing'));
   assert.ok((doc.elements['research-grid'].classList._added || []).includes('is-revealing'));
-  assert.ok((cardA.classList._added || []).includes('is-visible'));
-  assert.ok((cardB.classList._added || []).includes('is-visible'));
+  assert.ok((card.classList._added || []).includes('is-visible'));
 });
 
 // --- media/observer regression tests --------------------------------------
@@ -333,18 +324,19 @@ test('a second applyFilter disconnects the media and reveal observers the first 
   assert.ok(firstReveal.disconnected, 'the first reveal observer must be disconnected');
 });
 
-test('re-rendering the research grid does not disconnect the highlights grid observers', () => {
+// The page mounts one card grid today, but attachMedia/attachReveal are keyed
+// by grid id and share one page-wide playback winner, so a second grid opting
+// in must not be collateral damage when the first one re-renders. These two
+// tests drive a second grid through the exported attachers directly.
+test('re-rendering the research grid does not disconnect another grid\'s observers', () => {
   const sandbox = load();
   const Observer = makeObserverFactory();
   sandbox.IntersectionObserver = Observer;
   sandbox.matchMedia = makeMatchMedia({ '(hover: none)': true });
   const doc = makeDocument(IDS);
-  const highlightsVideo = makeVideo();
-  const highlightsCard = makeCard(highlightsVideo);
-  doc.elements['highlights-grid'] = makeGrid(
-    [{ card: highlightsCard, video: highlightsVideo }],
-    'highlights-grid'
-  );
+  const otherVideo = makeVideo();
+  const otherCard = makeCard(otherVideo);
+  doc.elements['other-grid'] = makeGrid([{ card: otherCard, video: otherVideo }], 'other-grid');
   const researchVideo = makeVideo();
   const researchCard = makeCard(researchVideo);
   doc.elements['research-grid'] = makeGrid(
@@ -353,17 +345,18 @@ test('re-rendering the research grid does not disconnect the highlights grid obs
   );
 
   sandbox.DR.mount(doc);
-  // Identify highlights-grid's observers by what they actually observed,
-  // since mount() also creates research-grid's own observers in the same
-  // pass and those are expected to get disconnected below.
-  const highlightsObservers = Observer.instances.filter(
-    (o) => o.observed.includes(highlightsVideo) || o.observed.includes(highlightsCard)
+  sandbox.DR.attachMedia(doc, 'other-grid');
+  sandbox.DR.attachReveal(doc, 'other-grid');
+  // Identify other-grid's observers by what they actually observed, since
+  // research-grid has its own and those are expected to get disconnected.
+  const otherObservers = Observer.instances.filter(
+    (o) => o.observed.includes(otherVideo) || o.observed.includes(otherCard)
   );
-  assert.strictEqual(highlightsObservers.length, 2, 'expected one media + one reveal observer for highlights-grid');
+  assert.strictEqual(otherObservers.length, 2, 'expected one media + one reveal observer for other-grid');
 
   sandbox.DR.applyFilter(doc, 'humanoid');
-  highlightsObservers.forEach((observer) => {
-    assert.ok(!observer.disconnected, 'a highlights-grid observer must survive a research-grid re-render');
+  otherObservers.forEach((observer) => {
+    assert.ok(!observer.disconnected, 'another grid\'s observer must survive a research-grid re-render');
   });
 });
 
@@ -515,18 +508,15 @@ test('a rejected play() is not recorded as playing, so a subsequent callback ret
   assert.strictEqual(video.playCalls, 2, 'a rejected play must be retried on the next qualifying callback, not frozen');
 });
 
-test('the two grids share one page-wide winner — a highlights-only batch must not pause a research video that is on screen', async () => {
+test('two grids share one page-wide winner — a batch from one must not pause a video playing in the other', async () => {
   const sandbox = load();
   const Observer = makeObserverFactory();
   sandbox.IntersectionObserver = Observer;
   sandbox.matchMedia = makeMatchMedia({ '(hover: none)': true });
   const doc = makeDocument(IDS);
-  const highlightsVideo = makeVideo();
-  const highlightsCard = makeCard(highlightsVideo);
-  doc.elements['highlights-grid'] = makeGrid(
-    [{ card: highlightsCard, video: highlightsVideo }],
-    'highlights-grid'
-  );
+  const otherVideo = makeVideo();
+  const otherCard = makeCard(otherVideo);
+  doc.elements['other-grid'] = makeGrid([{ card: otherCard, video: otherVideo }], 'other-grid');
   const researchVideo = makeVideo();
   const researchCard = makeCard(researchVideo);
   doc.elements['research-grid'] = makeGrid(
@@ -535,22 +525,23 @@ test('the two grids share one page-wide winner — a highlights-only batch must 
   );
 
   sandbox.DR.mount(doc);
-  const highlightsObserver = Observer.instances.find((o) => isMediaObserver(o) && o.observed.includes(highlightsVideo));
+  sandbox.DR.attachMedia(doc, 'other-grid');
+  const otherObserver = Observer.instances.find((o) => isMediaObserver(o) && o.observed.includes(otherVideo));
   const researchObserver = Observer.instances.find((o) => isMediaObserver(o) && o.observed.includes(researchVideo));
-  assert.ok(highlightsObserver && researchObserver && highlightsObserver !== researchObserver);
+  assert.ok(otherObserver && researchObserver && otherObserver !== researchObserver);
 
   // The research video is fully on screen and playing.
   researchObserver.callback([{ target: researchVideo, isIntersecting: true, intersectionRatio: 1 }]);
   assert.strictEqual(researchVideo.playCalls, 1);
   await flushMicrotask(); // let the resolved play() Promise record it as playing
 
-  // The user has scrolled away from highlights-grid; its observer fires
-  // with a single non-qualifying entry. This must not touch the research
-  // video at all — the two grids share one page-wide winner, not one each.
-  highlightsObserver.callback([{ target: highlightsVideo, isIntersecting: true, intersectionRatio: 0.1 }]);
-  assert.strictEqual(researchVideo.pauseCalls, 0, 'the research video must not be paused by a highlights-grid batch');
+  // The user has scrolled away from the other grid; its observer fires with a
+  // single non-qualifying entry. This must not touch the research video at
+  // all — the two grids share one page-wide winner, not one each.
+  otherObserver.callback([{ target: otherVideo, isIntersecting: true, intersectionRatio: 0.1 }]);
+  assert.strictEqual(researchVideo.pauseCalls, 0, 'the research video must not be paused by another grid\'s batch');
   assert.strictEqual(researchVideo.paused, false);
-  assert.strictEqual(highlightsVideo.playCalls, 0, 'the non-qualifying highlights video must never play');
+  assert.strictEqual(otherVideo.playCalls, 0, 'the non-qualifying video must never play');
 });
 
 test('re-rendering a grid purges its stale videos from the page-wide ratio state', async () => {

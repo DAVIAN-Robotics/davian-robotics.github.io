@@ -5,8 +5,9 @@
  * blue exists nowhere on the page except inside the footer's KAIST AI mark.
  *
  * The look is a lab plate: white paper, hairline rules, tracked micro-labels,
- * tabular figures, and the logo's node-and-link graph used as the one recurring
- * ornament — the hero's floor and the texture of a card that has no video yet.
+ * tabular figures. The one recurring drawing is technical, not decorative — the
+ * hero's figure of a planned end-effector trajectory, and the ruled lattice on
+ * a card that has no video yet.
  */
 
 :root {
@@ -19,8 +20,8 @@
      faint to be the only affordance boundary on an interactive control.
      --border-control is a neutral grey (equal R/G/B, so no hue at all) at
      3.36:1, used on every border-only interactive control (.btn incl.
-     .btn--outline/.btn--link, .chip, .lang-toggle, .team-list a); card and
-     container borders stay on --border. */
+     .btn--outline/.btn--link, .chip, .lang-toggle); card and container
+     borders stay on --border. */
   --border-control: #8c8c8c;
   --mask-solid: #000;
   --accent: #4a3372;
@@ -174,14 +175,6 @@ button {
   color: var(--fg-muted);
 }
 
-.eyebrow {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--fg-muted);
-}
-
 /* Header ------------------------------------------------------------------ */
 
 .site-header {
@@ -322,46 +315,22 @@ button {
 
 /* Hero -------------------------------------------------------------------- */
 
+/* Two panels, not two halves: the copy side is given the wider track so the
+ * sentence that says what the lab does gets the first fixation, and the media
+ * side reads as a plate mounted next to it. */
 .hero {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
   align-items: stretch;
   border-bottom: 1px solid var(--border);
 }
 
 .hero__media {
   position: relative;
-  min-height: 460px;
+  min-height: 480px;
   overflow: hidden;
   background: var(--bg-band);
   border-right: 1px solid var(--border);
-}
-
-/* The motif is the floor of the media panel. The <video> is hidden by
- * default (see .hero__video below) so the graph reads as the intended
- * artwork whether hero.mp4 is missing or JS is off; js/render.js listens
- * for the video's loadeddata event and adds .is-loaded once real frames
- * exist, which reveals the video over the graph. */
-.hero__motif {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.hero__motif-links path {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 1.25;
-  stroke-linecap: round;
-  opacity: 0.28;
-}
-
-.hero__motif-nodes circle {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 3;
-  opacity: 0.5;
 }
 
 .hero__video {
@@ -377,59 +346,198 @@ button {
   display: block;
 }
 
+/* The plate holds the media panel until the demo loop exists. It is a figure:
+ * graph paper, a reach envelope, a planned trajectory, a caption. The sibling
+ * selector below is why index.html keeps the <video> before it — once
+ * js/render.js marks the video .is-loaded, the plate steps aside completely. */
+.hero__plate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  background-image: linear-gradient(var(--accent-hair) 1px, transparent 1px),
+    linear-gradient(90deg, var(--accent-hair) 1px, transparent 1px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(130% 100% at 50% 45%, var(--mask-solid) 45%, transparent 100%);
+  mask-image: radial-gradient(130% 100% at 50% 45%, var(--mask-solid) 45%, transparent 100%);
+}
+
+.hero__video.is-loaded ~ .hero__plate {
+  display: none;
+}
+
+.hero__plate-fig {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  padding: 24px;
+}
+
+/* One ink, four weights of presence: the drawn plan is the darkest thing on
+ * the plate, everything that merely frames it sits back. */
+.hero__plate-fig path,
+.hero__plate-fig circle {
+  fill: none;
+  stroke: var(--accent);
+  vector-effect: non-scaling-stroke;
+}
+
+.hero__plate-marks path {
+  stroke-width: 1;
+  opacity: 0.35;
+}
+
+.hero__plate-rules path {
+  stroke-width: 1;
+  opacity: 0.3;
+}
+
+.hero__plate-drop {
+  stroke-width: 1;
+  stroke-dasharray: 3 6;
+  opacity: 0.45;
+  animation: plate-fade 0.6s var(--ease) 1.1s both;
+}
+
+.hero__plate-base path,
+.hero__plate-target path {
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  opacity: 0.5;
+}
+
+.hero__plate-gripper {
+  stroke-width: 2;
+  opacity: 0.75;
+}
+
+.hero__plate-path {
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  /* Base state is the finished drawing, so prefers-reduced-motion (which kills
+   * the animation outright) leaves a complete trajectory, not an empty panel. */
+  stroke-dasharray: 620;
+  stroke-dashoffset: 0;
+  animation: plate-draw 1.7s var(--ease) both;
+}
+
+.hero__plate-waypoints circle {
+  fill: var(--bg-band);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: plate-pop 0.45s var(--ease) both;
+}
+
+.hero__plate-waypoints circle:nth-child(1) {
+  animation-delay: 0.15s;
+}
+.hero__plate-waypoints circle:nth-child(2) {
+  animation-delay: 0.45s;
+}
+.hero__plate-waypoints circle:nth-child(3) {
+  animation-delay: 0.75s;
+}
+.hero__plate-waypoints circle:nth-child(4) {
+  animation-delay: 1.05s;
+}
+.hero__plate-waypoints circle:nth-child(5) {
+  animation-delay: 1.35s;
+}
+
+.hero__plate-goal {
+  fill: var(--bg-band);
+  stroke-width: 2.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: plate-pop 0.5s var(--ease) 1.6s both;
+}
+
+.hero__plate-caption {
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+@keyframes plate-draw {
+  from {
+    stroke-dashoffset: 620;
+  }
+}
+
+@keyframes plate-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+@keyframes plate-fade {
+  from {
+    opacity: 0;
+  }
+}
+
 .hero__body {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: 16px;
-  padding: 80px 64px;
-  overflow: hidden;
+  gap: 20px;
+  padding: 88px 64px;
 }
 
-/* A faint node field behind the copy — the same graph language as the panel,
- * reduced to its nodes so it never competes with the text. */
-.hero__body::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(var(--accent-faint) 1.5px, transparent 1.6px);
-  background-size: 34px 34px;
-  -webkit-mask-image: radial-gradient(120% 90% at 85% 15%, var(--mask-solid) 0%, transparent 70%);
-  mask-image: radial-gradient(120% 90% at 85% 15%, var(--mask-solid) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.hero__body > * {
-  position: relative;
-}
-
+/* The name reads as a lockup: the discipline sits under the lab, in the ink
+ * the whole page uses for emphasis. */
 .hero__title {
-  font-size: clamp(2.25rem, 1.6rem + 2.4vw, 3.25rem);
+  font-size: clamp(2.5rem, 1.7rem + 2.8vw, 3.75rem);
   font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.05;
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
 
-.hero__tagline {
-  max-width: 34ch;
-  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+.hero__title-line {
+  display: block;
+  color: var(--accent);
+}
+
+.hero__lead {
+  max-width: 32ch;
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
   font-weight: 500;
   line-height: 1.45;
+  letter-spacing: -0.01em;
   color: var(--fg);
 }
 
-.hero__blurb {
+.hero__affiliation {
   max-width: 46ch;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  font-size: 0.9375rem;
   color: var(--fg-muted);
+}
+
+.hero__affiliation a {
+  font-weight: 600;
+  border-bottom: 1px solid var(--accent-line);
+  transition: border-color 0.18s var(--ease);
+}
+
+.hero__affiliation a:hover {
+  border-bottom-color: var(--accent);
 }
 
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 /* Buttons ----------------------------------------------------------------- */
@@ -486,18 +594,67 @@ button {
   color: var(--accent);
 }
 
-.link-arrow {
-  display: inline-block;
-  margin-top: 28px;
-  font-size: 0.9375rem;
-  font-weight: 550;
-  border-bottom: 1px solid var(--accent-line);
-  padding-bottom: 2px;
-  transition: border-color 0.18s var(--ease);
+/* News -------------------------------------------------------------------- */
+
+/* An index, not a feed: year in the margin, the project as the entry, the
+ * event as the line under it. Hairline rules do the separating — the band is
+ * already tinted, so a card here would be a box inside a box. */
+.news__item {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 20px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
 }
 
-.link-arrow:hover {
+.news__item:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.news__year {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+}
+
+.news__title {
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+}
+
+.news__title a {
+  color: var(--fg);
+  border-bottom: 1px solid var(--accent-line);
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.news__title a:hover {
+  color: var(--accent);
   border-bottom-color: var(--accent);
+}
+
+.news__text {
+  margin-top: 4px;
+  font-size: 0.9375rem;
+  color: var(--fg-muted);
+}
+
+.news__kind {
+  justify-self: end;
+  padding: 3px 8px;
+  border: 1px solid var(--accent-line);
+  border-radius: 5px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--accent);
 }
 
 /* Chips ------------------------------------------------------------------- */
@@ -538,10 +695,6 @@ button {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: var(--gap);
-}
-
-.grid--featured {
-  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
 }
 
 .card {
@@ -638,10 +791,6 @@ button {
   line-height: 1.35;
 }
 
-.card--featured .card__title {
-  font-size: 1.1875rem;
-}
-
 /* Venue badge: a micro-label, not a pill of color. */
 .card__venue {
   padding: 3px 8px;
@@ -733,47 +882,6 @@ button {
   color: var(--accent);
 }
 
-/* Team -------------------------------------------------------------------- */
-
-.team-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 10px;
-}
-
-.team-list a {
-  display: inline-block;
-  padding: 8px 16px;
-  border: 1px solid var(--border-control);
-  border-radius: 999px;
-  font-size: 0.9375rem;
-  font-weight: 550;
-  color: var(--fg);
-  transition: border-color 0.18s var(--ease), color 0.18s var(--ease),
-    background-color 0.18s var(--ease);
-}
-
-.team-list a:hover {
-  border-color: var(--accent);
-  background: var(--accent-tint);
-  color: var(--accent);
-}
-
-/* Join -------------------------------------------------------------------- */
-
-.join__body {
-  max-width: 62ch;
-  font-size: 1.0625rem;
-  color: var(--fg-muted);
-}
-
-.join__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 28px;
-}
-
 /* Footer ------------------------------------------------------------------ */
 
 .site-footer {
@@ -818,8 +926,8 @@ button {
 
 /* Breakpoints ------------------------------------------------------------- */
 
-/* Tablet: the hero stacks with the media panel first, and the featured grid
- * drops to the same single-column rhythm as the rest of the page. */
+/* Tablet: the hero stacks. The copy leads — a stacked plate above the headline
+ * would push the one sentence that says what the lab does below the fold. */
 @media (max-width: 1023px) {
   .section {
     padding: 64px 0;
@@ -829,18 +937,15 @@ button {
     grid-template-columns: 1fr;
   }
 
-  .hero__media {
-    min-height: 300px;
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
-  }
-
   .hero__body {
-    padding: 48px 24px 56px;
+    order: -1;
+    padding: 56px 24px;
   }
 
-  .grid--featured {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  .hero__media {
+    min-height: 340px;
+    border-right: 0;
+    border-top: 1px solid var(--border);
   }
 
   .site-header__parent {
@@ -886,8 +991,7 @@ button {
     padding: 0 20px;
   }
 
-  .grid,
-  .grid--featured {
+  .grid {
     grid-template-columns: 1fr;
   }
 
@@ -897,11 +1001,33 @@ button {
   }
 
   .hero__media {
-    min-height: 220px;
+    min-height: 300px;
   }
 
-  .btn,
-  .team-list a {
+  /* The year and the kind badge stop being margins and become a label row
+   * above the entry — 84px of gutter is a quarter of a 375px viewport. */
+  .news__item {
+    grid-template-columns: auto 1fr;
+    gap: 8px 12px;
+  }
+
+  .news__year {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .news__kind {
+    grid-row: 1;
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .news__body {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+
+  .btn {
     white-space: normal;
   }
 

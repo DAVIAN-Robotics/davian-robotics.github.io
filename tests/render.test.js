@@ -118,7 +118,7 @@ test('absent media falls back to a typographic card, not a broken tag', () => {
 
 test('a card carries its id, title, venue, authors, and summary', () => {
   const { DR } = loadRenderer();
-  const html = DR.cardHTML(PROJECT, PEOPLE, {});
+  const html = DR.cardHTML(PROJECT, PEOPLE);
   assert.match(html, /data-project-id="phuma"/);
   assert.match(html, /PHUMA/);
   assert.match(html, /NeurIPS 2025/);
@@ -126,18 +126,78 @@ test('a card carries its id, title, venue, authors, and summary', () => {
   assert.match(html, /A humanoid locomotion dataset\./);
 });
 
-test('the featured variant is marked so CSS can enlarge it', () => {
-  const { DR } = loadRenderer();
-  assert.match(DR.cardHTML(PROJECT, PEOPLE, { featured: true }), /card--featured/);
-});
-
 test('user-supplied text is escaped, so a stray angle bracket cannot inject markup', () => {
   const { DR } = loadRenderer();
-  const html = DR.cardHTML(
-    { ...PROJECT, id: 'xss', title: '<img src=x onerror=alert(1)>' },
-    PEOPLE,
-    {}
-  );
+  const html = DR.cardHTML({ ...PROJECT, id: 'xss', title: '<img src=x onerror=alert(1)>' }, PEOPLE);
+  assert.doesNotMatch(html, /<img src=x/);
+  assert.match(html, /&lt;img src=x/);
+});
+
+// --- news ------------------------------------------------------------------
+
+const NEWS_ITEM = {
+  id: 'simbav2-icml-2025',
+  year: 2025,
+  kind: 'acceptance',
+  title: 'SimbaV2',
+  text: { en: 'Accepted to ICML 2025 as a spotlight.', ko: 'ICML 2025에 spotlight으로 채택되었습니다.' },
+  link: 'https://arxiv.org/abs/2502.15280',
+};
+
+test('a complete news item validates, and an incomplete one reports every missing field', () => {
+  const { DR } = loadRenderer();
+  assert.deepStrictEqual(DR.validateNews(NEWS_ITEM), { ok: true, missing: [] });
+  const result = DR.validateNews({ id: 'x', title: 'X' });
+  assert.strictEqual(result.ok, false);
+  assert.deepStrictEqual(result.missing.sort(), ['link', 'text.en', 'year']);
+});
+
+test('an invalid news item is skipped and warned about, and the valid ones survive', () => {
+  const { DR, warnings } = loadRenderer();
+  const kept = DR.validNews([NEWS_ITEM, { id: 'broken', title: 'B' }]);
+  assert.deepStrictEqual(kept.map((n) => n.id), ['simbav2-icml-2025']);
+  assert.strictEqual(warnings.length, 1);
+  assert.match(warnings[0], /broken/);
+  assert.match(warnings[0], /link/);
+});
+
+test('news sorts newest year first and keeps the authored order within a year', () => {
+  const { DR } = loadRenderer();
+  const sorted = DR.sortNews([
+    { ...NEWS_ITEM, id: 'old', year: 2025 },
+    { ...NEWS_ITEM, id: 'first-of-2026', year: 2026 },
+    { ...NEWS_ITEM, id: 'second-of-2026', year: 2026 },
+  ]);
+  assert.deepStrictEqual(sorted.map((n) => n.id), ['first-of-2026', 'second-of-2026', 'old']);
+});
+
+test('a news item renders its year, a linked title, both languages of its text, and a kind badge', () => {
+  const { DR } = loadRenderer();
+  const html = DR.newsHTML([NEWS_ITEM]);
+  assert.match(html, /data-news-id="simbav2-icml-2025"/);
+  assert.match(html, /news__year">2025</);
+  assert.match(html, /<a href="https:\/\/arxiv\.org\/abs\/2502\.15280"[^>]*>SimbaV2<\/a>/);
+  assert.match(html, /data-news-en="Accepted to ICML 2025 as a spotlight\."/);
+  assert.match(html, /data-news-ko="ICML 2025에 spotlight으로 채택되었습니다\."/);
+  assert.match(html, /data-i18n="news.kind.acceptance">Accepted</);
+});
+
+test('a news item with no Korean text still renders, with an empty ko attribute', () => {
+  const { DR } = loadRenderer();
+  const html = DR.newsHTML([{ ...NEWS_ITEM, text: { en: 'Released.' } }]);
+  assert.match(html, /data-news-ko=""/);
+  assert.match(html, />Released\.</);
+});
+
+test('an unknown news kind renders no badge rather than an empty one', () => {
+  const { DR } = loadRenderer();
+  const html = DR.newsHTML([{ ...NEWS_ITEM, kind: 'gossip' }]);
+  assert.doesNotMatch(html, /news__kind/);
+});
+
+test('news text is escaped too', () => {
+  const { DR } = loadRenderer();
+  const html = DR.newsHTML([{ ...NEWS_ITEM, title: '<img src=x onerror=alert(1)>' }]);
   assert.doesNotMatch(html, /<img src=x/);
   assert.match(html, /&lt;img src=x/);
 });

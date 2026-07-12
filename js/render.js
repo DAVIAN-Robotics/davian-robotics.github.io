@@ -7,6 +7,8 @@
   var REQUIRED = ['id', 'title', 'authors', 'year', 'summary.en'];
   var LINK_LABELS = { paper: 'Paper', code: 'Code', model: 'Model', data: 'Data', project: 'Project' };
   var LINK_ORDER = ['paper', 'code', 'model', 'data', 'project'];
+  var NEWS_REQUIRED = ['id', 'title', 'year', 'link', 'text.en'];
+  var NEWS_KINDS = { acceptance: 'Accepted', release: 'Released' };
 
   function escapeHTML(value) {
     return String(value == null ? '' : value)
@@ -17,33 +19,89 @@
       .replace(/'/g, '&#39;');
   }
 
-  function has(project, field) {
-    if (field === 'summary.en') {
-      return !!(project.summary && typeof project.summary.en === 'string' && project.summary.en);
+  // Reads a dotted path ('summary.en', 'text.en') off a record and asks
+  // whether it holds something worth rendering.
+  function has(record, field) {
+    var value = record;
+    var parts = field.split('.');
+    for (var i = 0; i < parts.length; i += 1) {
+      if (value === undefined || value === null) return false;
+      value = value[parts[i]];
     }
-    var value = project[field];
     if (Array.isArray(value)) return value.length > 0;
     return value !== undefined && value !== null && value !== '';
   }
 
-  function validateProject(project) {
-    var missing = REQUIRED.filter(function (field) {
-      return !has(project, field);
+  function validate(record, required) {
+    var missing = required.filter(function (field) {
+      return !has(record, field);
     });
     return { ok: missing.length === 0, missing: missing };
   }
 
-  function validProjects(projects) {
-    return (projects || []).filter(function (project) {
-      var result = validateProject(project);
+  function keepValid(records, required, what) {
+    return (records || []).filter(function (record) {
+      var result = validate(record, required);
       if (!result.ok) {
         console.warn(
-          'render: skipping project "' + (project && project.id ? project.id : '(no id)') +
+          'render: skipping ' + what + ' "' + (record && record.id ? record.id : '(no id)') +
             '" — missing required field(s): ' + result.missing.join(', ')
         );
       }
       return result.ok;
     });
+  }
+
+  function validateProject(project) {
+    return validate(project, REQUIRED);
+  }
+
+  function validProjects(projects) {
+    return keepValid(projects, REQUIRED, 'project');
+  }
+
+  function validateNews(item) {
+    return validate(item, NEWS_REQUIRED);
+  }
+
+  function validNews(items) {
+    return keepValid(items, NEWS_REQUIRED, 'news item');
+  }
+
+  /* Year descending. Array.prototype.sort is stable (ES2019), so items that
+   * share a year keep the order they were written in data/news.js — which is
+   * the only ordering we have, since no acceptance date is sourced. */
+  function sortNews(items) {
+    return items.slice().sort(function (a, b) {
+      return b.year - a.year;
+    });
+  }
+
+  function newsHTML(items) {
+    return items
+      .map(function (item) {
+        var kind = NEWS_KINDS[item.kind] ? item.kind : '';
+        var badge = kind
+          ? '<span class="news__kind" data-i18n="news.kind.' + kind + '">' + NEWS_KINDS[kind] + '</span>'
+          : '';
+        return (
+          '<li class="news__item" data-news-id="' + escapeHTML(item.id) + '">' +
+          '<span class="news__year">' + escapeHTML(item.year) + '</span>' +
+          '<div class="news__body">' +
+          '<h3 class="news__title">' +
+          '<a href="' + escapeHTML(item.link) + '" target="_blank" rel="noopener">' +
+          escapeHTML(item.title) +
+          '</a></h3>' +
+          '<p class="news__text" data-news-en="' + escapeHTML(item.text.en) + '" ' +
+          'data-news-ko="' + escapeHTML((item.text && item.text.ko) || '') + '">' +
+          escapeHTML(item.text.en) +
+          '</p>' +
+          '</div>' +
+          badge +
+          '</li>'
+        );
+      })
+      .join('');
   }
 
   function sortProjects(projects) {
@@ -117,14 +175,12 @@
     );
   }
 
-  function cardHTML(project, people, opts) {
-    var options = opts || {};
-    var classes = 'card' + (options.featured ? ' card--featured' : '');
+  function cardHTML(project, people) {
     var venue = project.venue
       ? '<span class="card__venue">' + escapeHTML(project.venue) + '</span>'
       : '';
     return (
-      '<article class="' + classes + '" data-project-id="' + escapeHTML(project.id) + '">' +
+      '<article class="card" data-project-id="' + escapeHTML(project.id) + '">' +
       mediaHTML(project.media, project.title) +
       '<div class="card__body">' +
       '<h3 class="card__title">' + escapeHTML(project.title) + '</h3>' +
@@ -157,19 +213,6 @@
         })
         .join('')
     );
-  }
-
-  function teamHTML(people) {
-    return Object.keys(people || {})
-      .map(function (id) {
-        var person = people[id];
-        return (
-          '<li><a href="' + escapeHTML(person.url) + '" target="_blank" rel="noopener">' +
-          escapeHTML(person.name) +
-          '</a></li>'
-        );
-      })
-      .join('');
   }
 
   // Module-scope observer state. Keyed by grid id so re-rendering one grid
@@ -246,7 +289,7 @@
       'research-grid',
       filterProjects(projects, tag)
         .map(function (project) {
-          return cardHTML(project, people, {});
+          return cardHTML(project, people);
         })
         .join('')
     );
@@ -366,25 +409,10 @@
   }
 
   function mount(doc) {
-    var people = global.PEOPLE || {};
     var projects = sortProjects(validProjects(global.PROJECTS));
-    renderInto(
-      doc,
-      'highlights-grid',
-      projects
-        .filter(function (project) {
-          return project.featured;
-        })
-        .map(function (project) {
-          return cardHTML(project, people, { featured: true });
-        })
-        .join('')
-    );
+    renderInto(doc, 'news-list', newsHTML(sortNews(validNews(global.NEWS))));
     renderInto(doc, 'filter-chips', chipsHTML(collectTags(projects)));
-    renderInto(doc, 'team-list', teamHTML(people));
     applyFilter(doc, 'all');
-    attachMedia(doc, 'highlights-grid');
-    attachReveal(doc, 'highlights-grid');
     // Bind once: without this guard, a second mount() on the same
     // #filter-chips node would stack a second click listener and every chip
     // click would run applyFilter twice.
@@ -413,8 +441,18 @@
     linksHTML: linksHTML,
     mediaHTML: mediaHTML,
     cardHTML: cardHTML,
+    validateNews: validateNews,
+    validNews: validNews,
+    sortNews: sortNews,
+    newsHTML: newsHTML,
     mount: mount,
     applyFilter: applyFilter,
+    // The page mounts one card grid today, but both attachers are keyed by
+    // grid id and share one page-wide "only one video plays" winner, so they
+    // are exported rather than hidden: a second grid must be able to opt in
+    // without duplicating that state.
+    attachMedia: attachMedia,
+    attachReveal: attachReveal,
   };
 
   // Browser boot: reveal the hero video once it has real frames. 'loadeddata'
