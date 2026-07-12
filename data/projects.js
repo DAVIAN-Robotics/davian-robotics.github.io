@@ -47,6 +47,11 @@ window.PROJECTS = [
     venue: 'IROS 2026',
     year: 2026,
     tags: ['vla', 'manipulation', 'planning'],
+    media: {
+      type: 'video',
+      src: 'assets/media/3d-hamster.mp4',
+      poster: 'assets/media/3d-hamster.jpg',
+    },
     summary: {
       en:
         'A depth-aware VLM planner that predicts metrically grounded 3D end-effector trajectories from a single RGB-D observation and a language instruction, feeding directly into a point-cloud low-level policy.',
@@ -67,6 +72,11 @@ window.PROJECTS = [
     venue: 'CVPR 2026',
     year: 2026,
     tags: ['video generation', 'egocentric'],
+    media: {
+      type: 'video',
+      src: 'assets/media/egox.mp4',
+      poster: 'assets/media/egox.jpg',
+    },
     summary: {
       en:
         'A video generation framework that produces first-person egocentric video from a single third-person exocentric video, built on large-scale video diffusion models and lightweight LoRA adaptation.',
@@ -97,6 +107,11 @@ window.PROJECTS = [
     venue: 'ICRA 2026',
     year: 2026,
     tags: ['vla', 'manipulation', 'test-time guidance'],
+    media: {
+      type: 'video',
+      src: 'assets/media/acg.mp4',
+      poster: 'assets/media/acg.jpg',
+    },
     summary: {
       en:
         'A training-free, test-time guidance algorithm that improves temporal and spatial action consistency in flow-based Vision-Language-Action models, reducing motion jitter and trajectory drift.',
@@ -127,6 +142,11 @@ window.PROJECTS = [
     ],
     year: 2025,
     tags: ['humanoid', 'locomotion', 'dataset'],
+    media: {
+      type: 'video',
+      src: 'assets/media/phuma.mp4',
+      poster: 'assets/media/phuma.jpg',
+    },
     summary: {
       en:
         'A high-quality humanoid locomotion dataset built from large-scale human motion data, using careful curation and physics-constrained retargeting to eliminate physical artifacts.',
@@ -148,6 +168,11 @@ window.PROJECTS = [
     venue: 'ICML 2025 (spotlight)',
     year: 2025,
     tags: ['reinforcement learning'],
+    media: {
+      type: 'video',
+      src: 'assets/media/simbav2.mp4',
+      poster: 'assets/media/simbav2.jpg',
+    },
     summary: {
       en:
         'A reinforcement learning architecture that stabilizes training via hyperspherical normalization, achieving state-of-the-art results on 57 continuous control tasks by scaling model capacity and compute.',
@@ -183,6 +208,11 @@ window.PROJECTS = [
     venue: 'RSS 2026',
     year: 2026,
     tags: ['reinforcement learning', 'sim2real'],
+    media: {
+      type: 'video',
+      src: 'assets/media/flashsac.mp4',
+      poster: 'assets/media/flashsac.jpg',
+    },
     summary: {
       en:
         'FlashSAC is a fast and stable off-policy reinforcement learning algorithm built on Soft Actor-Critic that sharply reduces gradient updates while scaling up model size and data throughput, bounding weight, feature, and gradient norms to curb critic error accumulation. Across more than 60 tasks in 10 simulators it outperforms PPO and strong off-policy baselines, and in sim-to-real humanoid locomotion it cuts training time from hours to minutes.',
