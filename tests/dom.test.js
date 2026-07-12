@@ -188,9 +188,9 @@ function load() {
   fakeWindow.matchMedia = () => ({ matches: false, addEventListener() {} });
   fakeWindow.PEOPLE = { pmh9960: { name: 'Minho Park', url: 'https://pmh9960.github.io' } };
   fakeWindow.PROJECTS = [
-    { id: 'a', title: 'A', authors: ['pmh9960'], year: 2026, tags: ['vla'],
+    { id: 'a', title: 'A', authors: ['pmh9960'], year: 2026, date: '2026-06', tags: ['vla'],
       summary: { en: 'Alpha.' } },
-    { id: 'b', title: 'B', authors: ['pmh9960'], year: 2025, tags: ['humanoid'],
+    { id: 'b', title: 'B', authors: ['pmh9960'], year: 2025, date: '2025-10', tags: ['humanoid'],
       summary: { en: 'Beta.' } },
     { id: 'broken', title: 'Broken' },
   ];

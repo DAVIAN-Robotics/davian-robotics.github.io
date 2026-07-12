@@ -4,7 +4,7 @@
 (function (global) {
   'use strict';
 
-  var REQUIRED = ['id', 'title', 'authors', 'year', 'summary.en'];
+  var REQUIRED = ['id', 'title', 'authors', 'year', 'date', 'summary.en'];
   var LINK_LABELS = { paper: 'Paper', code: 'Code', model: 'Model', data: 'Data', project: 'Project' };
   var LINK_ORDER = ['paper', 'code', 'model', 'data', 'project'];
   var NEWS_REQUIRED = ['id', 'title', 'date', 'link', 'text.en'];
@@ -111,9 +111,14 @@
       .join('');
   }
 
+  /* Newest first, by the SAME key and direction as sortNews — that is what keeps
+   * the Research grid and the News list in one order. 'YYYY-MM' sorts correctly
+   * as a plain string; `year` is for the venue badge, not for ordering (sorting
+   * on it is what used to drop the four 2026 papers into alphabetical order).
+   * Title breaks a tie, so two papers in the same month are still deterministic. */
   function sortProjects(projects) {
     return projects.slice().sort(function (a, b) {
-      if (b.year !== a.year) return b.year - a.year;
+      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
       return String(a.title).localeCompare(String(b.title));
     });
   }

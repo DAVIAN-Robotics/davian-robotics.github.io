@@ -19,7 +19,8 @@ function loadData() {
   return sandbox;
 }
 
-const REQUIRED = ['id', 'title', 'authors', 'year', 'summary'];
+const REQUIRED = ['id', 'title', 'authors', 'year', 'date', 'summary'];
+const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
 
 test('every person has a name and a url', () => {
   const { PEOPLE } = loadData();
@@ -39,6 +40,20 @@ test('every project has the required fields', () => {
     }
     assert.ok(Array.isArray(p.authors) && p.authors.length > 0, `${p.id}: authors must be a non-empty array`);
     assert.ok(typeof p.summary.en === 'string' && p.summary.en.length > 0, `${p.id}: summary.en is required`);
+  }
+});
+
+// The grid sorts on `date` and the badge reads `year`. If they disagree, a paper
+// sorts into one year and displays another — the exact mistake a hurried
+// contributor makes by copying a neighbouring entry and editing only one of them.
+test('every project date is YYYY-MM and agrees with its year', () => {
+  const { PROJECTS } = loadData();
+  for (const p of PROJECTS) {
+    assert.match(p.date, MONTH, `${p.id}: date must be 'YYYY-MM'`);
+    assert.ok(
+      p.date.startsWith(String(p.year)),
+      `${p.id}: date ${p.date} disagrees with year ${p.year}`
+    );
   }
 });
 
@@ -98,6 +113,29 @@ test('every news date is month precision — YYYY-MM, never a day', () => {
   for (const item of NEWS) {
     assert.match(item.date, /^\d{4}-(0[1-9]|1[0-2])$/, `${item.id}: date must be 'YYYY-MM'`);
   }
+});
+
+// The Research grid and the News list are one story told twice: the same six
+// papers, dated the same way. They are sorted by the same key in the same
+// direction (see sortProjects / sortNews), so if a date drifts in one file and
+// not the other, the two sections silently disagree about what is newest.
+test('every project is dated the same as its news item, so the grid and the list are in one order', () => {
+  const { PROJECTS, NEWS } = loadData();
+  for (const p of PROJECTS) {
+    const items = NEWS.filter((n) => n.id.startsWith(p.id));
+    assert.strictEqual(items.length, 1, `${p.id}: expected exactly one news item (id prefixed by the project id)`);
+    assert.strictEqual(
+      items[0].date,
+      p.date,
+      `${p.id}: project date ${p.date} != news date ${items[0].date}`
+    );
+  }
+  const byDateDesc = (a, b) => (a.date === b.date ? 0 : a.date < b.date ? 1 : -1);
+  assert.deepStrictEqual(
+    [...PROJECTS].sort(byDateDesc).map((p) => p.date),
+    [...NEWS].sort(byDateDesc).map((n) => n.date),
+    'the two sections must present the same dates in the same order'
+  );
 });
 
 test('every Korean string key is a string', () => {

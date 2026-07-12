@@ -7,7 +7,8 @@
  *     title: 'PAPER: Full Title',             // required
  *     authors: ['pmh9960', 'Jane Doe (SNU)'], // required; ids link, plain strings do not
  *     venue: 'NeurIPS 2025',                  // optional, shown as a badge
- *     year: 2025,                             // required, sorts the grid (newest first); use venue year if present, else arXiv posting year
+ *     year: 2025,                             // required, shown/implied by the badge; use venue year if present, else arXiv posting year
+ *     date: '2025-09',                        // required, 'YYYY-MM', SORTS the grid (newest first)
  *     tags: ['manipulation', 'vla'],          // optional, drives the filter chips
  *     media: {                                // optional; omit until the file exists
  *       type: 'video',                        // 'video' | 'image'
@@ -22,8 +23,17 @@
  *       data: 'https://huggingface.co/datasets/DAVIAN-Robotics/...',
  *       project: 'https://...',
  *     },
- *     featured: true,                         // optional; promotes it to the Highlights band
+ *     featured: true,                         // inert: the Highlights band this promoted to is gone
  *   }
+ *
+ * On `date` — it carries exactly the meaning it carries in data/news.js, and it
+ * is the same date: an ACCEPTANCE is dated by the venue's official
+ * author-notification date (not a per-paper timestamp, which is not public), a
+ * RELEASE by its release. The sources for every one of these dates are cited in
+ * a table at the top of data/news.js — read that before adding a date here, and
+ * do not guess one. Month precision, always: 'YYYY-MM', never 'YYYY-MM-DD'.
+ * `date` must agree with `year` (a test enforces it), and it is what orders the
+ * grid — so the Research grid and the News list stay in one order.
  *
  * Media budget: 3-6 second loop, H.264 MP4, 2 MB or less, poster image required.
  */
@@ -46,6 +56,7 @@ window.PROJECTS = [
     ],
     venue: 'IROS 2026',
     year: 2026,
+    date: '2026-06',
     tags: ['vla', 'manipulation', 'planning'],
     media: {
       type: 'video',
@@ -71,6 +82,7 @@ window.PROJECTS = [
     authors: ['keh0t0', 'kinam0252', 'Dohyeon Kim', 'pmh9960', 'junhahyung', 'jaegulchoo'],
     venue: 'CVPR 2026',
     year: 2026,
+    date: '2026-02',
     tags: ['video generation', 'egocentric'],
     media: {
       type: 'video',
@@ -106,6 +118,7 @@ window.PROJECTS = [
     ],
     venue: 'ICRA 2026',
     year: 2026,
+    date: '2026-01',
     tags: ['vla', 'manipulation', 'test-time guidance'],
     media: {
       type: 'video',
@@ -141,6 +154,7 @@ window.PROJECTS = [
       'jaegulchoo',
     ],
     year: 2025,
+    date: '2025-10',
     tags: ['humanoid', 'locomotion', 'dataset'],
     media: {
       type: 'video',
@@ -167,6 +181,7 @@ window.PROJECTS = [
     authors: ['joonleesky', 'leeyngdo', 'Takuma Seno', 'iamproto', 'Peter Stone', 'jaegulchoo'],
     venue: 'ICML 2025 (spotlight)',
     year: 2025,
+    date: '2025-05',
     tags: ['reinforcement learning'],
     media: {
       type: 'video',
@@ -207,6 +222,7 @@ window.PROJECTS = [
     ],
     venue: 'RSS 2026',
     year: 2026,
+    date: '2026-04',
     tags: ['reinforcement learning', 'sim2real'],
     media: {
       type: 'video',

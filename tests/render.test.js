@@ -27,6 +27,7 @@ const PROJECT = {
   authors: ['pmh9960', 'Jane Doe (SNU)'],
   venue: 'NeurIPS 2025',
   year: 2025,
+  date: '2025-09',
   tags: ['humanoid', 'dataset'],
   summary: { en: 'A humanoid locomotion dataset.' },
   links: { paper: 'https://arxiv.org/abs/2510.26236', code: null },
@@ -41,7 +42,7 @@ test('a project missing required fields reports every one of them', () => {
   const { DR } = loadRenderer();
   const result = DR.validateProject({ id: 'broken', title: 'T' });
   assert.strictEqual(result.ok, false);
-  assert.deepStrictEqual(result.missing.sort(), ['authors', 'summary.en', 'year']);
+  assert.deepStrictEqual(result.missing.sort(), ['authors', 'date', 'summary.en', 'year']);
 });
 
 test('an invalid project is skipped and warned about, and the valid ones survive', () => {
@@ -53,14 +54,37 @@ test('an invalid project is skipped and warned about, and the valid ones survive
   assert.match(warnings[0], /authors/);
 });
 
-test('projects sort newest first, then by title', () => {
+// The grid sorts on `date`, not `year` — sorting on the year is what used to
+// drop every paper from one year into alphabetical order. These three share a
+// year and must still come out newest month first.
+test('projects sort newest first by date, not by year, with the title breaking a tie', () => {
   const { DR } = loadRenderer();
   const sorted = DR.sortProjects([
-    { ...PROJECT, id: 'b', title: 'B', year: 2024 },
-    { ...PROJECT, id: 'c', title: 'C', year: 2026 },
-    { ...PROJECT, id: 'a', title: 'A', year: 2026 },
+    { ...PROJECT, id: 'jan', title: 'Z', year: 2026, date: '2026-01' },
+    { ...PROJECT, id: 'jun-b', title: 'B', year: 2026, date: '2026-06' },
+    { ...PROJECT, id: 'jun-a', title: 'A', year: 2026, date: '2026-06' },
+    { ...PROJECT, id: 'old', title: 'A', year: 2024, date: '2024-11' },
   ]);
-  assert.deepStrictEqual(sorted.map((p) => p.id), ['a', 'c', 'b']);
+  assert.deepStrictEqual(sorted.map((p) => p.id), ['jun-a', 'jun-b', 'jan', 'old']);
+});
+
+test('a project with no date is skipped rather than sorted unpredictably', () => {
+  const { DR, warnings } = loadRenderer();
+  const { date, ...noDate } = PROJECT;
+  const kept = DR.validProjects([PROJECT, { ...noDate, id: 'undated' }]);
+  assert.deepStrictEqual(kept.map((p) => p.id), ['phuma']);
+  assert.match(warnings[0], /undated/);
+  assert.match(warnings[0], /date/);
+});
+
+test('filtering by a tag preserves the newest-first order', () => {
+  const { DR } = loadRenderer();
+  const sorted = DR.sortProjects([
+    { ...PROJECT, id: 'jan', date: '2026-01', tags: ['vla'] },
+    { ...PROJECT, id: 'jun', date: '2026-06', tags: ['vla'] },
+    { ...PROJECT, id: 'other', date: '2026-03', tags: ['humanoid'] },
+  ]);
+  assert.deepStrictEqual(DR.filterProjects(sorted, 'vla').map((p) => p.id), ['jun', 'jan']);
 });
 
 test('tags are collected distinct and alphabetical', () => {
