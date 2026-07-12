@@ -750,6 +750,7 @@ button {
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -762,6 +763,65 @@ button {
 
 .card:hover {
   border-color: var(--accent);
+}
+
+/* The whole card opens its project page (or its arXiv abstract) — see cardHref
+ * in js/render.js. The card is NOT wrapped in an <a>: it already contains
+ * anchors (link buttons, author names), and nested anchors are invalid HTML that
+ * browsers silently restructure. Instead the title is the anchor and its ::after
+ * is stretched over the card, with the real inner links raised back above it.
+ * .card--linked is only on cards that actually have a destination, so a card
+ * with neither a project page nor a paper still reads as static. */
+.card--linked {
+  cursor: pointer;
+}
+
+.card__link {
+  color: inherit;
+}
+
+.card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--radius);
+}
+
+.card--linked:hover .card__title {
+  color: var(--accent);
+}
+
+/* The focus ring belongs to the CARD, not to the few words of the title: the
+ * stretched ::after is card-sized, so outlining it is what makes a keyboard user
+ * see which card they are on. The link's own ring is suppressed because it would
+ * draw a second, wrong-looking box around the title text. */
+.card__link:focus-visible {
+  outline: none;
+}
+
+/* The offset is INWARD: .card is overflow: hidden, so an outward ring on an
+ * inset-0 pseudo-element is clipped away by the card's own rounded corners. */
+.card__link:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Above the overlay, so they keep their own destinations and their own hover. */
+.card__authors,
+.card__links {
+  position: relative;
+  z-index: 1;
+}
+
+/* Also above it — but for a different reason: an element under the overlay
+ * cannot be selected with the mouse, and the summary is the one block of prose
+ * on the card someone might want to copy. The cost is that a click on the
+ * summary text itself does not navigate (the media, title, venue, and all the
+ * card's empty space still do), which is the cheaper half of this trade. */
+.card__summary {
+  position: relative;
+  z-index: 1;
 }
 
 /* Scroll reveal. Cards are visible by default; js/render.js opts a grid in by
@@ -841,6 +901,7 @@ button {
   font-weight: 650;
   letter-spacing: -0.015em;
   line-height: 1.35;
+  transition: color 0.18s var(--ease);
 }
 
 /* Venue badge: a micro-label, not a pill of color. */

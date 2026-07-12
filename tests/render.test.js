@@ -150,6 +150,54 @@ test('a card carries its id, title, venue, authors, and summary', () => {
   assert.match(html, /A humanoid locomotion dataset\./);
 });
 
+// --- the card's own destination -------------------------------------------
+
+test('the card links to its project page, falling back to the paper, and to nothing at all if it has neither', () => {
+  const { DR } = loadRenderer();
+  assert.strictEqual(
+    DR.cardHref({ project: 'https://davian-robotics.github.io/ACG', paper: 'https://arxiv.org/abs/1' }),
+    'https://davian-robotics.github.io/ACG',
+    'a project page wins'
+  );
+  assert.strictEqual(
+    DR.cardHref({ paper: 'https://arxiv.org/abs/2502.15280', code: 'https://github.com/x' }),
+    'https://arxiv.org/abs/2502.15280',
+    'no project page falls back to the paper — this is SimbaV2'
+  );
+  assert.strictEqual(DR.cardHref({ code: 'https://github.com/x' }), '');
+  assert.strictEqual(DR.cardHref(undefined), '');
+});
+
+test('a card with a destination wraps its title in the stretched link', () => {
+  const { DR } = loadRenderer();
+  const html = DR.cardHTML({ ...PROJECT, links: { project: 'https://example.org/p' } }, PEOPLE);
+  assert.match(html, /class="card card--linked"/);
+  assert.match(html, /<h3 class="card__title"><a class="card__link" href="https:\/\/example\.org\/p"/);
+});
+
+// An empty href reloads the page — worse than a card that simply does not click.
+test('a card with no destination is not a link and is not marked clickable', () => {
+  const { DR } = loadRenderer();
+  const html = DR.cardHTML({ ...PROJECT, links: { code: 'https://github.com/x' } }, PEOPLE);
+  assert.doesNotMatch(html, /card--linked/);
+  assert.doesNotMatch(html, /class="card__link"/); // not /card__link/ — .card__links is the button row
+  assert.doesNotMatch(html, /href=""/);
+  assert.match(html, /<h3 class="card__title">PHUMA<\/h3>/);
+});
+
+// The inner links are what the overlay must not swallow. They are still real
+// anchors in the markup — CSS raises them above the overlay.
+test('the card link never nests around the inner links — they stay separate anchors', () => {
+  const { DR } = loadRenderer();
+  const html = DR.cardHTML(
+    { ...PROJECT, links: { project: 'https://example.org/p', paper: 'https://arxiv.org/abs/1' } },
+    PEOPLE
+  );
+  assert.doesNotMatch(html, /<a[^>]*>\s*<article/, 'the card must not be wrapped in an anchor');
+  assert.match(html, /<a class="author" href="https:\/\/pmh9960\.github\.io"/);
+  assert.match(html, /<a class="btn btn--link" href="https:\/\/arxiv\.org\/abs\/1"/);
+});
+
 test('user-supplied text is escaped, so a stray angle bracket cannot inject markup', () => {
   const { DR } = loadRenderer();
   const html = DR.cardHTML({ ...PROJECT, id: 'xss', title: '<img src=x onerror=alert(1)>' }, PEOPLE);

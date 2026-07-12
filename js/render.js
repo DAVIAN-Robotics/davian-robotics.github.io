@@ -187,15 +187,36 @@
     );
   }
 
+  /* Where a card goes when you click its body: its project page, or the arXiv
+   * abstract when it has no project page (SimbaV2's old one 404s). A project
+   * with neither is NOT a link — an empty href would reload the page, which is
+   * worse than a card that simply does not click. */
+  function cardHref(links) {
+    if (!links) return '';
+    return links.project || links.paper || '';
+  }
+
   function cardHTML(project, people) {
     var venue = project.venue
       ? '<span class="card__venue">' + escapeHTML(project.venue) + '</span>'
       : '';
+    var href = cardHref(project.links);
+    // The stretched-link pattern: the title is the only anchor, and CSS blows
+    // its ::after up to cover the whole card. It is NOT an <a> wrapped around
+    // the card — the card already contains anchors (the link buttons, the author
+    // names), and nesting anchors is invalid HTML that browsers silently
+    // restructure. css/style.css raises those inner links back above the overlay
+    // so they stay independently clickable.
+    var title = href
+      ? '<h3 class="card__title"><a class="card__link" href="' + escapeHTML(href) +
+        '" target="_blank" rel="noopener">' + escapeHTML(project.title) + '</a></h3>'
+      : '<h3 class="card__title">' + escapeHTML(project.title) + '</h3>';
     return (
-      '<article class="card" data-project-id="' + escapeHTML(project.id) + '">' +
+      '<article class="card' + (href ? ' card--linked' : '') +
+      '" data-project-id="' + escapeHTML(project.id) + '">' +
       mediaHTML(project.media, project.title) +
       '<div class="card__body">' +
-      '<h3 class="card__title">' + escapeHTML(project.title) + '</h3>' +
+      title +
       venue +
       '<p class="card__authors">' + authorsHTML(project.authors, people) + '</p>' +
       '<p class="card__summary" data-summary-en="' + escapeHTML(project.summary.en) + '" ' +
@@ -452,6 +473,7 @@
     authorsHTML: authorsHTML,
     linksHTML: linksHTML,
     mediaHTML: mediaHTML,
+    cardHref: cardHref,
     cardHTML: cardHTML,
     validateNews: validateNews,
     validNews: validNews,
