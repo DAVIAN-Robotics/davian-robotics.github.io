@@ -138,6 +138,27 @@ test('every project is dated the same as its news item, so the grid and the list
   );
 });
 
+// Adding a tag means adding it to TAG_TONES in js/render.js. Without this test
+// a new tag silently takes whatever colour the hashed fallback gives it, which
+// is stable but arbitrary — nobody chose it, and it may collide with a hue that
+// means something else. Fail here instead, at the moment the tag is introduced.
+test('every tag used by a project has been given a colour on purpose', () => {
+  const { PROJECTS } = loadData();
+  const fakeWindow = {};
+  new Function('window', 'console', fs.readFileSync(path.join(ROOT, 'js/render.js'), 'utf8'))(
+    fakeWindow,
+    { warn() {} }
+  );
+  const tones = fakeWindow.DR.TAG_TONES;
+  const used = [...new Set(PROJECTS.flatMap((p) => p.tags || []))].sort();
+  const missing = used.filter((tag) => !Object.prototype.hasOwnProperty.call(tones, tag));
+  assert.deepStrictEqual(
+    missing,
+    [],
+    `add these to TAG_TONES in js/render.js: ${missing.join(', ')}`
+  );
+});
+
 test('every Korean string key is a string', () => {
   const { STRINGS } = loadData();
   assert.ok(STRINGS.ko, 'STRINGS.ko is missing');

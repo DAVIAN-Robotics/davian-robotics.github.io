@@ -152,11 +152,36 @@ test('a card carries its id, title, venue, authors, and summary', () => {
 
 // --- per-card tag labels ---------------------------------------------------
 
-test('a tag always gets the same colour, wherever it appears', () => {
+// The colour comes from the tag's NAME, via the TAG_TONES map in js/render.js —
+// never from where the tag happens to sit on a card. A tone keyed by index is
+// the bug this guards: 'manipulation' is the second tag on 3D HAMSTER and the
+// second on ACG, but the first on some future paper, and it must not change
+// colour when it moves.
+test('a tag is one colour everywhere, keyed by its name and not by its position on a card', () => {
   const { DR } = loadRenderer();
-  assert.strictEqual(DR.tagTone('vla'), DR.tagTone('vla'), 'the same tag must not change colour between cards');
-  const tones = ['vla', 'manipulation', 'humanoid', 'dataset', 'reinforcement learning'].map(DR.tagTone);
-  tones.forEach((tone) => assert.ok(tone >= 1 && tone <= 4, 'every tag lands on one of the four logo hues'));
+  ['vla', 'manipulation', 'humanoid', 'dataset', 'reinforcement learning'].forEach((tag) => {
+    assert.strictEqual(DR.tagTone(tag), DR.tagTone(tag));
+    const tone = DR.tagTone(tag);
+    assert.ok(tone >= 1 && tone <= 4, `${tag} must land on one of the four logo hues`);
+  });
+  // Same tag, two different positions in two different tag lists: same class.
+  const first = DR.tagsHTML(['manipulation', 'vla']);
+  const second = DR.tagsHTML(['planning', 'humanoid', 'manipulation']);
+  const toneOf = (html, tag) => html.match(new RegExp(`tag--(\\d)">${tag}<`))[1];
+  assert.strictEqual(
+    toneOf(first, 'manipulation'),
+    toneOf(second, 'manipulation'),
+    'manipulation must be the same colour whether it is first or last on the card'
+  );
+});
+
+// A tag missing from the map still renders (hashed fallback) rather than
+// rendering colourless or throwing — but the map is the intended path.
+test('a tag that is not in the map still gets a stable colour from the fallback', () => {
+  const { DR } = loadRenderer();
+  const tone = DR.tagTone('a tag nobody has added yet');
+  assert.ok(tone >= 1 && tone <= 4);
+  assert.strictEqual(tone, DR.tagTone('a tag nobody has added yet'), 'the fallback must be stable, not random');
 });
 
 test('tags render as labels, not controls — no button, no link, no data-tag', () => {

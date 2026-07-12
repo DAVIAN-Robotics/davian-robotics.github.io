@@ -196,14 +196,41 @@
     return links.project || links.paper || '';
   }
 
-  /* Which of the four logo colours a tag wears. It is a hash, not a counter, so
-   * a tag keeps its colour on every card it appears on and no matter what else
-   * is on the page — 'vla' is the same colour on 3D HAMSTER as on ACG, and stays
-   * that colour when a project is added. Four buckets, the four logo hues. */
+  /* WHICH COLOUR EACH TAG WEARS. ADDING A TAG MEANS ADDING IT HERE.
+   *
+   * Keyed by the tag's NAME, never by its position on a card — a tag that took
+   * its colour from its index would be purple on one card and sand on the next,
+   * which is the whole thing this map exists to prevent. 'manipulation' is pink
+   * on every card it appears on, today and after the next paper lands.
+   *
+   * The values are the four logo hues, defined as --tag-N-ink / --tag-N-bg in
+   * css/style.css: 1 deep purple, 2 pink, 3 salmon/rust, 4 sand/bronze. Related
+   * tags deliberately share a hue (the two VLA-ish tags are purple, the two
+   * embodiment ones pink), so the colour carries a little meaning rather than
+   * being noise.
+   *
+   * A tag that is NOT in this map still renders — it falls back to a hash of its
+   * own name, so it is stable and it is one of the four, it just was not chosen.
+   * That is the safety net, not the plan: put your tag in the map. */
+  var TAG_TONES = {
+    vla: 1,
+    'reinforcement learning': 1,
+    manipulation: 2,
+    humanoid: 2,
+    sim2real: 2,
+    planning: 3,
+    locomotion: 3,
+    'video generation': 3,
+    dataset: 4,
+    egocentric: 4,
+    'test-time guidance': 4,
+  };
+
   function tagTone(tag) {
+    var name = String(tag);
+    if (Object.prototype.hasOwnProperty.call(TAG_TONES, name)) return TAG_TONES[name];
     var sum = 0;
-    var text = String(tag);
-    for (var i = 0; i < text.length; i += 1) sum += text.charCodeAt(i);
+    for (var i = 0; i < name.length; i += 1) sum += name.charCodeAt(i);
     return (sum % 4) + 1;
   }
 
@@ -523,6 +550,10 @@
     linksHTML: linksHTML,
     mediaHTML: mediaHTML,
     cardHref: cardHref,
+    // Exported so tests/data.test.js can assert that every tag the projects
+    // actually use has been given a colour on purpose, rather than silently
+    // landing on the hashed fallback.
+    TAG_TONES: TAG_TONES,
     tagTone: tagTone,
     tagsHTML: tagsHTML,
     cardHTML: cardHTML,

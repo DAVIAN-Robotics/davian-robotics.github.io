@@ -20,6 +20,7 @@ window.PEOPLE = {
   yeolj00: { name: 'Jooyeol Yun', url: 'https://yeolj00.github.io/' },
   // No personal homepage; the ACG README links her GitHub profile, so that is what we link.
   whit3snow: { name: 'Hyojin Jang', url: 'https://github.com/Whit3Snow' },
+  k00dj19: { name: 'Dongjin Kim', url: 'https://k00dj-19.github.io/' },
   sibisibi: { name: 'Sibeen Kim', url: 'https://sibisibi.github.io/' },
   leeyngdo: { name: 'Youngdo Lee', url: 'https://leeyngdo.github.io/' },
   iamproto: { name: 'Donghu Kim', url: 'https://i-am-proto.github.io/' },

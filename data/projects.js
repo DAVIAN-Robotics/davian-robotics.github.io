@@ -45,7 +45,7 @@ window.PROJECTS = [
     authors: [
       'godnpeter',
       'lee15253',
-      'Dongjin Kim',
+      'k00dj19',
       'whit3snow',
       'myyzzzoooo',
       'moon1x21',
