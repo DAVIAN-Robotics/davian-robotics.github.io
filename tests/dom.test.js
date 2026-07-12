@@ -211,16 +211,18 @@ function load() {
   fakeWindow.PEOPLE = { pmh9960: { name: 'Minho Park', url: 'https://pmh9960.github.io' } };
   fakeWindow.PROJECTS = [
     { id: 'a', title: 'A', authors: ['pmh9960'], year: 2026, date: '2026-06', tags: ['vla'],
-      summary: { en: 'Alpha.' } },
+      summary: { en: 'Alpha.' }, links: { project: 'https://example.org/a-project' } },
     { id: 'b', title: 'B', authors: ['pmh9960'], year: 2025, date: '2025-10', tags: ['humanoid'],
-      summary: { en: 'Beta.' } },
+      summary: { en: 'Beta.' }, links: { paper: 'https://example.org/b-paper' } },
     { id: 'broken', title: 'Broken' },
   ];
+  // Each news item points at the project it is news about; the destination comes
+  // from that project's links, not from the news item.
   fakeWindow.NEWS = [
     { id: 'old', date: '2025-10', kind: 'release', title: 'Old',
-      text: { en: 'Released.' }, link: 'https://example.org/old' },
+      text: { en: 'Released.' }, project: 'b' },
     { id: 'new', date: '2026-06', kind: 'acceptance', title: 'New',
-      text: { en: 'Accepted.' }, link: 'https://example.org/new' },
+      text: { en: 'Accepted.' }, project: 'a' },
   ];
   return fakeWindow;
 }
@@ -233,7 +235,7 @@ test('mount renders the news list, newest date first', () => {
   sandbox.DR.mount(doc);
   const html = doc.elements['news-list'].innerHTML;
   assert.ok(html.indexOf('data-news-id="new"') < html.indexOf('data-news-id="old"'));
-  assert.match(html, /https:\/\/example\.org\/new/);
+  assert.match(html, /href="https:\/\/example\.org\/a-project"/, "the row points where project a's card points");
 });
 
 test('mount renders every valid project into the research grid, newest first', () => {

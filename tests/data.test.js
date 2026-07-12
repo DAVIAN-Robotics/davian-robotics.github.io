@@ -85,16 +85,40 @@ test('every link is an absolute url', () => {
   }
 });
 
-test('every news item has the required fields, a known kind, and an absolute link', () => {
+test('every news item has the required fields and a known kind', () => {
   const { NEWS } = loadData();
   assert.ok(NEWS.length > 0, 'NEWS is empty');
   for (const item of NEWS) {
-    for (const field of ['id', 'title', 'date', 'kind', 'link']) {
+    for (const field of ['id', 'title', 'date', 'kind', 'project']) {
       assert.ok(item[field] !== undefined && item[field] !== null, `${item.id}: missing ${field}`);
     }
     assert.ok(['acceptance', 'release'].includes(item.kind), `${item.id}: kind must be acceptance or release`);
-    assert.match(item.link, /^https?:\/\//, `${item.id}: link must be absolute`);
     assert.ok(typeof item.text.en === 'string' && item.text.en.length > 0, `${item.id}: text.en is required`);
+  }
+});
+
+// A news row carries no URL of its own — it points wherever its project's card
+// points. A `project` that matches nothing would render the row as plain text,
+// silently dropping the link, so catch the typo here instead.
+test('every news item points at a project that exists', () => {
+  const { NEWS, PROJECTS } = loadData();
+  const ids = new Set(PROJECTS.map((p) => p.id));
+  for (const item of NEWS) {
+    assert.ok(ids.has(item.project), `${item.id}: project '${item.project}' is not in data/projects.js`);
+  }
+});
+
+// The one thing that would make a row silently unclickable: a project with
+// neither a project page nor a paper. Every project we ship has one.
+test('every project a news item points at has somewhere to send the reader', () => {
+  const { NEWS, PROJECTS } = loadData();
+  for (const item of NEWS) {
+    const project = PROJECTS.find((p) => p.id === item.project);
+    const links = project.links || {};
+    assert.ok(
+      links.project || links.paper,
+      `${item.id}: ${project.id} has neither a project page nor a paper, so its news row would not link`
+    );
   }
 });
 
@@ -122,8 +146,8 @@ test('every news date is month precision — YYYY-MM, never a day', () => {
 test('every project is dated the same as its news item, so the grid and the list are in one order', () => {
   const { PROJECTS, NEWS } = loadData();
   for (const p of PROJECTS) {
-    const items = NEWS.filter((n) => n.id.startsWith(p.id));
-    assert.strictEqual(items.length, 1, `${p.id}: expected exactly one news item (id prefixed by the project id)`);
+    const items = NEWS.filter((n) => n.project === p.id);
+    assert.strictEqual(items.length, 1, `${p.id}: expected exactly one news item pointing at it`);
     assert.strictEqual(
       items[0].date,
       p.date,

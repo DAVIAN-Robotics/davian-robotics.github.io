@@ -687,6 +687,22 @@ button {
   color: var(--fg);
 }
 
+/* A news item whose project has nowhere to point renders as a <div>, not an <a>
+ * with a dead href. It must not pretend to be clickable either: no hover fill,
+ * no underline, no pointer. */
+.news__link--static {
+  cursor: default;
+}
+
+.news__link--static:hover {
+  background: none;
+}
+
+.news__link--static:hover .news__title {
+  color: var(--fg);
+  border-bottom-color: transparent;
+}
+
 .news__link:focus-visible {
   outline-offset: -2px;
 }

@@ -7,7 +7,7 @@
   var REQUIRED = ['id', 'title', 'authors', 'year', 'date', 'summary.en'];
   var LINK_LABELS = { paper: 'Paper', code: 'Code', model: 'Model', data: 'Data', project: 'Project' };
   var LINK_ORDER = ['paper', 'code', 'model', 'data', 'project'];
-  var NEWS_REQUIRED = ['id', 'title', 'date', 'link', 'text.en'];
+  var NEWS_REQUIRED = ['id', 'title', 'date', 'project', 'text.en'];
   var NEWS_KINDS = { acceptance: 'Accepted', release: 'Released' };
 
   function escapeHTML(value) {
@@ -79,22 +79,47 @@
     });
   }
 
-  function newsHTML(items) {
+  /* A news row goes exactly where its project's CARD goes — same rule, same
+   * function (cardHref): the project page, or the paper if there is no project
+   * page. Clicking "Accepted to CVPR 2026" therefore lands in the same place as
+   * clicking the EgoX card, which is the whole point.
+   *
+   * The destination is resolved from data/projects.js by id, not stored on the
+   * news item: a URL written down twice is a URL that will eventually disagree
+   * with itself. A news item whose project cannot be found, or whose project has
+   * neither a project page nor a paper, renders as plain text — never as a dead
+   * link. */
+  function newsHref(item, projects) {
+    var id = item && item.project;
+    if (!id) return '';
+    var match = (projects || []).filter(function (project) {
+      return project.id === id;
+    })[0];
+    return match ? cardHref(match.links) : '';
+  }
+
+  function newsHTML(items, projects) {
     return items
       .map(function (item) {
         var kind = NEWS_KINDS[item.kind] ? item.kind : '';
         var badge = kind
           ? '<span class="news__kind" data-i18n="news.kind.' + kind + '">' + NEWS_KINDS[kind] + '</span>'
           : '';
-        // <time datetime> carries the same 'YYYY-MM' string it prints: a valid
-        // month value, and the machine-readable form of exactly the precision we
-        // are willing to claim.
+        var href = newsHref(item, projects);
         // One <a> wraps the whole row, so the entire line is the target and one
         // focus stop covers it. Nothing inside may be interactive — an <a> may
         // not contain another — which is why the title is a bare heading here.
+        // With no destination the same row is a <div>: no href, nothing to click.
+        var open = href
+          ? '<a class="news__link" href="' + escapeHTML(href) + '">'
+          : '<div class="news__link news__link--static">';
+        var close = href ? '</a>' : '</div>';
+        // <time datetime> carries the same 'YYYY-MM' string it prints: a valid
+        // month value, and the machine-readable form of exactly the precision we
+        // are willing to claim.
         return (
           '<li class="news__item" data-news-id="' + escapeHTML(item.id) + '">' +
-          '<a class="news__link" href="' + escapeHTML(item.link) + '">' +
+          open +
           '<time class="news__date" datetime="' + escapeHTML(item.date) + '">' +
           escapeHTML(item.date) +
           '</time>' +
@@ -104,7 +129,7 @@
           escapeHTML(item.text.en) +
           '</p>' +
           badge +
-          '</a>' +
+          close +
           '</li>'
         );
       })
@@ -557,8 +582,8 @@
   }
 
   function mount(doc) {
-    renderInto(doc, 'news-list', newsHTML(sortNews(validNews(global.NEWS))));
-    // var projects = sortProjects(validProjects(global.PROJECTS));
+    var projects = sortProjects(validProjects(global.PROJECTS));
+    renderInto(doc, 'news-list', newsHTML(sortNews(validNews(global.NEWS)), projects));
     // renderInto(doc, 'filter-chips', chipsHTML(collectTags(projects)));
     applyFilter(doc, 'all');
     bindCardClicks(doc, 'research-grid');
@@ -603,6 +628,7 @@
     validateNews: validateNews,
     validNews: validNews,
     sortNews: sortNews,
+    newsHref: newsHref,
     newsHTML: newsHTML,
     mount: mount,
     applyFilter: applyFilter,

@@ -277,15 +277,23 @@ const NEWS_ITEM = {
   kind: 'acceptance',
   title: 'SimbaV2',
   text: { en: 'Accepted to ICML 2025 as a spotlight.', ko: 'ICML 2025에 spotlight으로 채택되었습니다.' },
-  link: 'https://arxiv.org/abs/2502.15280',
+  project: 'simbav2',
 };
+
+// The projects a news item resolves its destination against. SimbaV2 has both a
+// project page and a paper; the project page wins, same rule as the card.
+const NEWS_PROJECTS = [
+  { id: 'simbav2', links: { paper: 'https://arxiv.org/abs/2502.15280', project: 'https://davian-robotics.github.io/SimbaV2/' } },
+  { id: 'paper-only', links: { paper: 'https://arxiv.org/abs/1' } },
+  { id: 'nowhere', links: { code: 'https://github.com/x' } },
+];
 
 test('a complete news item validates, and an incomplete one reports every missing field', () => {
   const { DR } = loadRenderer();
   assert.deepStrictEqual(DR.validateNews(NEWS_ITEM), { ok: true, missing: [] });
   const result = DR.validateNews({ id: 'x', title: 'X' });
   assert.strictEqual(result.ok, false);
-  assert.deepStrictEqual(result.missing.sort(), ['date', 'link', 'text.en']);
+  assert.deepStrictEqual(result.missing.sort(), ['date', 'project', 'text.en']);
 });
 
 test('an invalid news item is skipped and warned about, and the valid ones survive', () => {
@@ -294,7 +302,7 @@ test('an invalid news item is skipped and warned about, and the valid ones survi
   assert.deepStrictEqual(kept.map((n) => n.id), ['simbav2-icml-2025']);
   assert.strictEqual(warnings.length, 1);
   assert.match(warnings[0], /broken/);
-  assert.match(warnings[0], /link/);
+  assert.match(warnings[0], /project/);
 });
 
 test('news sorts newest date first, across years and within one, keeping the authored order in a tie', () => {
@@ -317,7 +325,7 @@ test('news sorts newest date first, across years and within one, keeping the aut
 
 test('a news item renders its date as a machine-readable <time>, its title, both languages of its text, and a kind badge', () => {
   const { DR } = loadRenderer();
-  const html = DR.newsHTML([NEWS_ITEM]);
+  const html = DR.newsHTML([NEWS_ITEM], NEWS_PROJECTS);
   assert.match(html, /data-news-id="simbav2-icml-2025"/);
   assert.match(html, /<time class="news__date" datetime="2025-05">2025-05<\/time>/);
   assert.match(html, /<h3 class="news__title">SimbaV2<\/h3>/);
@@ -330,9 +338,40 @@ test('a news item renders its date as a machine-readable <time>, its title, both
 // re-grew its own anchor would be invalid markup and a second focus stop.
 test('the whole row is one link and nothing inside it is a second link', () => {
   const { DR } = loadRenderer();
-  const html = DR.newsHTML([NEWS_ITEM]);
-  assert.match(html, /<a class="news__link" href="https:\/\/arxiv\.org\/abs\/2502\.15280">/);
+  const html = DR.newsHTML([NEWS_ITEM], NEWS_PROJECTS);
+  assert.match(html, /<a class="news__link" href="https:\/\/davian-robotics\.github\.io\/SimbaV2\/">/);
   assert.strictEqual((html.match(/<a /g) || []).length, 1, 'exactly one anchor per row');
+});
+
+// --- where a news row points -----------------------------------------------
+
+// The row goes where the CARD goes: same rule, same cardHref. A reader clicking
+// "Accepted to ICML 2025" must land where clicking the SimbaV2 card lands.
+test('a news row points at its project page, falling back to the paper', () => {
+  const { DR } = loadRenderer();
+  assert.strictEqual(
+    DR.newsHref({ project: 'simbav2' }, NEWS_PROJECTS),
+    'https://davian-robotics.github.io/SimbaV2/',
+    'the project page wins, exactly as it does on the card'
+  );
+  assert.strictEqual(
+    DR.newsHref({ project: 'paper-only' }, NEWS_PROJECTS),
+    'https://arxiv.org/abs/1',
+    'no project page falls back to the paper'
+  );
+  assert.strictEqual(DR.newsHref({ project: 'nowhere' }, NEWS_PROJECTS), '');
+  assert.strictEqual(DR.newsHref({ project: 'not-a-project' }, NEWS_PROJECTS), '');
+  assert.strictEqual(DR.newsHref({}, NEWS_PROJECTS), '');
+});
+
+// An <a href=""> reloads the page. A row with nowhere to go is not a link.
+test('a news row with no destination renders as plain text, not a dead link', () => {
+  const { DR } = loadRenderer();
+  const html = DR.newsHTML([{ ...NEWS_ITEM, project: 'nowhere' }], NEWS_PROJECTS);
+  assert.doesNotMatch(html, /<a /, 'no anchor at all');
+  assert.doesNotMatch(html, /href=""/);
+  assert.match(html, /<div class="news__link news__link--static">/);
+  assert.match(html, /SimbaV2/, 'the row still renders — it just does not link');
 });
 
 // Nothing on this site opens a new tab. The renderer emits most of the page's
@@ -342,7 +381,7 @@ test('nothing the renderer emits opens a new tab', () => {
   const { DR } = loadRenderer();
   const everything = [
     DR.cardHTML(PROJECT, PEOPLE),
-    DR.newsHTML([NEWS_ITEM]),
+    DR.newsHTML([NEWS_ITEM], NEWS_PROJECTS),
     DR.authorsHTML(PROJECT.authors, PEOPLE),
     DR.linksHTML(PROJECT.links),
   ].join('');
@@ -353,20 +392,20 @@ test('nothing the renderer emits opens a new tab', () => {
 
 test('a news item with no Korean text still renders, with an empty ko attribute', () => {
   const { DR } = loadRenderer();
-  const html = DR.newsHTML([{ ...NEWS_ITEM, text: { en: 'Released.' } }]);
+  const html = DR.newsHTML([{ ...NEWS_ITEM, text: { en: 'Released.' } }], NEWS_PROJECTS);
   assert.match(html, /data-news-ko=""/);
   assert.match(html, />Released\.</);
 });
 
 test('an unknown news kind renders no badge rather than an empty one', () => {
   const { DR } = loadRenderer();
-  const html = DR.newsHTML([{ ...NEWS_ITEM, kind: 'gossip' }]);
+  const html = DR.newsHTML([{ ...NEWS_ITEM, kind: 'gossip' }], NEWS_PROJECTS);
   assert.doesNotMatch(html, /news__kind/);
 });
 
 test('news text is escaped too', () => {
   const { DR } = loadRenderer();
-  const html = DR.newsHTML([{ ...NEWS_ITEM, title: '<img src=x onerror=alert(1)>' }]);
+  const html = DR.newsHTML([{ ...NEWS_ITEM, title: '<img src=x onerror=alert(1)>' }], NEWS_PROJECTS);
   assert.doesNotMatch(html, /<img src=x/);
   assert.match(html, /&lt;img src=x/);
 });

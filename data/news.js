@@ -37,8 +37,15 @@
  *       en: 'Accepted to CoRL 2026.',
  *       ko: 'CoRL 2026에 채택되었습니다.',
  *     },
- *     link: 'https://arxiv.org/abs/...',      // required, where the item points
+ *     project: 'slug',                       // required, the id of the entry in
+ *                                             // data/projects.js this is news ABOUT
  *   }
+ *
+ * A news row points wherever that project's card points — its project page, or
+ * its paper if it has no project page. It does NOT carry a URL of its own: every
+ * link for a paper lives in data/projects.js, in one place, so the row and the
+ * card can never drift apart and point at different pages. A `project` that
+ * matches nothing renders as plain text rather than a dead link.
  *
  * js/render.js sorts by `date`, newest first — the date decides the order on the
  * page, not the order in this file.
@@ -53,7 +60,7 @@ window.NEWS = [
       en: 'Accepted to IROS 2026.',
       ko: 'IROS 2026에 채택되었습니다.',
     },
-    link: 'https://arxiv.org/abs/2606.31329',
+    project: '3d-hamster',
   },
   {
     id: 'flashsac-rss-2026',
@@ -64,7 +71,7 @@ window.NEWS = [
       en: 'Accepted to RSS 2026. Joint work with Holiday Robotics.',
       ko: 'RSS 2026에 채택되었습니다. Holiday Robotics와의 공동 연구입니다.',
     },
-    link: 'https://arxiv.org/abs/2604.04539',
+    project: 'flashsac',
   },
   {
     id: 'egox-cvpr-2026',
@@ -75,7 +82,7 @@ window.NEWS = [
       en: 'Accepted to CVPR 2026.',
       ko: 'CVPR 2026에 채택되었습니다.',
     },
-    link: 'https://arxiv.org/abs/2512.08269',
+    project: 'egox',
   },
   {
     id: 'acg-icra-2026',
@@ -86,7 +93,7 @@ window.NEWS = [
       en: 'Accepted to ICRA 2026.',
       ko: 'ICRA 2026에 채택되었습니다.',
     },
-    link: 'https://arxiv.org/abs/2510.22201',
+    project: 'acg',
   },
   {
     // No accepted venue: a preprint with a released dataset, so it is written as a
@@ -99,7 +106,7 @@ window.NEWS = [
       en: 'Dataset released on Hugging Face, with the preprint on arXiv.',
       ko: '데이터셋을 Hugging Face에 공개하고, 프리프린트를 arXiv에 게시했습니다.',
     },
-    link: 'https://arxiv.org/abs/2510.26236',
+    project: 'phuma',
   },
   {
     id: 'simbav2-icml-2025',
@@ -110,6 +117,6 @@ window.NEWS = [
       en: 'Accepted to ICML 2025 as a spotlight.',
       ko: 'ICML 2025에 spotlight으로 채택되었습니다.',
     },
-    link: 'https://arxiv.org/abs/2502.15280',
+    project: 'simbav2',
   },
 ];
