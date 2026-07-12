@@ -94,7 +94,7 @@
         // not contain another — which is why the title is a bare heading here.
         return (
           '<li class="news__item" data-news-id="' + escapeHTML(item.id) + '">' +
-          '<a class="news__link" href="' + escapeHTML(item.link) + '" target="_blank" rel="noopener">' +
+          '<a class="news__link" href="' + escapeHTML(item.link) + '">' +
           '<time class="news__date" datetime="' + escapeHTML(item.date) + '">' +
           escapeHTML(item.date) +
           '</time>' +
@@ -147,7 +147,7 @@
         var person = dict[entry];
         if (!person) return escapeHTML(entry);
         return (
-          '<a class="author" href="' + escapeHTML(person.url) + '" target="_blank" rel="noopener">' +
+          '<a class="author" href="' + escapeHTML(person.url) + '">' +
           escapeHTML(person.name) +
           '</a>'
         );
@@ -162,7 +162,7 @@
     })
       .map(function (key) {
         return (
-          '<a class="btn btn--link" href="' + escapeHTML(links[key]) + '" target="_blank" rel="noopener">' +
+          '<a class="btn btn--link" href="' + escapeHTML(links[key]) + '">' +
           '<span data-i18n="links.' + key + '">' + LINK_LABELS[key] + '</span></a>'
         );
       })
@@ -270,7 +270,7 @@
     // string — and the last one silently served English to Korean readers.
     var title = href
       ? '<h3 class="card__title"><a class="card__link" href="' + escapeHTML(href) +
-        '" target="_blank" rel="noopener">' + escapeHTML(project.title) + '</a></h3>'
+        '">' + escapeHTML(project.title) + '</a></h3>'
       : '<h3 class="card__title">' + escapeHTML(project.title) + '</h3>';
     return (
       '<article class="card' + (href ? ' card--linked' : '') +
@@ -514,11 +514,54 @@
    * change — applyFilter(doc, tag) already does the work, and it is what renders
    * the grid today with the tag 'all'.
    */
+  /* THE WHOLE CARD IS THE CLICK TARGET, INCLUDING THE PART THAT IS NOT IN IT.
+   *
+   * The stretched .card__link::after covers the card's own box, and that is not
+   * the whole surface. Two regions escaped it:
+   *   - the summary and the author paragraph, which sit ABOVE the overlay
+   *     (z-index: 1, so the summary stays selectable); and
+   *   - the expanded body, which on hover/focus overflows BELOW the card — the
+   *     overlay's containing block is the card, whose box never grows, so the
+   *     revealed text was a dead zone.
+   * Neither is reachable by stretching the overlay, so the grid delegates
+   * instead: a click anywhere inside a linked card that is not on a real link
+   * goes where the card goes. The overlay stays — it is what gives the card a
+   * genuine <a> (focusable, Enter works, the URL shows in the status bar).
+   *
+   * Bound on the grid, not per card, so re-rendering the cards (applyFilter
+   * replaces innerHTML) cannot orphan or duplicate it; the guard makes a second
+   * mount() a no-op rather than a double navigation. */
+  function bindCardClicks(doc, gridId) {
+    var grid = doc.getElementById(gridId);
+    if (!grid || !grid.addEventListener) return;
+    if (grid.dataset && grid.dataset.cardClickBound) return;
+    grid.addEventListener('click', function (event) {
+      var target = event.target;
+      if (!target || !target.closest) return;
+      // A real link — a link button, an author's name, or the card's own title
+      // anchor (and its ::after, whose clicks are dispatched to the anchor).
+      // Leave it alone: it already knows where it is going.
+      if (target.closest('a')) return;
+      var card = target.closest('.card--linked');
+      if (!card || !card.querySelector) return;
+      var link = card.querySelector('.card__link');
+      if (!link) return;
+      // Selecting the summary ends in a click. That is a selection, not a
+      // navigation — do not yank the reader off the page for it.
+      var selection = global.getSelection && global.getSelection();
+      if (selection && String(selection)) return;
+      var href = link.getAttribute && link.getAttribute('href');
+      if (href && global.location) global.location.href = href;
+    });
+    if (grid.dataset) grid.dataset.cardClickBound = '1';
+  }
+
   function mount(doc) {
     renderInto(doc, 'news-list', newsHTML(sortNews(validNews(global.NEWS))));
     // var projects = sortProjects(validProjects(global.PROJECTS));
     // renderInto(doc, 'filter-chips', chipsHTML(collectTags(projects)));
     applyFilter(doc, 'all');
+    bindCardClicks(doc, 'research-grid');
     // // Bind once: without this guard, a second mount() on the same
     // // #filter-chips node would stack a second click listener and every chip
     // // click would run applyFilter twice.

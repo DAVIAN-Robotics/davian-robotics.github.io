@@ -167,6 +167,27 @@ function makeMatchMedia(map) {
   return (query) => ({ matches: !!map[query], addEventListener() {} });
 }
 
+// --- whole-card click doubles ---------------------------------------------
+
+// A click target inside a card. `anchor` is the nearest <a> the real DOM's
+// closest('a') would find — null for the regions that have none (the summary
+// text, the author paragraph's whitespace, the expanded body's overflow), which
+// are exactly the regions the delegated handler exists to cover.
+function makeClickTarget(options) {
+  const opts = options || {};
+  const link = { getAttribute: (n) => (n === 'href' ? opts.cardHref || 'https://example.org/project' : null) };
+  const card = {
+    querySelector: (sel) => (sel === '.card__link' && !opts.unlinked ? link : null),
+  };
+  return {
+    closest(sel) {
+      if (sel === 'a') return opts.anchor || null;
+      if (sel === '.card--linked') return opts.unlinked ? null : card;
+      return null;
+    },
+  };
+}
+
 // Shelved with the tag filter it belongs to (see the chip tests below): the chip
 // click handler resolved the tag via event.target.closest('.chip'), so the target
 // could be the chip button itself or a child of it.
@@ -655,6 +676,67 @@ test('under prefers-reduced-motion, attachMedia never plays a video, on any devi
 });
 
 // --- chip click handler regression tests ----------------------------------
+
+// --- whole-card click ------------------------------------------------------
+
+test('clicking a dead region of a card — the summary, or the expanded overflow — navigates to the project page', () => {
+  const sandbox = load();
+  sandbox.location = { href: '' };
+  const doc = makeDocument(IDS);
+  sandbox.DR.mount(doc);
+  doc.elements['research-grid'].dispatch('click', {
+    target: makeClickTarget({ cardHref: 'https://davian-robotics.github.io/ACG' }),
+  });
+  assert.strictEqual(sandbox.location.href, 'https://davian-robotics.github.io/ACG');
+});
+
+// The pair that is easy to break while fixing the above: a click that lands on a
+// real link must be left entirely alone, or every Paper button and every author
+// name would be hijacked to the project page.
+test('clicking a real link inside a card — a link button, an author — is left alone', () => {
+  const sandbox = load();
+  sandbox.location = { href: '' };
+  const doc = makeDocument(IDS);
+  sandbox.DR.mount(doc);
+  doc.elements['research-grid'].dispatch('click', {
+    target: makeClickTarget({ anchor: { href: 'https://arxiv.org/abs/2510.22201' } }),
+  });
+  assert.strictEqual(sandbox.location.href, '', 'the anchor must handle its own click — the card must not steal it');
+});
+
+test('a card with no destination does not navigate anywhere', () => {
+  const sandbox = load();
+  sandbox.location = { href: '' };
+  const doc = makeDocument(IDS);
+  sandbox.DR.mount(doc);
+  doc.elements['research-grid'].dispatch('click', { target: makeClickTarget({ unlinked: true }) });
+  assert.strictEqual(sandbox.location.href, '');
+});
+
+// Selecting the summary text ends in a click. Navigating on it would yank the
+// reader off the page mid-selection.
+test('a click that ends a text selection does not navigate', () => {
+  const sandbox = load();
+  sandbox.location = { href: '' };
+  sandbox.getSelection = () => ({ toString: () => 'some text the reader just selected' });
+  const doc = makeDocument(IDS);
+  sandbox.DR.mount(doc);
+  doc.elements['research-grid'].dispatch('click', { target: makeClickTarget({}) });
+  assert.strictEqual(sandbox.location.href, '');
+});
+
+test('the card click handler is bound once — a second mount does not double-navigate', () => {
+  const sandbox = load();
+  sandbox.location = { href: '' };
+  const doc = makeDocument(IDS);
+  sandbox.DR.mount(doc);
+  sandbox.DR.mount(doc);
+  assert.strictEqual(
+    doc.elements['research-grid']._handlers.click.length,
+    1,
+    'exactly one click handler on the grid'
+  );
+});
 
 // The two tests that used to live here drove the chip click wiring end to end
 // (bind-once, and closest('.chip') resolving a click on a nested label). That

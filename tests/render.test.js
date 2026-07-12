@@ -331,11 +331,24 @@ test('a news item renders its date as a machine-readable <time>, its title, both
 test('the whole row is one link and nothing inside it is a second link', () => {
   const { DR } = loadRenderer();
   const html = DR.newsHTML([NEWS_ITEM]);
-  assert.match(
-    html,
-    /<a class="news__link" href="https:\/\/arxiv\.org\/abs\/2502\.15280"[^>]*rel="noopener">/
-  );
+  assert.match(html, /<a class="news__link" href="https:\/\/arxiv\.org\/abs\/2502\.15280">/);
   assert.strictEqual((html.match(/<a /g) || []).length, 1, 'exactly one anchor per row');
+});
+
+// Nothing on this site opens a new tab. The renderer emits most of the page's
+// links, so this is the test that keeps them in the same tab — a stray
+// target="_blank" copied into any one of these builders fails here.
+test('nothing the renderer emits opens a new tab', () => {
+  const { DR } = loadRenderer();
+  const everything = [
+    DR.cardHTML(PROJECT, PEOPLE),
+    DR.newsHTML([NEWS_ITEM]),
+    DR.authorsHTML(PROJECT.authors, PEOPLE),
+    DR.linksHTML(PROJECT.links),
+  ].join('');
+  assert.doesNotMatch(everything, /target=/, 'no link may set a target');
+  assert.doesNotMatch(everything, /_blank/);
+  assert.doesNotMatch(everything, /rel="noopener"/, 'rel=noopener existed only to support target=_blank');
 });
 
 test('a news item with no Korean text still renders, with an empty ko attribute', () => {
