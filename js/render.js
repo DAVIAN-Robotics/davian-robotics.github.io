@@ -235,15 +235,16 @@
     // names), and nesting anchors is invalid HTML that browsers silently
     // restructure. css/style.css raises those inner links back above the overlay
     // so they stay independently clickable.
-    // CSS clamps the title to 2 lines and the summary to 5, which is what makes
-    // the cards a uniform height. The title attribute carries the full text so a
-    // clamped card can still be read in place on hover — and js/i18n.js keeps the
-    // summary's tooltip in step with the language, since it is the same string.
-    var full = ' title="' + escapeHTML(project.title) + '"';
+    // CSS clamps the title, the author list and the summary, which is what makes
+    // every card the same height. Nothing carries a `title` attribute: the clamps
+    // come off on hover and on keyboard focus (see .card:hover / :focus-within in
+    // css/style.css), so the full text is revealed in the card, in the selected
+    // language. A `title` tooltip would have to be a second copy of the same
+    // string — and the last one silently served English to Korean readers.
     var title = href
-      ? '<h3 class="card__title"' + full + '><a class="card__link" href="' + escapeHTML(href) +
+      ? '<h3 class="card__title"><a class="card__link" href="' + escapeHTML(href) +
         '" target="_blank" rel="noopener">' + escapeHTML(project.title) + '</a></h3>'
-      : '<h3 class="card__title"' + full + '>' + escapeHTML(project.title) + '</h3>';
+      : '<h3 class="card__title">' + escapeHTML(project.title) + '</h3>';
     return (
       '<article class="card' + (href ? ' card--linked' : '') +
       '" data-project-id="' + escapeHTML(project.id) + '">' +
@@ -252,8 +253,7 @@
       title +
       venue +
       '<p class="card__authors">' + authorsHTML(project.authors, people) + '</p>' +
-      '<p class="card__summary" title="' + escapeHTML(project.summary.en) + '" ' +
-      'data-summary-en="' + escapeHTML(project.summary.en) + '" ' +
+      '<p class="card__summary" data-summary-en="' + escapeHTML(project.summary.en) + '" ' +
       'data-summary-ko="' + escapeHTML(project.summary.ko || '') + '">' +
       escapeHTML(project.summary.en) +
       '</p>' +

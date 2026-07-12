@@ -201,7 +201,7 @@ test('a card with a destination wraps its title in the stretched link', () => {
   const { DR } = loadRenderer();
   const html = DR.cardHTML({ ...PROJECT, links: { project: 'https://example.org/p' } }, PEOPLE);
   assert.match(html, /class="card card--linked"/);
-  assert.match(html, /<h3 class="card__title" title="[^"]*"><a class="card__link" href="https:\/\/example\.org\/p"/);
+  assert.match(html, /<h3 class="card__title"><a class="card__link" href="https:\/\/example\.org\/p"/);
 });
 
 // An empty href reloads the page — worse than a card that simply does not click.
@@ -211,7 +211,7 @@ test('a card with no destination is not a link and is not marked clickable', () 
   assert.doesNotMatch(html, /card--linked/);
   assert.doesNotMatch(html, /class="card__link"/); // not /card__link/ — .card__links is the button row
   assert.doesNotMatch(html, /href=""/);
-  assert.match(html, /<h3 class="card__title" title="PHUMA">PHUMA<\/h3>/);
+  assert.match(html, /<h3 class="card__title">PHUMA<\/h3>/);
 });
 
 // The inner links are what the overlay must not swallow. They are still real
@@ -225,6 +225,16 @@ test('the card link never nests around the inner links — they stay separate an
   assert.doesNotMatch(html, /<a[^>]*>\s*<article/, 'the card must not be wrapped in an anchor');
   assert.match(html, /<a class="author" href="https:\/\/pmh9960\.github\.io"/);
   assert.match(html, /<a class="btn btn--link" href="https:\/\/arxiv\.org\/abs\/1"/);
+});
+
+// A `title` tooltip would be a second copy of a string that has two languages,
+// and the copy does not go through js/i18n.js's swap — the last one showed the
+// English summary to a reader who had switched the page to Korean. The clamps now
+// come off on hover/focus instead, so there is nothing a tooltip would add.
+test('no card carries a title attribute — it would leak English into Korean mode', () => {
+  const { DR } = loadRenderer();
+  const html = DR.cardHTML(PROJECT, PEOPLE);
+  assert.doesNotMatch(html, /\stitle="/);
 });
 
 test('user-supplied text is escaped, so a stray angle bracket cannot inject markup', () => {

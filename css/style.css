@@ -58,6 +58,13 @@
      has to clear the sticky header — the scroll-padding above, .site-header__inner
      — reads this, so the logo size and the header height stay in step. */
   --header-h: 76px;
+  /* The card's body track (see .card). It has to clear the TALLEST clamped body —
+     title 2 lines + venue + authors 2 lines + summary 5 lines + the tag row + the
+     button row — because anything past it is clipped. One value covers every
+     breakpoint and both languages: measured against the real six projects at
+     1440 / 1024 / 768 / 640 / 375, in English and Korean, nothing clips. Raise it
+     if a card ever starts eating its own buttons. */
+  --card-body-h: 396px;
   --gap: 24px;
   --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
 }
@@ -772,10 +779,25 @@ button {
   gap: var(--gap);
 }
 
+/* THE CARD IS A GRID, AND THAT IS WHAT MAKES THE HOVER EXPANSION FREE OF JANK.
+ *
+ * Two rows: the media (auto, an aspect-ratio box) and the body — and the body's
+ * track is a FIXED LENGTH, --card-body-h. A grid item that overflows a fixed
+ * track does not resize that track. So a card's height is `media + --card-body-h`
+ * and nothing else: it does not depend on how long the title, the author list or
+ * the summary happen to be. Every card in a row is the same height, the row is
+ * the same height whatever is hovered, and when the clamps come off below, the
+ * text overflows the body downward over the cards beneath INSTEAD of growing the
+ * row. Neighbours cannot move, by construction — there is no length in the flow
+ * for them to react to.
+ *
+ * The cost is that --card-body-h has to be big enough for the tallest clamped
+ * body at each breakpoint (measured, see the media queries), and content past it
+ * would be clipped. The clamps are what keep that bounded. */
 .card {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto var(--card-body-h);
   overflow: hidden;
   background: var(--bg);
   border: 1px solid var(--border);
@@ -847,6 +869,88 @@ button {
   z-index: 1;
 }
 
+/* THE REVEAL. On hover and on keyboard focus, every clamp on the card comes off
+ * and the body runs to its full length, spilling out of the card's box and over
+ * whatever is beneath it. The card's own height never changes (see the fixed body
+ * track above), so nothing in the grid moves.
+ *
+ * What each declaration is load-bearing for:
+ *  - z-index on the card raises the WHOLE card above its neighbours, so the
+ *    spilling body paints over the cards below rather than under them.
+ *  - overflow: visible lets the body escape the card. .card__media carries its
+ *    own top corner radius (below) precisely because the card can no longer clip
+ *    it while overflow is visible.
+ *  - the body's opaque background is what makes the spilled text readable — it is
+ *    covering another card, not empty page.
+ *  - height: auto lets the body outgrow its fixed track; min-height keeps a short
+ *    card's body filling it.
+ *  - the 1px accent border (no shadow — that rule still stands) continues the
+ *    card's own outline around the spilled part; the negative margins line it up
+ *    with the card's border rather than sitting 1px inside it.
+ *
+ * Hover is gated behind (hover: hover) so a touch device never gets a sticky
+ * expanded card; focus-within is not gated, because that is how a keyboard
+ * reaches it — tabbing to the title link (or to a link button, or to an author
+ * clipped by the author clamp) expands the card and brings the text into view. */
+.card__body {
+  overflow: hidden;
+}
+
+.card:focus-within {
+  z-index: 5;
+  overflow: visible;
+  border-color: var(--accent);
+}
+
+.card:focus-within .card__body {
+  /* align-self: start is what actually frees it: a grid item is stretched to its
+     track by default, and `height: auto` on a STRETCHED item still resolves to the
+     TRACK's height — so without this the body stays exactly --card-body-h, the
+     clamps come off into a box that cannot grow, and nothing is revealed. */
+  align-self: start;
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
+  margin: 0 -1px -1px;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-top: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.card:focus-within .card__title,
+.card:focus-within .card__authors,
+.card:focus-within .card__summary {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    z-index: 5;
+    overflow: visible;
+  }
+
+  .card:hover .card__body {
+    align-self: start;
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+    margin: 0 -1px -1px;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-top: 0;
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+
+  .card:hover .card__title,
+  .card:hover .card__authors,
+  .card:hover .card__summary {
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+  }
+}
+
 /* Scroll reveal. Cards are visible by default; js/render.js opts a grid in by
  * setting .is-revealing on it and .is-visible per card as it enters view, so a
  * page with JS off or an observer that never fires still shows every card. */
@@ -860,12 +964,16 @@ button {
   transform: none;
 }
 
+/* The top corners are rounded HERE, not by the card clipping them: the card
+ * turns overflow: visible while it is expanded, so it can no longer clip its own
+ * media. Radius less the 1px border, so it sits inside the card's outline. */
 .card__media {
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
   background: var(--bg-band);
   border-bottom: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
 }
 
 .card__media img,
@@ -952,7 +1060,17 @@ button {
   color: var(--accent);
 }
 
+/* Clamped for the same reason as the title and the summary: the body's track is
+ * a fixed length, so a ten-author list cannot be allowed to push the summary and
+ * the buttons out of it. Two lines is enough for most, and the clamp comes off on
+ * hover/focus with everything else — so an author link hidden by the clamp is
+ * still reachable: tabbing to it expands the card and brings it into view. */
 .card__authors {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
   font-size: 0.8125rem;
   line-height: 1.55;
   color: var(--fg-muted);
