@@ -142,6 +142,9 @@ window.PROJECTS = [
   {
     id: 'phuma',
     title: 'PHUMA: Physically Reliable Humanoid Locomotion Dataset',
+    // No accepted venue. This is what it is — do not upgrade it to a conference
+    // without an acceptance. Its news item says the same thing (a release).
+    venue: 'Preprint (arXiv)',
     authors: [
       'kyungminn',
       'sibisibi',

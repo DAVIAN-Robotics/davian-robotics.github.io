@@ -275,8 +275,14 @@
           <header class="section__head">
             <h2 class="section__title" data-i18n="section.research">Research</h2>
           </header>
-          <!-- Chips and cards are both rendered by js/render.js. -->
-          <div id="filter-chips" class="chips"></div>
+          <!-- The tag filter is SHELVED, not removed: six projects are not worth
+               filtering, and each card now carries its own tags as labels. The
+               logic is still in js/render.js and still tested. To bring it back,
+               uncomment the row below, the two blocks in mount() in js/render.js,
+               and the .chips / .chip rules in css/style.css. -->
+          <!-- <div id="filter-chips" class="chips"></div> -->
+
+          <!-- Cards are rendered by js/render.js. -->
           <div id="research-grid" class="grid"></div>
         </div>
       </section>

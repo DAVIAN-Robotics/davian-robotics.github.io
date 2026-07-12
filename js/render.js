@@ -196,6 +196,34 @@
     return links.project || links.paper || '';
   }
 
+  /* Which of the four logo colours a tag wears. It is a hash, not a counter, so
+   * a tag keeps its colour on every card it appears on and no matter what else
+   * is on the page — 'vla' is the same colour on 3D HAMSTER as on ACG, and stays
+   * that colour when a project is added. Four buckets, the four logo hues. */
+  function tagTone(tag) {
+    var sum = 0;
+    var text = String(tag);
+    for (var i = 0; i < text.length; i += 1) sum += text.charCodeAt(i);
+    return (sum % 4) + 1;
+  }
+
+  /* Labels, not controls: <li>s, not buttons. The tag filter they used to drive
+   * is shelved (see mount), and these never had click behaviour anyway. */
+  function tagsHTML(tags) {
+    if (!tags || !tags.length) return '';
+    return (
+      '<ul class="card__tags">' +
+      tags
+        .map(function (tag) {
+          return (
+            '<li class="tag tag--' + tagTone(tag) + '">' + escapeHTML(tag) + '</li>'
+          );
+        })
+        .join('') +
+      '</ul>'
+    );
+  }
+
   function cardHTML(project, people) {
     var venue = project.venue
       ? '<span class="card__venue">' + escapeHTML(project.venue) + '</span>'
@@ -207,10 +235,15 @@
     // names), and nesting anchors is invalid HTML that browsers silently
     // restructure. css/style.css raises those inner links back above the overlay
     // so they stay independently clickable.
+    // CSS clamps the title to 2 lines and the summary to 5, which is what makes
+    // the cards a uniform height. The title attribute carries the full text so a
+    // clamped card can still be read in place on hover — and js/i18n.js keeps the
+    // summary's tooltip in step with the language, since it is the same string.
+    var full = ' title="' + escapeHTML(project.title) + '"';
     var title = href
-      ? '<h3 class="card__title"><a class="card__link" href="' + escapeHTML(href) +
+      ? '<h3 class="card__title"' + full + '><a class="card__link" href="' + escapeHTML(href) +
         '" target="_blank" rel="noopener">' + escapeHTML(project.title) + '</a></h3>'
-      : '<h3 class="card__title">' + escapeHTML(project.title) + '</h3>';
+      : '<h3 class="card__title"' + full + '>' + escapeHTML(project.title) + '</h3>';
     return (
       '<article class="card' + (href ? ' card--linked' : '') +
       '" data-project-id="' + escapeHTML(project.id) + '">' +
@@ -219,10 +252,12 @@
       title +
       venue +
       '<p class="card__authors">' + authorsHTML(project.authors, people) + '</p>' +
-      '<p class="card__summary" data-summary-en="' + escapeHTML(project.summary.en) + '" ' +
+      '<p class="card__summary" title="' + escapeHTML(project.summary.en) + '" ' +
+      'data-summary-en="' + escapeHTML(project.summary.en) + '" ' +
       'data-summary-ko="' + escapeHTML(project.summary.ko || '') + '">' +
       escapeHTML(project.summary.en) +
       '</p>' +
+      tagsHTML(project.tags) +
       '<div class="card__links">' + linksHTML(project.links) + '</div>' +
       '</div>' +
       '</article>'
@@ -441,26 +476,37 @@
     mediaVideosByGrid[gridId] = Array.prototype.slice.call(videos);
   }
 
+  /* THE TAG FILTER IS DELIBERATELY SHELVED — six projects are not worth
+   * filtering, so the chip row is not rendered and nothing is bound. The logic
+   * itself is alive and still tested (collectTags / filterProjects / chipsHTML /
+   * applyFilter), because this comes back the moment the list is long enough to
+   * justify it.
+   *
+   * To re-enable: uncomment the two blocks below, and uncomment #filter-chips in
+   * index.html and the .chips / .chip rules in css/style.css. Nothing else has to
+   * change — applyFilter(doc, tag) already does the work, and it is what renders
+   * the grid today with the tag 'all'.
+   */
   function mount(doc) {
-    var projects = sortProjects(validProjects(global.PROJECTS));
     renderInto(doc, 'news-list', newsHTML(sortNews(validNews(global.NEWS))));
-    renderInto(doc, 'filter-chips', chipsHTML(collectTags(projects)));
+    // var projects = sortProjects(validProjects(global.PROJECTS));
+    // renderInto(doc, 'filter-chips', chipsHTML(collectTags(projects)));
     applyFilter(doc, 'all');
-    // Bind once: without this guard, a second mount() on the same
-    // #filter-chips node would stack a second click listener and every chip
-    // click would run applyFilter twice.
-    var chips = doc.getElementById('filter-chips');
-    if (chips && chips.addEventListener && !(chips.dataset && chips.dataset.filterBound)) {
-      chips.addEventListener('click', function (event) {
-        // closest('.chip'), not a direct getAttribute on event.target: the
-        // click target can be a child of the chip button (e.g. an i18n
-        // <span> wrapping its label), which has no data-tag of its own.
-        var chip = event.target && event.target.closest && event.target.closest('.chip');
-        var tag = chip && chip.getAttribute && chip.getAttribute('data-tag');
-        if (tag) applyFilter(doc, tag);
-      });
-      if (chips.dataset) chips.dataset.filterBound = '1';
-    }
+    // // Bind once: without this guard, a second mount() on the same
+    // // #filter-chips node would stack a second click listener and every chip
+    // // click would run applyFilter twice.
+    // var chips = doc.getElementById('filter-chips');
+    // if (chips && chips.addEventListener && !(chips.dataset && chips.dataset.filterBound)) {
+    //   chips.addEventListener('click', function (event) {
+    //     // closest('.chip'), not a direct getAttribute on event.target: the
+    //     // click target can be a child of the chip button (e.g. an i18n
+    //     // <span> wrapping its label), which has no data-tag of its own.
+    //     var chip = event.target && event.target.closest && event.target.closest('.chip');
+    //     var tag = chip && chip.getAttribute && chip.getAttribute('data-tag');
+    //     if (tag) applyFilter(doc, tag);
+    //   });
+    //   if (chips.dataset) chips.dataset.filterBound = '1';
+    // }
   }
 
   global.DR = {
@@ -470,10 +516,15 @@
     sortProjects: sortProjects,
     collectTags: collectTags,
     filterProjects: filterProjects,
+    // Exported although mount() no longer calls it: the tag filter is shelved,
+    // not deleted, and this keeps it reachable (and tested) until it returns.
+    chipsHTML: chipsHTML,
     authorsHTML: authorsHTML,
     linksHTML: linksHTML,
     mediaHTML: mediaHTML,
     cardHref: cardHref,
+    tagTone: tagTone,
+    tagsHTML: tagsHTML,
     cardHTML: cardHTML,
     validateNews: validateNews,
     validNews: validNews,

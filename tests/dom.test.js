@@ -167,12 +167,13 @@ function makeMatchMedia(map) {
   return (query) => ({ matches: !!map[query], addEventListener() {} });
 }
 
-// The chip click handler resolves the tag via event.target.closest('.chip'),
-// so the target can be the chip button itself or a child of it.
-function chipClickTarget(tag) {
-  const chip = { getAttribute: (attr) => (attr === 'data-tag' ? tag : null) };
-  return { getAttribute: () => null, closest: (sel) => (sel === '.chip' ? chip : null) };
-}
+// Shelved with the tag filter it belongs to (see the chip tests below): the chip
+// click handler resolved the tag via event.target.closest('.chip'), so the target
+// could be the chip button itself or a child of it.
+// function chipClickTarget(tag) {
+//   const chip = { getAttribute: (attr) => (attr === 'data-tag' ? tag : null) };
+//   return { getAttribute: () => null, closest: (sel) => (sel === '.chip' ? chip : null) };
+// }
 
 // Loaded in this realm (not vm.createContext) so objects the renderer
 // returns compare with assert.deepStrictEqual — a vm context would give
@@ -223,14 +224,32 @@ test('mount renders every valid project into the research grid, newest first', (
   assert.doesNotMatch(html, /data-project-id="broken"/);
 });
 
-test('mount renders an All chip plus one chip per tag', () => {
+// The tag filter is deliberately shelved (six projects are not worth filtering)
+// but NOT deleted — chipsHTML / collectTags / filterProjects are still exercised
+// in tests/render.test.js so the logic stays correct for when it comes back.
+// This test guards the shelving itself: mount must not render the chip row and
+// must not bind anything to it. If someone re-enables the filter, they have to
+// come here and say so on purpose.
+test('the tag filter is shelved: mount renders no chips and binds no chip handler', () => {
   const sandbox = load();
   const doc = makeDocument(IDS);
   sandbox.DR.mount(doc);
-  const html = doc.elements['filter-chips'].innerHTML;
+  const chips = doc.elements['filter-chips'];
+  assert.strictEqual(chips.innerHTML, '', 'the chip row must stay empty while the filter is shelved');
+  assert.strictEqual(chips._handlers.click, undefined, 'no click handler may be bound to the chip row');
+  assert.strictEqual(chips.dataset.filterBound, undefined);
+});
+
+test('the shelved filter still works — chipsHTML and applyFilter are alive for when it is switched back on', () => {
+  const sandbox = load();
+  const doc = makeDocument(IDS);
+  const html = sandbox.DR.chipsHTML(sandbox.DR.collectTags(sandbox.PROJECTS));
   assert.match(html, /data-tag="all"/);
   assert.match(html, /data-tag="humanoid"/);
   assert.match(html, /data-tag="vla"/);
+  sandbox.DR.applyFilter(doc, 'humanoid');
+  assert.match(doc.elements['research-grid'].innerHTML, /data-project-id="b"/);
+  assert.doesNotMatch(doc.elements['research-grid'].innerHTML, /data-project-id="a"/);
 });
 
 test('applyFilter re-renders the grid with only the matching projects', () => {
@@ -637,31 +656,8 @@ test('under prefers-reduced-motion, attachMedia never plays a video, on any devi
 
 // --- chip click handler regression tests ----------------------------------
 
-test('mount binds the chip click handler only once — a second mount does not double-fire applyFilter', () => {
-  const sandbox = load();
-  const Observer = makeObserverFactory();
-  sandbox.IntersectionObserver = Observer;
-  const doc = makeDocument(IDS);
-  sandbox.DR.mount(doc);
-  sandbox.DR.mount(doc);
-
-  const chips = doc.elements['filter-chips'];
-  // Every applyFilter run constructs exactly one new reveal observer for
-  // research-grid, so counting new instances is a reliable proxy for how
-  // many times applyFilter actually ran off of this one click.
-  const before = Observer.instances.length;
-  chips.dispatch('click', { target: chipClickTarget('humanoid') });
-  const after = Observer.instances.length;
-  assert.strictEqual(after - before, 1, 'applyFilter must run exactly once per click');
-});
-
-test('chip click handler uses closest(".chip"), so a click on a wrapped label span still filters', () => {
-  const sandbox = load();
-  const doc = makeDocument(IDS);
-  sandbox.DR.mount(doc);
-  const chips = doc.elements['filter-chips'];
-  chips.dispatch('click', { target: chipClickTarget('humanoid') });
-  const html = doc.elements['research-grid'].innerHTML;
-  assert.match(html, /data-project-id="b"/);
-  assert.doesNotMatch(html, /data-project-id="a"/);
-});
+// The two tests that used to live here drove the chip click wiring end to end
+// (bind-once, and closest('.chip') resolving a click on a nested label). That
+// wiring is commented out in mount() while the filter is shelved, so they have
+// nothing to drive. Restore them from git history alongside the filter — they
+// are the tests that catch the double-bind bug if it comes back.

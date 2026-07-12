@@ -53,7 +53,13 @@
     Array.prototype.forEach.call(nodes, function (node) {
       var ko = node.getAttribute(koAttr);
       var en = node.getAttribute(enAttr);
-      node.textContent = lang === 'ko' && ko ? ko : en;
+      var text = lang === 'ko' && ko ? ko : en;
+      node.textContent = text;
+      // A clamped card summary carries its full text in `title` so a truncated
+      // one can still be read on hover. It is the same string, so it has to
+      // follow the language too — otherwise the card reads Korean and its
+      // tooltip answers in English.
+      if (node.getAttribute('title') !== null) node.setAttribute('title', text);
     });
   }
 

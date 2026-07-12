@@ -150,6 +150,35 @@ test('a card carries its id, title, venue, authors, and summary', () => {
   assert.match(html, /A humanoid locomotion dataset\./);
 });
 
+// --- per-card tag labels ---------------------------------------------------
+
+test('a tag always gets the same colour, wherever it appears', () => {
+  const { DR } = loadRenderer();
+  assert.strictEqual(DR.tagTone('vla'), DR.tagTone('vla'), 'the same tag must not change colour between cards');
+  const tones = ['vla', 'manipulation', 'humanoid', 'dataset', 'reinforcement learning'].map(DR.tagTone);
+  tones.forEach((tone) => assert.ok(tone >= 1 && tone <= 4, 'every tag lands on one of the four logo hues'));
+});
+
+test('tags render as labels, not controls — no button, no link, no data-tag', () => {
+  const { DR } = loadRenderer();
+  const html = DR.tagsHTML(['vla', 'manipulation']);
+  assert.match(html, /<li class="tag tag--\d">vla<\/li>/);
+  assert.match(html, /<li class="tag tag--\d">manipulation<\/li>/);
+  assert.doesNotMatch(html, /<button|<a |data-tag=/, 'a tag label must not look or behave like the old filter chip');
+});
+
+test('a project with no tags renders no tag row at all', () => {
+  const { DR } = loadRenderer();
+  assert.strictEqual(DR.tagsHTML([]), '');
+  assert.strictEqual(DR.tagsHTML(undefined), '');
+});
+
+test('a card carries its tags, and they are escaped like everything else', () => {
+  const { DR } = loadRenderer();
+  assert.match(DR.cardHTML(PROJECT, PEOPLE), /class="card__tags"/);
+  assert.match(DR.tagsHTML(['<img src=x>']), /&lt;img src=x&gt;/);
+});
+
 // --- the card's own destination -------------------------------------------
 
 test('the card links to its project page, falling back to the paper, and to nothing at all if it has neither', () => {
@@ -172,7 +201,7 @@ test('a card with a destination wraps its title in the stretched link', () => {
   const { DR } = loadRenderer();
   const html = DR.cardHTML({ ...PROJECT, links: { project: 'https://example.org/p' } }, PEOPLE);
   assert.match(html, /class="card card--linked"/);
-  assert.match(html, /<h3 class="card__title"><a class="card__link" href="https:\/\/example\.org\/p"/);
+  assert.match(html, /<h3 class="card__title" title="[^"]*"><a class="card__link" href="https:\/\/example\.org\/p"/);
 });
 
 // An empty href reloads the page — worse than a card that simply does not click.
@@ -182,7 +211,7 @@ test('a card with no destination is not a link and is not marked clickable', () 
   assert.doesNotMatch(html, /card--linked/);
   assert.doesNotMatch(html, /class="card__link"/); // not /card__link/ — .card__links is the button row
   assert.doesNotMatch(html, /href=""/);
-  assert.match(html, /<h3 class="card__title">PHUMA<\/h3>/);
+  assert.match(html, /<h3 class="card__title" title="PHUMA">PHUMA<\/h3>/);
 });
 
 // The inner links are what the overlay must not swallow. They are still real

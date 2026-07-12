@@ -36,6 +36,23 @@
   --accent-tint-strong: color-mix(in srgb, var(--accent) 8%, var(--bg));
   --accent-line: color-mix(in srgb, var(--accent) 22%, transparent);
   --accent-faint: color-mix(in srgb, var(--accent) 12%, transparent);
+  /* Tag chips are the one place on the page that spends more than the single
+     accent, and the four hues are the logo's own: deep purple, pink, salmon,
+     sand. The pale two (salmon, sand) are unreadable as text at their logo
+     values, so each tone is stored as a DARKENED ink and worn as a 9% tint of
+     itself — measured against its own tint, the four inks land at 9.0, 5.8, 5.2
+     and 5.8:1, all past AA. They are tints, not fills, on purpose: the demo
+     video is still the loudest thing on a card and a row of solid chips would
+     out-shout it. No blue, here or anywhere. js/render.js's tagTone() hashes a
+     tag onto one of these four, so a tag keeps its colour everywhere. */
+  --tag-1-ink: #4a3372;
+  --tag-2-ink: #9c3572;
+  --tag-3-ink: #a8442a;
+  --tag-4-ink: #7a5712;
+  --tag-1-bg: color-mix(in srgb, var(--tag-1-ink) 9%, var(--bg));
+  --tag-2-bg: color-mix(in srgb, var(--tag-2-ink) 9%, var(--bg));
+  --tag-3-bg: color-mix(in srgb, var(--tag-3-ink) 9%, var(--bg));
+  --tag-4-bg: color-mix(in srgb, var(--tag-4-ink) 9%, var(--bg));
   --accent-hair: color-mix(in srgb, var(--accent) 9%, transparent);
   /* Tall enough for the 46px logo lockup plus breathing room. Everything that
      has to clear the sticky header — the scroll-padding above, .site-header__inner
@@ -709,37 +726,43 @@ button {
   color: var(--accent);
 }
 
-/* Chips ------------------------------------------------------------------- */
+/* Chips (the tag FILTER) --------------------------------------------------- */
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 28px;
-}
-
-.chip {
-  padding: 6px 14px;
-  border: 1px solid var(--border-control);
-  border-radius: 999px;
-  font-size: 0.8125rem;
-  font-weight: 550;
-  color: var(--fg-muted);
-  transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease),
-    color 0.18s var(--ease);
-}
-
-.chip:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.chip--active,
-.chip--active:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
-}
+/* SHELVED, not deleted: six projects are not worth filtering. Uncomment this
+ * block together with #filter-chips in index.html and the two blocks in mount()
+ * in js/render.js — nothing else has to change. Not to be confused with .tag
+ * below, which is the per-card label and is very much live.
+ *
+ * .chips {
+ *   display: flex;
+ *   flex-wrap: wrap;
+ *   gap: 8px;
+ *   margin-bottom: 28px;
+ * }
+ *
+ * .chip {
+ *   padding: 6px 14px;
+ *   border: 1px solid var(--border-control);
+ *   border-radius: 999px;
+ *   font-size: 0.8125rem;
+ *   font-weight: 550;
+ *   color: var(--fg-muted);
+ *   transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease),
+ *     color 0.18s var(--ease);
+ * }
+ *
+ * .chip:hover {
+ *   border-color: var(--accent);
+ *   color: var(--accent);
+ * }
+ *
+ * .chip--active,
+ * .chip--active:hover {
+ *   background: var(--accent);
+ *   border-color: var(--accent);
+ *   color: var(--bg);
+ * }
+ */
 
 /* Grid and cards ---------------------------------------------------------- */
 
@@ -896,7 +919,19 @@ button {
   padding: 22px;
 }
 
+/* The clamps are what make the grid a grid. Without them one 446-character
+ * summary (FlashSAC's) drags its whole row 190px taller than the next, and every
+ * card is a different shape. Read from the data: five of the six summaries run
+ * 5-6 lines, so 5 is the line at which clamping is the exception; titles run
+ * 2-5 lines, so 2. The full text of both is in a `title` attribute, so a clamped
+ * card can still be read in place on hover, and the card links to the paper's
+ * own page anyway. */
 .card__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
   font-size: 1.0625rem;
   font-weight: 650;
   letter-spacing: -0.015em;
@@ -935,8 +970,54 @@ button {
 }
 
 .card__summary {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  overflow: hidden;
   font-size: 0.9375rem;
   color: var(--fg-muted);
+}
+
+/* Tag chips: labels, not controls. No border, no pointer, no hover — the only
+ * thing on this card that looks tappable and is not would be a lie, so they are
+ * flat tinted text. They sit UNDER the card's stretched link (unlike the author
+ * links and the button row, which are raised above it), so clicking one opens
+ * the project page like clicking any other part of the card. */
+.card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.tag {
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.tag--1 {
+  background: var(--tag-1-bg);
+  color: var(--tag-1-ink);
+}
+
+.tag--2 {
+  background: var(--tag-2-bg);
+  color: var(--tag-2-ink);
+}
+
+.tag--3 {
+  background: var(--tag-3-bg);
+  color: var(--tag-3-ink);
+}
+
+.tag--4 {
+  background: var(--tag-4-bg);
+  color: var(--tag-4-ink);
 }
 
 .card__links {
