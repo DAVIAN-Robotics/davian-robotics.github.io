@@ -29,11 +29,19 @@
 
     <header class="site-header">
       <div class="container site-header__inner">
+        <!-- The <a> is the crop window; the <img> inside is oversized and pulled
+             up/left so only the inked lockup shows. The file carries ~10% of its
+             own width and ~12% of its height as empty margin (alpha bbox is
+             25,22 → 2023,807 of 2247x921), which is what made the wordmark look
+             small and soft at a header size — the height was being spent on
+             nothing. Sizing is driven entirely by --logo-h in css/style.css; the
+             file itself is untouched. -->
         <a class="site-header__logo" href="#top">
           <img
             src="assets/logo/davian-robotics-horizontal.png"
             alt="DAVIAN Robotics"
-            height="32"
+            width="2247"
+            height="921"
           />
         </a>
 

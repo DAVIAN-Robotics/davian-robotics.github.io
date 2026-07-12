@@ -37,7 +37,10 @@
   --accent-line: color-mix(in srgb, var(--accent) 22%, transparent);
   --accent-faint: color-mix(in srgb, var(--accent) 12%, transparent);
   --accent-hair: color-mix(in srgb, var(--accent) 9%, transparent);
-  --header-h: 60px;
+  /* Tall enough for the 46px logo lockup plus breathing room. Everything that
+     has to clear the sticky header — the scroll-padding above, .site-header__inner
+     — reads this, so the logo size and the header height stay in step. */
+  --header-h: 76px;
   --gap: 24px;
   --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
 }
@@ -187,9 +190,34 @@ button {
   min-height: var(--header-h);
 }
 
+/* The logo is cropped to its own ink, in CSS, without touching the file.
+ *
+ * davian-robotics-horizontal.png is 2247x921 but its alpha bounding box is
+ * 25,22 → 2023,807 — an inked lockup of 1998x785 sitting in ~10% horizontal and
+ * ~12% vertical padding. Constraining the FILE to a header height therefore
+ * spends that height on empty pixels and leaves the "ROBOTICS" line too small to
+ * read. So the <a> is a crop window sized to the INK (--logo-h is the height of
+ * the lockup, not of the file), and the <img> is scaled up by the file/ink ratio
+ * and pulled up and left by the padding. Every number below is one of those four
+ * bbox values — recrop only if the asset is replaced.
+ *
+ * The source is 2247px wide, so at 46px tall it is still ~10x oversampled: the
+ * mark stays crisp. */
+.site-header__logo {
+  --logo-h: 46px;
+  display: block;
+  width: calc(var(--logo-h) * 1998 / 785);
+  height: var(--logo-h);
+  overflow: hidden;
+}
+
 .site-header__logo img {
-  height: 32px;
+  height: calc(var(--logo-h) * 921 / 785);
   width: auto;
+  /* The reset caps images at max-width: 100%; this one must overflow its box —
+     that is the crop. */
+  max-width: none;
+  margin: calc(var(--logo-h) * -22 / 785) 0 0 calc(var(--logo-h) * -25 / 785);
 }
 
 .site-header__parent {
