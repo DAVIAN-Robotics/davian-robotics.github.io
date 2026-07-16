@@ -39,6 +39,29 @@
  */
 window.PROJECTS = [
   {
+    id: 'pointmap',
+    title: 'See like a Robot: Robot-Centric Pointmaps for Vision-Language-Action Models',
+    authors: ['lee15253', 'godnpeter', 'k00dj19', 'joonleesky', 'pmh9960', 'jaegulchoo'],
+    year: 2026,
+    date: '2026-07',
+    tags: ['vla', 'manipulation'],
+    media: {
+      type: 'video',
+      src: 'assets/media/pointmap.mp4',
+      poster: 'assets/media/pointmap.jpg',
+    },
+    summary: {
+      en:
+        'Robot-centric pointmaps give a VLA per-pixel 3D in the frame where actions are defined, keeping the policy robust as training-time camera viewpoint variation grows, with one extra encoder and one element-wise addition.',
+      ko:
+        '로봇 좌표계 포인트맵으로 VLA에 픽셀 단위 3D를 제공해, 학습 시 카메라 시점 변화가 커져도 정책이 강건하게 유지됩니다. 인코더 하나와 element-wise 덧셈만 추가하면 됩니다.',
+    },
+    links: {
+      paper: 'https://arxiv.org/abs/2607.11498',
+      project: 'https://davian-robotics.github.io/pointmap/',
+    },
+  },
+  {
     id: '3d-hamster',
     title:
       '3D HAMSTER: Bridging Planning and Control in Hierarchical Vision Language Action Models through 3D Trajectory Guidance',
