@@ -52,6 +52,19 @@
  */
 window.NEWS = [
   {
+    // No accepted venue yet: a preprint, so it is written as a release and dated
+    // by the arXiv posting (2607.11498 -> July 2026). Do not give it a venue.
+    id: 'pointmap-arxiv',
+    date: '2026-07',
+    kind: 'release',
+    title: 'See like a Robot',
+    text: {
+      en: 'Preprint released on arXiv.',
+      ko: '프리프린트가 arXiv에 공개되었습니다.',
+    },
+    project: 'pointmap',
+  },
+  {
     id: '3d-hamster-iros-2026',
     date: '2026-06',
     kind: 'acceptance',
