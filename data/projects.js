@@ -39,6 +39,43 @@
  */
 window.PROJECTS = [
   {
+    id: 'phuma',
+    title: 'PHUMA: Physically Reliable Humanoid Locomotion Dataset',
+    venue: 'CoRL 2026',
+    authors: [
+      'kyungminn',
+      'sibisibi',
+      'leeyngdo',
+      'pmh9960',
+      'mynsng',
+      'godnpeter',
+      'iamproto',
+      'joonleesky',
+      'jaegulchoo',
+    ],
+    year: 2026,
+    date: '2026-09',
+    tags: ['humanoid', 'locomotion', 'dataset'],
+    media: {
+      type: 'video',
+      src: 'assets/media/phuma.mp4',
+      poster: 'assets/media/phuma.jpg',
+    },
+    summary: {
+      en:
+        'A high-quality humanoid locomotion dataset built from large-scale human motion data, using careful curation and physics-constrained retargeting to eliminate physical artifacts.',
+      ko:
+        '대규모 인간 동작 데이터를 정교한 큐레이션과 물리 제약 리타겟팅으로 정제하여 물리적 아티팩트를 제거한 고품질 휴머노이드 보행 데이터셋입니다.',
+    },
+    links: {
+      paper: 'https://arxiv.org/abs/2510.26236',
+      code: 'https://github.com/DAVIAN-Robotics/PHUMA',
+      data: 'https://huggingface.co/datasets/DAVIAN-Robotics/PHUMA',
+      project: 'https://davian-robotics.github.io/PHUMA/',
+    },
+    featured: true,
+  },
+  {
     id: 'pointmap',
     title: 'See like a Robot: Robot-Centric Pointmaps for Vision-Language-Action Models',
     authors: ['lee15253', 'godnpeter', 'k00dj19', 'joonleesky', 'pmh9960', 'jaegulchoo'],
@@ -159,45 +196,6 @@ window.PROJECTS = [
       code: 'https://github.com/DAVIAN-Robotics/ACG',
       model: 'https://huggingface.co/collections/DAVIAN-Robotics/acg-gr00t-n1-2b-post-trained-models',
       project: 'https://davian-robotics.github.io/ACG',
-    },
-    featured: true,
-  },
-  {
-    id: 'phuma',
-    title: 'PHUMA: Physically Reliable Humanoid Locomotion Dataset',
-    // No accepted venue. This is what it is — do not upgrade it to a conference
-    // without an acceptance. Its news item says the same thing (a release).
-    venue: 'Preprint (arXiv)',
-    authors: [
-      'kyungminn',
-      'sibisibi',
-      'leeyngdo',
-      'pmh9960',
-      'mynsng',
-      'godnpeter',
-      'iamproto',
-      'joonleesky',
-      'jaegulchoo',
-    ],
-    year: 2025,
-    date: '2025-10',
-    tags: ['humanoid', 'locomotion', 'dataset'],
-    media: {
-      type: 'video',
-      src: 'assets/media/phuma.mp4',
-      poster: 'assets/media/phuma.jpg',
-    },
-    summary: {
-      en:
-        'A high-quality humanoid locomotion dataset built from large-scale human motion data, using careful curation and physics-constrained retargeting to eliminate physical artifacts.',
-      ko:
-        '대규모 인간 동작 데이터를 정교한 큐레이션과 물리 제약 리타겟팅으로 정제하여 물리적 아티팩트를 제거한 고품질 휴머노이드 보행 데이터셋입니다.',
-    },
-    links: {
-      paper: 'https://arxiv.org/abs/2510.26236',
-      code: 'https://github.com/DAVIAN-Robotics/PHUMA',
-      data: 'https://huggingface.co/datasets/DAVIAN-Robotics/PHUMA',
-      project: 'https://davian-robotics.github.io/PHUMA/',
     },
     featured: true,
   },
