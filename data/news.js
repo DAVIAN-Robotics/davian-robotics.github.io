@@ -8,7 +8,8 @@
  * day the venue notified all of its authors. That is a real, citable date, and it
  * is the only one we can stand behind:
  *
- *   IROS 2026   2026-06-16   https://2026.ieee-iros.org/about/important-dates/
+ *   CoRL 2026   2026-09-04   https://www.corl.org/contributions/call-for-demos
+ *   IROS 2026   2026-06-16  https://2026.ieee-iros.org/about/important-dates/
  *   RSS 2026    2026-04-27   https://roboticsconference.org/information/cfp/
  *   CVPR 2026   2026-02-21   https://cvpr.thecvf.com/Conferences/2026/Dates
  *   ICRA 2026   2026-01-31   https://2026.ieee-icra.org/event/notifications-of-acceptance-rejection-sent/
@@ -23,8 +24,8 @@
  *   2. Adding an item means finding its venue's notification date and citing it in
  *      that table. Do not guess one, and do not copy a neighbour's.
  *
- * A RELEASE item is dated by the release itself (PHUMA's arXiv id 2510.26236 puts
- * it in October 2025) and claims no venue.
+ * A RELEASE item is dated by the release itself (See like a Robot's arXiv id
+ * 2607.11498 puts it in July 2026) and claims no venue.
  *
  * Template — copy this object and fill it in:
  *
@@ -51,6 +52,17 @@
  * page, not the order in this file.
  */
 window.NEWS = [
+  {
+    id: 'phuma-corl-2026',
+    date: '2026-09',
+    kind: 'acceptance',
+    title: 'PHUMA',
+    text: {
+      en: 'Accepted to CoRL 2026.',
+      ko: 'CoRL 2026에 채택되었습니다.',
+    },
+    project: 'phuma',
+  },
   {
     // No accepted venue yet: a preprint, so it is written as a release and dated
     // by the arXiv posting (2607.11498 -> July 2026). Do not give it a venue.
@@ -107,19 +119,6 @@ window.NEWS = [
       ko: 'ICRA 2026에 채택되었습니다.',
     },
     project: 'acg',
-  },
-  {
-    // No accepted venue: a preprint with a released dataset, so it is written as a
-    // release and dated by the arXiv posting. Do not give it a venue.
-    id: 'phuma-release-2025',
-    date: '2025-10',
-    kind: 'release',
-    title: 'PHUMA',
-    text: {
-      en: 'Dataset released on Hugging Face, with the preprint on arXiv.',
-      ko: '데이터셋을 Hugging Face에 공개하고, 프리프린트를 arXiv에 게시했습니다.',
-    },
-    project: 'phuma',
   },
   {
     id: 'simbav2-icml-2025',
