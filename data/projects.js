@@ -41,7 +41,7 @@ window.PROJECTS = [
   {
     id: 'phuma',
     title: 'PHUMA: Physically Reliable Humanoid Locomotion Dataset',
-    venue: 'CoRL 2026',
+    venue: 'CoRL 2026 (spotlight)',
     authors: [
       'kyungminn',
       'sibisibi',
@@ -74,6 +74,60 @@ window.PROJECTS = [
       project: 'https://davian-robotics.github.io/PHUMA/',
     },
     featured: true,
+  },
+  {
+    id: 'pam',
+    title: 'Procedural Assistance Memory for Proactive Robot',
+    venue: 'CoRL 2026',
+    authors: [
+      'aiclaudev',
+      'pmh9960',
+      'Jeonghoon Park',
+      'godnpeter',
+      'junhahyung',
+      'Sungwon Hwang',
+      'lee15253',
+      'jaegulchoo',
+    ],
+    year: 2026,
+    date: '2026-09',
+    tags: ['vla', 'manipulation'],
+    summary: {
+      en:
+        'A proactive robot assistant that acts before it is asked: a VLM reads a Procedural Assistance Memory, a finite-state machine of the user\'s daily routine, to decide when and how to help, a VLA carries the task out, and a reflection VLM refines the memory after each day without any retraining.',
+      ko:
+        '요청받기 전에 먼저 돕는 능동형 로봇 어시스턴트입니다. VLM이 사용자의 일과를 유한 상태 기계로 정리한 Procedural Assistance Memory를 읽고 언제 어떻게 도울지 판단하면 VLA가 이를 실행하며, 하루가 끝날 때마다 reflection VLM이 재학습 없이 메모리를 다듬습니다.',
+    },
+    links: {
+      code: 'https://github.com/DAVIAN-Robotics/PAM',
+      project: 'https://davian-robotics.github.io/PAM/',
+    },
+  },
+  {
+    id: 'residual-rl',
+    title: 'Object-Centric Residual RL for Zero-Shot Sim-to-Real VLA Enhancement',
+    venue: 'CoRL 2026',
+    authors: [
+      'kinam0252',
+      'Namiko Saito',
+      'Heecheol Kim',
+      'Katsushi Ikeuchi',
+      'jaegulchoo',
+      'Yasuyuki Matsushita',
+    ],
+    year: 2026,
+    date: '2026-09',
+    tags: ['vla', 'reinforcement learning', 'sim2real'],
+    summary: {
+      en:
+        'A residual RL policy trained purely in simulation on object poses corrects a VLA\'s actions and transfers zero-shot to a real Franka robot, raising success from 42% to 76% across five manipulation tasks.',
+      ko:
+        '물체 자세만 관측으로 받아 시뮬레이션에서만 학습한 residual 강화학습 정책이 VLA의 행동을 보정하고, 실제 Franka 로봇에 zero-shot으로 전이되어 다섯 가지 조작 태스크의 성공률을 42%에서 76%로 높입니다.',
+    },
+    links: {
+      paper: 'https://arxiv.org/abs/2606.18953',
+      project: 'https://www.microsoft.com/en-us/research/articles/object-centric-residual-rl/',
+    },
   },
   {
     id: 'pointmap',

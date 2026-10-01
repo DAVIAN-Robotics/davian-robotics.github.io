@@ -8,6 +8,7 @@
 window.PEOPLE = {
   jaegulchoo: { name: 'Jaegul Choo', url: 'https://sites.google.com/site/jaegulchoo/' },
   pmh9960: { name: 'Minho Park', url: 'https://pmh9960.github.io' },
+  aiclaudev: { name: 'Dohyun Lee', url: 'https://aiclaudev.github.io/' },
   kyungminn: { name: 'Kyungmin Lee', url: 'https://kyungminn.github.io/' },
   myyzzzoooo: { name: 'Hoiyeong Jin', url: 'https://myyzzzoooo.github.io/' },
   godnpeter: { name: 'Dongyoon Hwang', url: 'https://godnpeter.github.io' },

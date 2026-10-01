@@ -58,10 +58,32 @@ window.NEWS = [
     kind: 'acceptance',
     title: 'PHUMA',
     text: {
+      en: 'Accepted to CoRL 2026 as a spotlight.',
+      ko: 'CoRL 2026에 spotlight으로 채택되었습니다.',
+    },
+    project: 'phuma',
+  },
+  {
+    id: 'pam-corl-2026',
+    date: '2026-09',
+    kind: 'acceptance',
+    title: 'PAM',
+    text: {
       en: 'Accepted to CoRL 2026.',
       ko: 'CoRL 2026에 채택되었습니다.',
     },
-    project: 'phuma',
+    project: 'pam',
+  },
+  {
+    id: 'residual-rl-corl-2026',
+    date: '2026-09',
+    kind: 'acceptance',
+    title: 'Object-Centric Residual RL',
+    text: {
+      en: 'Accepted to CoRL 2026. Joint work with Microsoft Research.',
+      ko: 'CoRL 2026에 채택되었습니다. Microsoft Research와의 공동 연구입니다.',
+    },
+    project: 'residual-rl',
   },
   {
     // No accepted venue yet: a preprint, so it is written as a release and dated
