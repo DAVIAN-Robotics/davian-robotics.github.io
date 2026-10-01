@@ -650,10 +650,12 @@ button {
 }
 
 /* One row per venue event. The row is not a link: a row can name several
- * papers, so each paper name (.news__paper) is its own link instead. */
+ * papers, so each paper name (.news__paper) is its own link instead.
+ * The venue column is a FIXED width (it fits "NeurIPS 2026"), not max-content,
+ * so every row's text starts at the same x, the way a date column does. */
 .news__row {
   display: grid;
-  grid-template-columns: 5.5rem max-content minmax(0, 1fr) auto;
+  grid-template-columns: 5.5rem 7.5rem minmax(0, 1fr) auto;
   align-items: baseline;
   gap: 2px 20px;
   padding: 4px 12px;
@@ -673,13 +675,13 @@ button {
   font-weight: 650;
   letter-spacing: -0.015em;
   line-height: 1.45;
-  white-space: nowrap;
 }
 
+/* Same size and ink as the venue, so the row reads as one sentence. */
 .news__text {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.45;
-  color: var(--fg-muted);
+  color: var(--fg);
 }
 
 /* Paper names read as the row's subject: full-strength ink, the accent and an
