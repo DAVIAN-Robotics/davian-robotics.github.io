@@ -219,10 +219,10 @@ function load() {
   // Each news item points at the project it is news about; the destination comes
   // from that project's links, not from the news item.
   fakeWindow.NEWS = [
-    { id: 'old', date: '2025-10', kind: 'release', title: 'Old',
-      text: { en: 'Released.' }, project: 'b' },
-    { id: 'new', date: '2026-06', kind: 'acceptance', title: 'New',
-      text: { en: 'Accepted.' }, project: 'a' },
+    { id: 'old', date: '2025-10', kind: 'release', title: 'arXiv',
+      papers: [{ project: 'b', name: 'B' }] },
+    { id: 'new', date: '2026-06', kind: 'acceptance', title: 'IROS 2026',
+      papers: [{ project: 'a', name: 'A' }] },
   ];
   return fakeWindow;
 }
@@ -235,7 +235,7 @@ test('mount renders the news list, newest date first', () => {
   sandbox.DR.mount(doc);
   const html = doc.elements['news-list'].innerHTML;
   assert.ok(html.indexOf('data-news-id="new"') < html.indexOf('data-news-id="old"'));
-  assert.match(html, /href="https:\/\/example\.org\/a-project"/, "the row points where project a's card points");
+  assert.match(html, /href="https:\/\/example\.org\/a-project"/, "the paper name points where project a's card points");
 });
 
 test('mount renders every valid project into the research grid, newest first', () => {

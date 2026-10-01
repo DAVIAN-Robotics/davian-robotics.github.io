@@ -44,7 +44,10 @@
     // lives in data/projects.js and data/news.js. An empty Korean value falls
     // back to English rather than blanking the node.
     swapPairs(doc, '.card__summary', 'data-summary-en', 'data-summary-ko', lang);
-    swapPairs(doc, '.news__text', 'data-news-en', 'data-news-ko', lang);
+    // News rows mix swappable text with paper links, so only the plain-text
+    // leaves carry the pair (see i18nSpan in js/render.js) — swapping the whole
+    // .news__text would wipe the links out.
+    swapPairs(doc, '[data-news-en]', 'data-news-en', 'data-news-ko', lang);
     if (doc.documentElement) doc.documentElement.lang = lang;
   }
 

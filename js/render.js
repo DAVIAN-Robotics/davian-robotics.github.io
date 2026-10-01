@@ -7,8 +7,10 @@
   var REQUIRED = ['id', 'title', 'authors', 'year', 'date', 'summary.en'];
   var LINK_LABELS = { paper: 'Paper', code: 'Code', model: 'Model', data: 'Data', project: 'Project' };
   var LINK_ORDER = ['paper', 'code', 'model', 'data', 'project'];
-  var NEWS_REQUIRED = ['id', 'title', 'date', 'project', 'text.en'];
-  var NEWS_KINDS = { acceptance: 'Accepted', release: 'Released' };
+  var NEWS_REQUIRED = ['id', 'title', 'date', 'papers'];
+  var NEWS_KINDS = { acceptance: 'Accepted', release: 'Released', award: 'Award' };
+  // How many news rows show before the rest fold behind "Show more".
+  var NEWS_VISIBLE = 10;
 
   function escapeHTML(value) {
     return String(value == null ? '' : value)
@@ -98,53 +100,151 @@
     return match ? cardHref(match.links) : '';
   }
 
-  function newsHTML(items, projects) {
-    return items
-      .map(function (item) {
-        var kind = NEWS_KINDS[item.kind] ? item.kind : '';
-        var badge = kind
-          ? '<span class="news__kind" data-i18n="news.kind.' + kind + '">' + NEWS_KINDS[kind] + '</span>'
-          : '';
-        var href = newsHref(item, projects);
-        // One <a> wraps the whole row, so the entire line is the target and one
-        // focus stop covers it. Nothing inside may be interactive — an <a> may
-        // not contain another — which is why the title is a bare heading here.
-        // With no destination the same row is a <div>: no href, nothing to click.
-        var open = href
-          ? '<a class="news__link" href="' + escapeHTML(href) + '">'
-          : '<div class="news__link news__link--static">';
-        var close = href ? '</a>' : '</div>';
-        // <time datetime> carries the same 'YYYY-MM' string it prints: a valid
-        // month value, and the machine-readable form of exactly the precision we
-        // are willing to claim.
-        return (
-          '<li class="news__item" data-news-id="' + escapeHTML(item.id) + '">' +
-          open +
-          '<time class="news__date" datetime="' + escapeHTML(item.date) + '">' +
-          escapeHTML(item.date) +
-          '</time>' +
-          '<h3 class="news__title">' + escapeHTML(item.title) + '</h3>' +
-          '<p class="news__text" data-news-en="' + escapeHTML(item.text.en) + '" ' +
-          'data-news-ko="' + escapeHTML((item.text && item.text.ko) || '') + '">' +
-          escapeHTML(item.text.en) +
-          '</p>' +
-          badge +
-          close +
-          '</li>'
-        );
+  /* A leaf that js/i18n.js swaps between languages. It holds plain text only:
+   * the swap assigns textContent, so the paper links sit BESIDE these spans,
+   * never inside one, and survive a language change. */
+  function i18nSpan(cls, en, ko) {
+    return (
+      '<span class="' + cls + '" data-news-en="' + escapeHTML(en) + '" data-news-ko="' +
+      escapeHTML(ko || '') + '">' + escapeHTML(en) + '</span>'
+    );
+  }
+
+  /* The words before the paper names, one pattern for every row: "1 paper
+   * accepted:", "3 papers accepted:", "1 preprint released:". An item may still
+   * carry its own `lead` for a row that fits none of these. */
+  function newsLead(item) {
+    if (item.lead && item.lead.en) return item.lead;
+    var n = item.papers.length;
+    if (item.kind === 'release') {
+      return { en: n + (n > 1 ? ' preprints' : ' preprint') + ' released:', ko: '프리프린트 ' + n + '편 공개:' };
+    }
+    return { en: n + (n > 1 ? ' papers' : ' paper') + ' accepted:', ko: '논문 ' + n + '편 채택:' };
+  }
+
+  /* One paper inside a row: its short name, linked wherever its CARD links
+   * (newsHref -> cardHref), plus an optional note such as "(spotlight)". */
+  function newsPaperHTML(paper, projects) {
+    var href = newsHref(paper, projects);
+    var name = escapeHTML(paper.name || paper.project);
+    var html = href
+      ? '<a class="news__paper" href="' + escapeHTML(href) + '">' + name + '</a>'
+      : '<span class="news__paper news__paper--static">' + name + '</span>';
+    if (paper.note && paper.note.en) {
+      // An honour note ("spotlight", "oral", ...) is printed in red.
+      html += ' ' + i18nSpan('news__note' + (paper.note.honor ? ' news__note--honor' : ''),
+        '(' + paper.note.en + ')', paper.note.ko ? '(' + paper.note.ko + ')' : '');
+    }
+    return html;
+  }
+
+  /* One row per venue event: "CoRL 2026 — 3 papers accepted: A, B, C." The row
+   * itself is not a link any more (a row can name several papers); each paper
+   * name is its own link. */
+  function newsRowHTML(item, projects) {
+    var kind = NEWS_KINDS[item.kind] ? item.kind : '';
+    var badge = kind
+      ? '<span class="news__kind" data-i18n="news.kind.' + kind + '">' + NEWS_KINDS[kind] + '</span>'
+      : '';
+    var lead = newsLead(item);
+    var papers = item.papers
+      .map(function (paper) {
+        return newsPaperHTML(paper, projects);
       })
-      .join('');
+      .join(', ');
+    // <time datetime> carries the same 'YYYY-MM' string it prints: a valid
+    // month value, and the machine-readable form of exactly the precision we
+    // are willing to claim.
+    return (
+      '<li class="news__item" data-news-id="' + escapeHTML(item.id) + '">' +
+      '<div class="news__row">' +
+      '<time class="news__date" datetime="' + escapeHTML(item.date) + '">' +
+      escapeHTML(item.date) +
+      '</time>' +
+      '<h3 class="news__title">' + escapeHTML(item.title) + '</h3>' +
+      '<p class="news__text">' +
+      i18nSpan('news__lead' + (item.kind === 'award' ? ' news__lead--honor' : ''), lead.en, lead.ko) +
+      ' ' + papers + '.</p>' +
+      badge +
+      '</div>' +
+      '</li>'
+    );
+  }
+
+  /* The newest `visible` rows, then the rest behind a "Show more" button. The
+   * folded rows sit in .news__earlier ABOVE the button, so opening it slides them
+   * down beneath the visible rows (a CSS grid-rows transition) and the button
+   * ends up below them. While closed the block is `inert`: hidden rows must not
+   * take keyboard focus. bindNewsToggle wires the click. */
+  function newsHTML(items, projects, visible) {
+    var limit = visible === undefined ? NEWS_VISIBLE : visible;
+    var rows = items.map(function (item) {
+      return newsRowHTML(item, projects);
+    });
+    if (rows.length <= limit) return rows.join('');
+    return (
+      rows.slice(0, limit).join('') +
+      '<li class="news__more">' +
+      '<div class="news__earlier" id="news-earlier" inert>' +
+      '<ol class="news news--earlier">' + rows.slice(limit).join('') + '</ol>' +
+      '</div>' +
+      '<button type="button" class="news__toggle" aria-expanded="false" aria-controls="news-earlier">' +
+      i18nSpan('news__toggle-label', NEWS_TOGGLE.more.en, NEWS_TOGGLE.more.ko) +
+      '</button>' +
+      '</li>'
+    );
+  }
+
+  var NEWS_TOGGLE = {
+    more: { en: 'Show more', ko: '더 보기' },
+    less: { en: 'Show less', ko: '접기' },
+  };
+
+  /* Opens or closes the folded rows. Pure DOM-in, DOM-out so a test can drive
+   * it with plain objects: flips aria-expanded, the open class and `inert`, and
+   * relabels the button in the page's current language. */
+  function toggleNews(button, earlier, lang) {
+    var open = button.getAttribute('aria-expanded') !== 'true';
+    button.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      earlier.classList.add('news__earlier--open');
+      earlier.removeAttribute('inert');
+    } else {
+      earlier.classList.remove('news__earlier--open');
+      earlier.setAttribute('inert', '');
+    }
+    var label = open ? NEWS_TOGGLE.less : NEWS_TOGGLE.more;
+    var span = button.querySelector('.news__toggle-label');
+    if (span) {
+      span.setAttribute('data-news-en', label.en);
+      span.setAttribute('data-news-ko', label.ko);
+      span.textContent = lang === 'ko' ? label.ko : label.en;
+    }
+    return open;
+  }
+
+  function bindNewsToggle(doc) {
+    if (!doc.querySelector) return;
+    var button = doc.querySelector('.news__toggle');
+    var earlier = doc.getElementById('news-earlier');
+    if (!button || !earlier || !button.addEventListener) return;
+    button.addEventListener('click', function () {
+      var lang = doc.documentElement && doc.documentElement.lang === 'ko' ? 'ko' : 'en';
+      toggleNews(button, earlier, lang);
+    });
   }
 
   /* Newest first, by the SAME key and direction as sortNews — that is what keeps
    * the Research grid and the News list in one order. 'YYYY-MM' sorts correctly
    * as a plain string; `year` is for the venue badge, not for ordering (sorting
    * on it is what used to drop the four 2026 papers into alphabetical order).
-   * Title breaks a tie, so two papers in the same month are still deterministic. */
+   * A tie keeps the order of data/projects.js (Array.prototype.sort is stable),
+   * so papers from the same month appear in the order they are written there —
+   * the same order their news row lists them in. */
   function sortProjects(projects) {
     return projects.slice().sort(function (a, b) {
-      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
-      return String(a.title).localeCompare(String(b.title));
+      if (a.date === b.date) return 0;
+      return a.date < b.date ? 1 : -1;
     });
   }
 
@@ -165,16 +265,20 @@
     });
   }
 
-  function authorsHTML(authors, people) {
+  /* `equal` is how many leading authors are co-first authors; each of them
+   * gets a "*" (the legend sits under the Research heading in index.html). */
+  function authorsHTML(authors, people, equal) {
     var dict = people || {};
+    var marked = equal > 1 ? equal : 0;
     return (authors || [])
-      .map(function (entry) {
+      .map(function (entry, index) {
         var person = dict[entry];
-        if (!person) return escapeHTML(entry);
+        var mark = index < marked ? '<span class="author__mark">*</span>' : '';
+        if (!person) return escapeHTML(entry) + mark;
         return (
           '<a class="author" href="' + escapeHTML(person.url) + '">' +
           escapeHTML(person.name) +
-          '</a>'
+          '</a>' + mark
         );
       })
       .join(', ');
@@ -277,8 +381,15 @@
   }
 
   function cardHTML(project, people) {
-    var venue = project.venue
-      ? '<span class="card__venue">' + escapeHTML(project.venue) + '</span>'
+    // An honour (Spotlight, Oral, Outstanding Paper Award, ...) is set apart
+    // from the venue and printed in red, beside the venue badge.
+    var honor = project.honor
+      ? '<span class="card__honor">' + escapeHTML(project.honor) + '</span>'
+      : '';
+    var venue = project.venue || honor
+      ? '<div class="card__venue-row">' +
+        (project.venue ? '<span class="card__venue">' + escapeHTML(project.venue) + '</span>' : '') +
+        honor + '</div>'
       : '';
     var href = cardHref(project.links);
     // The stretched-link pattern: the title is the only anchor, and CSS blows
@@ -304,7 +415,7 @@
       '<div class="card__body">' +
       title +
       venue +
-      '<p class="card__authors">' + authorsHTML(project.authors, people) + '</p>' +
+      '<p class="card__authors">' + authorsHTML(project.authors, people, project.equal) + '</p>' +
       '<p class="card__summary" data-summary-en="' + escapeHTML(project.summary.en) + '" ' +
       'data-summary-ko="' + escapeHTML(project.summary.ko || '') + '">' +
       escapeHTML(project.summary.en) +
@@ -584,6 +695,7 @@
   function mount(doc) {
     var projects = sortProjects(validProjects(global.PROJECTS));
     renderInto(doc, 'news-list', newsHTML(sortNews(validNews(global.NEWS)), projects));
+    bindNewsToggle(doc);
     // renderInto(doc, 'filter-chips', chipsHTML(collectTags(projects)));
     applyFilter(doc, 'all');
     bindCardClicks(doc, 'research-grid');
@@ -630,6 +742,8 @@
     sortNews: sortNews,
     newsHref: newsHref,
     newsHTML: newsHTML,
+    newsLead: newsLead,
+    toggleNews: toggleNews,
     mount: mount,
     applyFilter: applyFilter,
     // The page mounts one card grid today, but both attachers are keyed by

@@ -156,9 +156,9 @@ test('the card summary pass swaps to Korean, restores to English, and falls back
   assert.strictEqual(noKorean.textContent, 'Still English only.');
 });
 
-// --- .news__text coverage ---------------------------------------------------
-// Same node-carried mechanism as .card__summary, on the text js/render.js
-// generates from data/news.js.
+// --- news text coverage ------------------------------------------------------
+// Same node-carried mechanism as .card__summary, on the plain-text leaves
+// ([data-news-en]) js/render.js generates from data/news.js.
 
 test('the news text pass swaps to Korean, restores to English, and falls back to English when the Korean text is empty', () => {
   const sandbox = load();
@@ -171,7 +171,7 @@ test('the news text pass swaps to Korean, restores to English, and falls back to
     { textContent: 'Released.' }
   );
   const doc = {
-    querySelectorAll: (selector) => (selector === '.news__text' ? [translated, noKorean] : []),
+    querySelectorAll: (selector) => (selector === '[data-news-en]' ? [translated, noKorean] : []),
     documentElement: {},
   };
   sandbox.I18N.apply(doc, 'ko');

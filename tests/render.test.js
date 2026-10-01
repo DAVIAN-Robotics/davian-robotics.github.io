@@ -57,7 +57,7 @@ test('an invalid project is skipped and warned about, and the valid ones survive
 // The grid sorts on `date`, not `year` — sorting on the year is what used to
 // drop every paper from one year into alphabetical order. These three share a
 // year and must still come out newest month first.
-test('projects sort newest first by date, not by year, with the title breaking a tie', () => {
+test('projects sort newest first by date, not by year, keeping the authored order in a tie', () => {
   const { DR } = loadRenderer();
   const sorted = DR.sortProjects([
     { ...PROJECT, id: 'jan', title: 'Z', year: 2026, date: '2026-01' },
@@ -65,7 +65,7 @@ test('projects sort newest first by date, not by year, with the title breaking a
     { ...PROJECT, id: 'jun-a', title: 'A', year: 2026, date: '2026-06' },
     { ...PROJECT, id: 'old', title: 'A', year: 2024, date: '2024-11' },
   ]);
-  assert.deepStrictEqual(sorted.map((p) => p.id), ['jun-a', 'jun-b', 'jan', 'old']);
+  assert.deepStrictEqual(sorted.map((p) => p.id), ['jun-b', 'jun-a', 'jan', 'old']);
 });
 
 test('a project with no date is skipped rather than sorted unpredictably', () => {
@@ -272,15 +272,14 @@ test('user-supplied text is escaped, so a stray angle bracket cannot inject mark
 // --- news ------------------------------------------------------------------
 
 const NEWS_ITEM = {
-  id: 'simbav2-icml-2025',
+  id: 'icml-2025',
   date: '2025-05',
   kind: 'acceptance',
-  title: 'SimbaV2',
-  text: { en: 'Accepted to ICML 2025 as a spotlight.', ko: 'ICML 2025에 spotlight으로 채택되었습니다.' },
-  project: 'simbav2',
+  title: 'ICML 2025',
+  papers: [{ project: 'simbav2', name: 'SimbaV2', note: { en: 'spotlight', ko: 'spotlight', honor: true } }],
 };
 
-// The projects a news item resolves its destination against. SimbaV2 has both a
+// The projects a news row resolves its destinations against. SimbaV2 has both a
 // project page and a paper; the project page wins, same rule as the card.
 const NEWS_PROJECTS = [
   { id: 'simbav2', links: { paper: 'https://arxiv.org/abs/2502.15280', project: 'https://davian-robotics.github.io/SimbaV2/' } },
@@ -288,21 +287,22 @@ const NEWS_PROJECTS = [
   { id: 'nowhere', links: { code: 'https://github.com/x' } },
 ];
 
-test('a complete news item validates, and an incomplete one reports every missing field', () => {
+test('a complete news row validates, and an incomplete one reports every missing field', () => {
   const { DR } = loadRenderer();
   assert.deepStrictEqual(DR.validateNews(NEWS_ITEM), { ok: true, missing: [] });
   const result = DR.validateNews({ id: 'x', title: 'X' });
   assert.strictEqual(result.ok, false);
-  assert.deepStrictEqual(result.missing.sort(), ['date', 'project', 'text.en']);
+  assert.deepStrictEqual(result.missing.sort(), ['date', 'papers']);
+  assert.deepStrictEqual(DR.validateNews({ ...NEWS_ITEM, papers: [] }).missing, ['papers'], 'an empty papers list is missing');
 });
 
-test('an invalid news item is skipped and warned about, and the valid ones survive', () => {
+test('an invalid news row is skipped and warned about, and the valid ones survive', () => {
   const { DR, warnings } = loadRenderer();
   const kept = DR.validNews([NEWS_ITEM, { id: 'broken', title: 'B' }]);
-  assert.deepStrictEqual(kept.map((n) => n.id), ['simbav2-icml-2025']);
+  assert.deepStrictEqual(kept.map((n) => n.id), ['icml-2025']);
   assert.strictEqual(warnings.length, 1);
   assert.match(warnings[0], /broken/);
-  assert.match(warnings[0], /project/);
+  assert.match(warnings[0], /papers/);
 });
 
 test('news sorts newest date first, across years and within one, keeping the authored order in a tie', () => {
@@ -323,31 +323,115 @@ test('news sorts newest date first, across years and within one, keeping the aut
   ]);
 });
 
-test('a news item renders its date as a machine-readable <time>, its title, both languages of its text, and a kind badge', () => {
+test('a news row renders its date as a machine-readable <time>, the venue as its title, a bilingual lead and a kind badge', () => {
   const { DR } = loadRenderer();
   const html = DR.newsHTML([NEWS_ITEM], NEWS_PROJECTS);
-  assert.match(html, /data-news-id="simbav2-icml-2025"/);
+  assert.match(html, /data-news-id="icml-2025"/);
   assert.match(html, /<time class="news__date" datetime="2025-05">2025-05<\/time>/);
-  assert.match(html, /<h3 class="news__title">SimbaV2<\/h3>/);
-  assert.match(html, /data-news-en="Accepted to ICML 2025 as a spotlight\."/);
-  assert.match(html, /data-news-ko="ICML 2025에 spotlight으로 채택되었습니다\."/);
+  assert.match(html, /<h3 class="news__title">ICML 2025<\/h3>/);
+  assert.match(html, /data-news-en="1 paper accepted:" data-news-ko="논문 1편 채택:"/);
   assert.match(html, /data-i18n="news.kind.acceptance">Accepted</);
 });
 
-// The row is the link. An <a> may not contain another <a>, so a title that
-// re-grew its own anchor would be invalid markup and a second focus stop.
-test('the whole row is one link and nothing inside it is a second link', () => {
+// Papers at one venue share one row, and each name is its own link — the row
+// itself is not wrapped in an anchor any more.
+test('a row with several papers counts them and links each name where its card links', () => {
   const { DR } = loadRenderer();
-  const html = DR.newsHTML([NEWS_ITEM], NEWS_PROJECTS);
-  assert.match(html, /<a class="news__link" href="https:\/\/davian-robotics\.github\.io\/SimbaV2\/">/);
-  assert.strictEqual((html.match(/<a /g) || []).length, 1, 'exactly one anchor per row');
+  const item = {
+    id: 'corl', date: '2026-09', kind: 'acceptance', title: 'CoRL 2026',
+    papers: [{ project: 'simbav2', name: 'A' }, { project: 'paper-only', name: 'B' }, { project: 'nowhere', name: 'C' }],
+  };
+  const html = DR.newsHTML([item], NEWS_PROJECTS);
+  assert.match(html, /data-news-en="3 papers accepted:" data-news-ko="논문 3편 채택:"/);
+  assert.match(html, /<a class="news__paper" href="https:\/\/davian-robotics\.github\.io\/SimbaV2\/">A<\/a>/);
+  assert.match(html, /<a class="news__paper" href="https:\/\/arxiv\.org\/abs\/1">B<\/a>/);
+  assert.strictEqual((html.match(/<a /g) || []).length, 2, 'one anchor per paper that has somewhere to go');
+  assert.doesNotMatch(html, /class="news__link/, 'the row is not one big link');
 });
 
-// --- where a news row points -----------------------------------------------
+// An <a href=""> reloads the page. A paper with nowhere to go is plain text.
+test('a paper with no destination renders as plain text, not a dead link', () => {
+  const { DR } = loadRenderer();
+  const html = DR.newsHTML([{ ...NEWS_ITEM, papers: [{ project: 'nowhere', name: 'SimbaV2' }] }], NEWS_PROJECTS);
+  assert.doesNotMatch(html, /<a /, 'no anchor at all');
+  assert.doesNotMatch(html, /href=""/);
+  assert.match(html, /<span class="news__paper news__paper--static">SimbaV2<\/span>/);
+});
 
-// The row goes where the CARD goes: same rule, same cardHref. A reader clicking
-// "Accepted to ICML 2025" must land where clicking the SimbaV2 card lands.
-test('a news row points at its project page, falling back to the paper', () => {
+// Honours are the one thing in red: an honour note on a paper, and the lead of
+// an award row.
+test('honour notes and award leads carry the honour class; plain notes do not', () => {
+  const { DR } = loadRenderer();
+  const html = DR.newsHTML([NEWS_ITEM], NEWS_PROJECTS);
+  assert.match(html, /class="news__note news__note--honor" data-news-en="\(spotlight\)"/);
+  const plain = DR.newsHTML([{ ...NEWS_ITEM, papers: [{ project: 'simbav2', name: 'X', note: { en: 'with Y' } }] }], NEWS_PROJECTS);
+  assert.match(plain, /class="news__note" data-news-en="\(with Y\)"/);
+  const award = DR.newsHTML([{ ...NEWS_ITEM, kind: 'award', lead: { en: 'Best Paper Award:', ko: '최우수 논문상:' } }], NEWS_PROJECTS);
+  assert.match(award, /class="news__lead news__lead--honor" data-news-en="Best Paper Award:"/);
+  assert.match(award, /data-i18n="news.kind.award">Award</);
+});
+
+// Only the newest rows show; the rest sit behind "Show more", inert until opened.
+test('rows past the visible count fold behind a "Show more" button', () => {
+  const { DR } = loadRenderer();
+  const items = ['a', 'b', 'c', 'd', 'e', 'f', 'g'].map((id) => ({ ...NEWS_ITEM, id }));
+  const html = DR.newsHTML(items, NEWS_PROJECTS, 5);
+  const [shown, folded] = html.split('<li class="news__more">');
+  assert.strictEqual((shown.match(/data-news-id=/g) || []).length, 5, 'five rows show');
+  assert.strictEqual((folded.match(/data-news-id=/g) || []).length, 2, 'the rest are folded');
+  assert.match(folded, /<div class="news__earlier" id="news-earlier" inert>/, 'folded rows are inert while closed');
+  assert.match(folded, /<button type="button" class="news__toggle" aria-expanded="false" aria-controls="news-earlier">/);
+  assert.match(folded, /data-news-en="Show more" data-news-ko="더 보기"/);
+  assert.ok(folded.indexOf('news__earlier') < folded.indexOf('news__toggle'), 'the rows sit above the button, so they open downward');
+  assert.doesNotMatch(DR.newsHTML(items.slice(0, 5), NEWS_PROJECTS, 5), /news__more/, 'no more rows than the limit: no button');
+});
+
+test('ten rows show by default before anything folds', () => {
+  const { DR } = loadRenderer();
+  const ten = Array.from({ length: 10 }, (_, i) => ({ ...NEWS_ITEM, id: 'n' + i }));
+  assert.doesNotMatch(DR.newsHTML(ten, NEWS_PROJECTS), /news__more/);
+  assert.match(DR.newsHTML([...ten, { ...NEWS_ITEM, id: 'n10' }], NEWS_PROJECTS), /news__more/);
+});
+
+test('the toggle opens and closes the folded rows and relabels itself in the current language', () => {
+  const { DR } = loadRenderer();
+  const attrs = { 'aria-expanded': 'false' };
+  const span = { attrs: {}, textContent: 'Show more', setAttribute(k, v) { this.attrs[k] = v; } };
+  const button = {
+    getAttribute: (k) => attrs[k],
+    setAttribute: (k, v) => { attrs[k] = v; },
+    querySelector: () => span,
+  };
+  const classes = new Set();
+  const earlierAttrs = { inert: '' };
+  const earlier = {
+    classList: { add: (c) => classes.add(c), remove: (c) => classes.delete(c) },
+    setAttribute: (k, v) => { earlierAttrs[k] = v; },
+    removeAttribute: (k) => { delete earlierAttrs[k]; },
+  };
+  assert.strictEqual(DR.toggleNews(button, earlier, 'ko'), true);
+  assert.strictEqual(attrs['aria-expanded'], 'true');
+  assert.ok(classes.has('news__earlier--open'));
+  assert.ok(!('inert' in earlierAttrs), 'open rows are focusable');
+  assert.strictEqual(span.textContent, '접기');
+  assert.strictEqual(span.attrs['data-news-en'], 'Show less');
+  assert.strictEqual(DR.toggleNews(button, earlier, 'en'), false);
+  assert.strictEqual(attrs['aria-expanded'], 'false');
+  assert.ok(!classes.has('news__earlier--open'));
+  assert.ok('inert' in earlierAttrs, 'closed rows are inert again');
+  assert.strictEqual(span.textContent, 'Show more');
+});
+
+test('a release row counts preprints the same way an acceptance row counts papers', () => {
+  const { DR } = loadRenderer();
+  assert.deepStrictEqual(DR.newsLead({ kind: 'release', papers: [{}] }), { en: '1 preprint released:', ko: '프리프린트 1편 공개:' });
+  assert.deepStrictEqual(DR.newsLead({ kind: 'acceptance', papers: [{}, {}] }), { en: '2 papers accepted:', ko: '논문 2편 채택:' });
+});
+
+// --- where a news name points ----------------------------------------------
+
+// A name goes where the CARD goes: same rule, same cardHref.
+test('a paper in a news row points at its project page, falling back to the paper', () => {
   const { DR } = loadRenderer();
   assert.strictEqual(
     DR.newsHref({ project: 'simbav2' }, NEWS_PROJECTS),
@@ -364,14 +448,24 @@ test('a news row points at its project page, falling back to the paper', () => {
   assert.strictEqual(DR.newsHref({}, NEWS_PROJECTS), '');
 });
 
-// An <a href=""> reloads the page. A row with nowhere to go is not a link.
-test('a news row with no destination renders as plain text, not a dead link', () => {
+// --- co-first authors and honours on cards ---------------------------------
+
+test('the first `equal` authors get a co-first mark, and nobody else does', () => {
   const { DR } = loadRenderer();
-  const html = DR.newsHTML([{ ...NEWS_ITEM, project: 'nowhere' }], NEWS_PROJECTS);
-  assert.doesNotMatch(html, /<a /, 'no anchor at all');
-  assert.doesNotMatch(html, /href=""/);
-  assert.match(html, /<div class="news__link news__link--static">/);
-  assert.match(html, /SimbaV2/, 'the row still renders — it just does not link');
+  const people = { a: { name: 'A', url: 'https://a.example' } };
+  const html = DR.authorsHTML(['a', 'B', 'C'], people, 2);
+  assert.strictEqual((html.match(/author__mark/g) || []).length, 2);
+  assert.match(html, /<\/a><span class="author__mark">\*<\/span>, B<span class="author__mark">\*<\/span>, C$/);
+  assert.doesNotMatch(DR.authorsHTML(['a', 'B'], people), /author__mark/, 'no equal: no marks');
+});
+
+test('a card prints its honour in red beside the venue badge', () => {
+  const { DR } = loadRenderer();
+  const html = DR.cardHTML(
+    { id: 'x', title: 'X', authors: [], year: 2026, date: '2026-09', venue: 'CoRL 2026', honor: 'Spotlight', summary: { en: 'S' } },
+    {}
+  );
+  assert.match(html, /<div class="card__venue-row"><span class="card__venue">CoRL 2026<\/span><span class="card__honor">Spotlight<\/span><\/div>/);
 });
 
 // Nothing on this site opens a new tab. The renderer emits most of the page's
@@ -390,11 +484,15 @@ test('nothing the renderer emits opens a new tab', () => {
   assert.doesNotMatch(everything, /rel="noopener"/, 'rel=noopener existed only to support target=_blank');
 });
 
-test('a news item with no Korean text still renders, with an empty ko attribute', () => {
+test('a lead or note with no Korean text still renders, with an empty ko attribute', () => {
   const { DR } = loadRenderer();
-  const html = DR.newsHTML([{ ...NEWS_ITEM, text: { en: 'Released.' } }], NEWS_PROJECTS);
-  assert.match(html, /data-news-ko=""/);
-  assert.match(html, />Released\.</);
+  const html = DR.newsHTML(
+    [{ ...NEWS_ITEM, lead: { en: 'Released:' }, papers: [{ project: 'simbav2', name: 'X', note: { en: 'beta' } }] }],
+    NEWS_PROJECTS
+  );
+  assert.match(html, /data-news-en="Released:" data-news-ko=""/);
+  assert.match(html, /data-news-en="\(beta\)" data-news-ko=""/);
+  assert.match(html, />Released:</);
 });
 
 test('an unknown news kind renders no badge rather than an empty one', () => {
@@ -405,7 +503,11 @@ test('an unknown news kind renders no badge rather than an empty one', () => {
 
 test('news text is escaped too', () => {
   const { DR } = loadRenderer();
-  const html = DR.newsHTML([{ ...NEWS_ITEM, title: '<img src=x onerror=alert(1)>' }], NEWS_PROJECTS);
+  const evil = '<img src=x onerror=alert(1)>';
+  const html = DR.newsHTML(
+    [{ ...NEWS_ITEM, title: evil, papers: [{ project: 'simbav2', name: evil, note: { en: evil } }] }],
+    NEWS_PROJECTS
+  );
   assert.doesNotMatch(html, /<img src=x/);
   assert.match(html, /&lt;img src=x/);
 });

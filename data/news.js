@@ -1,12 +1,19 @@
-/* The news list — acceptances and releases, newest first.
+/* The news list — one row per VENUE EVENT, newest first.
+ *
+ * A row is "CoRL 2026 — 3 papers accepted: PHUMA (Spotlight), PAM, ...": the
+ * venue is the title, and every paper it is about is listed in `papers`. Papers
+ * that land at the same venue share ONE row; do not add a second row for the
+ * same venue and kind. An honour (Spotlight, Oral, an award) is a red note on
+ * its paper, not a row of its own. js/render.js shows the newest ten rows and
+ * folds the rest behind "Show more".
  *
  * READ THIS BEFORE ADDING A DATE.
  *
  * We have no per-paper acceptance timestamp for any of these papers, and there is
- * no public source for one. So the date on an ACCEPTANCE item is NOT the day that
+ * no public source for one. So the date on an ACCEPTANCE row is NOT the day that
  * paper was accepted — it is the VENUE'S OFFICIAL AUTHOR-NOTIFICATION DATE, the
- * day the venue notified all of its authors. That is a real, citable date, and it
- * is the only one we can stand behind:
+ * day the venue notified all of its authors. That is a real, citable date, and
+ * it is the only one we can stand behind:
  *
  *   CoRL 2026   2026-09-04   https://www.corl.org/contributions/call-for-demos
  *   IROS 2026   2026-06-16  https://2026.ieee-iros.org/about/important-dates/
@@ -21,136 +28,103 @@
  *      would present the venue's notification day as if it were this paper's, and
  *      we do not know that. The sourced day belongs in the table above, not on the
  *      page.
- *   2. Adding an item means finding its venue's notification date and citing it in
- *      that table. Do not guess one, and do not copy a neighbour's.
+ *   2. Adding a row means finding its venue's date and citing it in that table.
+ *      Do not guess one, and do not copy a neighbour's.
  *
- * A RELEASE item is dated by the release itself (See like a Robot's arXiv id
- * 2607.11498 puts it in July 2026) and claims no venue.
+ * A RELEASE row is dated by the release itself (SeeR-VLA's arXiv id
+ * 2607.11498 puts it in July 2026) and claims no venue; its title is 'Preprint'.
  *
  * Template — copy this object and fill it in:
  *
  *   {
- *     id: 'slug-venue',                       // required, unique, lowercase
+ *     id: 'venue-year',                       // required, unique, lowercase
  *     date: '2026-06',                        // required, 'YYYY-MM' — see above
  *     kind: 'acceptance',                     // required: 'acceptance' | 'release'
- *     title: 'PAPER',                         // required, the short project name
- *     text: {                                 // en required, ko optional
- *       en: 'Accepted to CoRL 2026.',
- *       ko: 'CoRL 2026에 채택되었습니다.',
- *     },
- *     project: 'slug',                       // required, the id of the entry in
- *                                             // data/projects.js this is news ABOUT
+ *     title: 'IROS 2026',                     // required, the venue (or 'Preprint')
+ *     papers: [                               // required, one entry per paper
+ *       {
+ *         project: 'slug',                    // the id in data/projects.js
+ *         name: 'PAPER',                      // the short name printed in the row
+ *         note: { en: 'Spotlight', ko: 'Spotlight', honor: true },  // optional, shown
+ *                                             // in ( ); honor: true prints it in red
+ *       },
+ *     ],
  *   }
  *
- * A news row points wherever that project's card points — its project page, or
- * its paper if it has no project page. It does NOT carry a URL of its own: every
+ * The words before the names are generated: "1 paper accepted:" / "3 papers
+ * accepted:" for an acceptance, "1 preprint released:" for a release.
+ *
+ * Each paper name links wherever that project's card points — its project page,
+ * or its paper if it has no project page. A row carries no URL of its own: every
  * link for a paper lives in data/projects.js, in one place, so the row and the
- * card can never drift apart and point at different pages. A `project` that
- * matches nothing renders as plain text rather than a dead link.
+ * card can never drift apart. A `project` that matches nothing renders as plain
+ * text rather than a dead link.
  *
  * js/render.js sorts by `date`, newest first — the date decides the order on the
  * page, not the order in this file.
  */
 window.NEWS = [
   {
-    id: 'phuma-corl-2026',
+    id: 'corl-2026',
     date: '2026-09',
     kind: 'acceptance',
-    title: 'PHUMA',
-    text: {
-      en: 'Accepted to CoRL 2026 as a spotlight.',
-      ko: 'CoRL 2026에 spotlight으로 채택되었습니다.',
-    },
-    project: 'phuma',
-  },
-  {
-    id: 'pam-corl-2026',
-    date: '2026-09',
-    kind: 'acceptance',
-    title: 'PAM',
-    text: {
-      en: 'Accepted to CoRL 2026.',
-      ko: 'CoRL 2026에 채택되었습니다.',
-    },
-    project: 'pam',
-  },
-  {
-    id: 'residual-rl-corl-2026',
-    date: '2026-09',
-    kind: 'acceptance',
-    title: 'Object-Centric Residual RL',
-    text: {
-      en: 'Accepted to CoRL 2026. Joint work with Microsoft Research.',
-      ko: 'CoRL 2026에 채택되었습니다. Microsoft Research와의 공동 연구입니다.',
-    },
-    project: 'residual-rl',
+    title: 'CoRL 2026',
+    papers: [
+      { project: 'phuma', name: 'PHUMA', note: { en: 'Spotlight', ko: 'Spotlight', honor: true } },
+      { project: 'pam', name: 'PAM' },
+      { project: 'residual-rl', name: 'OCRL' },
+    ],
   },
   {
     // No accepted venue yet: a preprint, so it is written as a release and dated
     // by the arXiv posting (2607.11498 -> July 2026). Do not give it a venue.
-    id: 'pointmap-arxiv',
+    id: 'preprint-2026-07',
     date: '2026-07',
     kind: 'release',
-    title: 'See like a Robot',
-    text: {
-      en: 'Preprint released on arXiv.',
-      ko: '프리프린트가 arXiv에 공개되었습니다.',
-    },
-    project: 'pointmap',
+    title: 'Preprint',
+    papers: [{ project: 'pointmap', name: 'SeeR-VLA' }],
   },
   {
-    id: '3d-hamster-iros-2026',
+    id: 'iros-2026',
     date: '2026-06',
     kind: 'acceptance',
-    title: '3D HAMSTER',
-    text: {
-      en: 'Accepted to IROS 2026.',
-      ko: 'IROS 2026에 채택되었습니다.',
-    },
-    project: '3d-hamster',
+    title: 'IROS 2026',
+    papers: [{ project: '3d-hamster', name: '3D HAMSTER' }],
   },
   {
-    id: 'flashsac-rss-2026',
+    // The Outstanding Paper Award was presented at the conference in July 2026;
+    // the row keeps the acceptance date, and the award rides on the paper.
+    id: 'rss-2026',
     date: '2026-04',
     kind: 'acceptance',
-    title: 'FlashSAC',
-    text: {
-      en: 'Accepted to RSS 2026. Joint work with Holiday Robotics.',
-      ko: 'RSS 2026에 채택되었습니다. Holiday Robotics와의 공동 연구입니다.',
-    },
-    project: 'flashsac',
+    title: 'RSS 2026',
+    papers: [
+      {
+        project: 'flashsac',
+        name: 'FlashSAC',
+        note: { en: 'Outstanding Paper Award', ko: 'Outstanding Paper Award', honor: true },
+      },
+    ],
   },
   {
-    id: 'egox-cvpr-2026',
+    id: 'cvpr-2026',
     date: '2026-02',
     kind: 'acceptance',
-    title: 'EgoX',
-    text: {
-      en: 'Accepted to CVPR 2026.',
-      ko: 'CVPR 2026에 채택되었습니다.',
-    },
-    project: 'egox',
+    title: 'CVPR 2026',
+    papers: [{ project: 'egox', name: 'EgoX' }],
   },
   {
-    id: 'acg-icra-2026',
+    id: 'icra-2026',
     date: '2026-01',
     kind: 'acceptance',
-    title: 'ACG',
-    text: {
-      en: 'Accepted to ICRA 2026.',
-      ko: 'ICRA 2026에 채택되었습니다.',
-    },
-    project: 'acg',
+    title: 'ICRA 2026',
+    papers: [{ project: 'acg', name: 'ACG' }],
   },
   {
-    id: 'simbav2-icml-2025',
+    id: 'icml-2025',
     date: '2025-05',
     kind: 'acceptance',
-    title: 'SimbaV2',
-    text: {
-      en: 'Accepted to ICML 2025 as a spotlight.',
-      ko: 'ICML 2025에 spotlight으로 채택되었습니다.',
-    },
-    project: 'simbav2',
+    title: 'ICML 2025',
+    papers: [{ project: 'simbav2', name: 'SimbaV2', note: { en: 'Spotlight', ko: 'Spotlight', honor: true } }],
   },
 ];

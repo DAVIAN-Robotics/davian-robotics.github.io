@@ -6,7 +6,9 @@
  *     id: 'short-slug',                       // required, unique, lowercase
  *     title: 'PAPER: Full Title',             // required
  *     authors: ['pmh9960', 'Jane Doe (SNU)'], // required; ids link, plain strings do not
+ *     equal: 2,                               // optional; the first N authors are co-first authors (marked *)
  *     venue: 'NeurIPS 2025',                  // optional, shown as a badge
+ *     honor: 'Spotlight',                     // optional; Oral / Spotlight / an award, shown in red beside the venue
  *     year: 2025,                             // required, shown/implied by the badge; use venue year if present, else arXiv posting year
  *     date: '2025-09',                        // required, 'YYYY-MM', SORTS the grid (newest first)
  *     tags: ['manipulation', 'vla'],          // optional, drives the filter chips
@@ -40,8 +42,10 @@
 window.PROJECTS = [
   {
     id: 'phuma',
+    equal: 2,
     title: 'PHUMA: Physically Reliable Humanoid Locomotion Dataset',
-    venue: 'CoRL 2026 (spotlight)',
+    venue: 'CoRL 2026',
+    honor: 'Spotlight',
     authors: [
       'kyungminn',
       'sibisibi',
@@ -77,6 +81,7 @@ window.PROJECTS = [
   },
   {
     id: 'pam',
+    equal: 2,
     title: 'Procedural Assistance Memory for Proactive Robot',
     venue: 'CoRL 2026',
     authors: [
@@ -131,8 +136,9 @@ window.PROJECTS = [
   },
   {
     id: 'pointmap',
-    title: 'See like a Robot: Robot-Centric Pointmaps for Vision-Language-Action Models',
-    authors: ['lee15253', 'godnpeter', 'k00dj19', 'joonleesky', 'pmh9960', 'jaegulchoo'],
+    equal: 2,
+    title: 'See like a Robot: Robot-Centric Pointmaps for VLA Models',
+    authors: ['lee15253', 'godnpeter', 'k00dj19', 'joonleesky', 'mynsng', 'jaegulchoo', 'pmh9960'],
     year: 2026,
     date: '2026-07',
     tags: ['vla', 'manipulation'],
@@ -154,6 +160,7 @@ window.PROJECTS = [
   },
   {
     id: '3d-hamster',
+    equal: 3,
     title:
       '3D HAMSTER: Bridging Planning and Control in Hierarchical Vision Language Action Models through 3D Trajectory Guidance',
     authors: [
@@ -192,6 +199,7 @@ window.PROJECTS = [
   },
   {
     id: 'egox',
+    equal: 3,
     title: 'EgoX: Egocentric Video Generation from a Single Exocentric Video',
     authors: ['keh0t0', 'kinam0252', 'Dohyeon Kim', 'pmh9960', 'junhahyung', 'jaegulchoo'],
     venue: 'CVPR 2026',
@@ -219,6 +227,7 @@ window.PROJECTS = [
   },
   {
     id: 'acg',
+    equal: 2,
     title: 'ACG: Action Coherence Guidance for Flow-based Vision-Language-Action Models',
     authors: [
       'pmh9960',
@@ -255,9 +264,11 @@ window.PROJECTS = [
   },
   {
     id: 'simbav2',
+    equal: 2,
     title: 'SimbaV2: Hyperspherical Normalization for Scalable Deep Reinforcement Learning',
     authors: ['joonleesky', 'leeyngdo', 'Takuma Seno', 'iamproto', 'Peter Stone', 'jaegulchoo'],
-    venue: 'ICML 2025 (spotlight)',
+    venue: 'ICML 2025',
+    honor: 'Spotlight',
     year: 2025,
     date: '2025-05',
     tags: ['reinforcement learning'],
@@ -285,6 +296,7 @@ window.PROJECTS = [
   },
   {
     id: 'flashsac',
+    equal: 2,
     title: 'FlashSAC: Fast and Stable Off-Policy Reinforcement Learning for High-Dimensional Robot Control',
     authors: [
       'iamproto',
@@ -302,6 +314,7 @@ window.PROJECTS = [
       'joonleesky',
     ],
     venue: 'RSS 2026',
+    honor: 'Outstanding Paper Award',
     year: 2026,
     date: '2026-04',
     tags: ['reinforcement learning', 'sim2real'],

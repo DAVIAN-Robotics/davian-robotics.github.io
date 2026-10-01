@@ -29,27 +29,16 @@
 
     <header class="site-header">
       <div class="container site-header__inner">
-        <!-- The <a> is the crop window; the <img> inside is oversized and pulled
-             up/left so only the inked lockup shows. The file carries ~10% of its
-             own width and ~12% of its height as empty margin (alpha bbox is
-             25,22 → 2023,807 of 2247x921), which is what made the wordmark look
-             small and soft at a header size — the height was being spent on
-             nothing. Sizing is driven entirely by --logo-h in css/style.css; the
-             file itself is untouched. -->
+        <!-- A vector logo already cut to its ink; its height is --logo-h in
+             css/style.css and the width follows the file's aspect ratio. -->
         <a class="site-header__logo" href="#top">
           <img
-            src="assets/logo/davian-robotics-horizontal.png"
+            src="assets/logo/davian-robotics.svg"
             alt="DAVIAN Robotics"
-            width="2247"
-            height="921"
+            width="1169"
+            height="295"
           />
         </a>
-
-        <a
-          class="site-header__parent"
-          href="https://davian.kaist.ac.kr/"
-          >DAVIAN Lab</a
-        >
 
         <nav class="site-nav" aria-label="Sections">
           <a href="#news" data-i18n="nav.news">News</a>
@@ -224,15 +213,16 @@
             DAVIAN <span class="hero__title-line">Robotics</span>
           </h1>
           <p class="hero__lead" data-i18n="hero.lead">
-            Our research focuses on learning-based robotic manipulation through vision-language-action models and sim-to-real reinforcement learning.
+            We develop learning-based approaches to robotic manipulation, with a focus on vision-language-action models and sim-to-real reinforcement learning.
           </p>
           <!-- Split across spans because js/i18n.js translates by assigning
                textContent, which would wipe out a child <a>. Each span is
                translated on its own and the link between them is left alone. -->
+          <!-- No whitespace between </a> and the second span: it starts with a comma
+               in English and with a particle (의) in Korean. -->
           <p class="hero__affiliation">
-            <span data-i18n="hero.affiliation.pre">The robotics group of</span>
-            <a href="https://davian.kaist.ac.kr/">DAVIAN Lab</a>
-            <span data-i18n="hero.affiliation.post">(Prof. Jaegul Choo) at KAIST AI.</span>
+            <span data-i18n="hero.affiliation.pre">DAVIAN Robotics is the robotics group within</span>
+            <a href="https://davian.kaist.ac.kr/">DAVIAN Lab</a><span data-i18n="hero.affiliation.post">, led by Prof. Jaegul Choo at KAIST AI.</span>
           </p>
           <div class="hero__actions">
             <a
@@ -263,6 +253,7 @@
         <div class="container">
           <header class="section__head">
             <h2 class="section__title" data-i18n="section.research">Research</h2>
+            <p class="section__note" data-i18n="research.equal">* Equal contribution</p>
           </header>
           <!-- The tag filter is SHELVED, not removed: six projects are not worth
                filtering, and each card now carries its own tags as labels. The
