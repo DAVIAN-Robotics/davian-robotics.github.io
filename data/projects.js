@@ -147,7 +147,6 @@ window.PROJECTS = [
     },
     links: {
       paper: 'https://arxiv.org/abs/2607.11498',
-      project: 'https://davian-robotics.github.io/pointmap/',
     },
   },
   {

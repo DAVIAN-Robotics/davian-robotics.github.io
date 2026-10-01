@@ -19,7 +19,7 @@
  *   IROS 2026   2026-06-16  https://2026.ieee-iros.org/about/important-dates/
  *   RSS 2026    2026-04-27   https://roboticsconference.org/information/cfp/
  *   CVPR 2026   2026-02-21   https://cvpr.thecvf.com/Conferences/2026/Dates
- *   ICRA 2026   2026-01-31   https://2026.ieee-icra.org/event/notifications-of-acceptance-rejection-sent/
+ *   ICRA 2026   2026-01-31   https://2026.ieee-icra.org/contribute/call-for-icra-2026-papers-now-accepting-submissions/
  *   ICML 2025   2025-05-01   https://icml.cc/Conferences/2025/Dates
  *
  * Two rules follow, and tests enforce both:

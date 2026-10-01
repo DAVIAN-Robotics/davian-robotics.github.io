@@ -1427,6 +1427,33 @@ a.news__paper:focus-visible {
   }
 }
 
+/* Touch users can read complete cards without a hover or a tap to expand. */
+@media (max-width: 640px), (hover: none) {
+  .card {
+    grid-template-rows: auto auto;
+  }
+
+  .card .card__body,
+  .card:focus-within .card__body,
+  .card:hover .card__body {
+    align-self: stretch;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    margin: 0;
+    border: 0;
+  }
+
+  .card .card__title,
+  .card .card__authors,
+  .card .card__summary {
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    overflow: visible;
+  }
+}
+
 /* Motion ------------------------------------------------------------------ */
 
 @media (prefers-reduced-motion: reduce) {
