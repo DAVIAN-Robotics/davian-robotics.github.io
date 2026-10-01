@@ -1,6 +1,6 @@
 # DAVIAN Robotics — website
 
-This is the source for [davian-robotics.github.io](https://davian-robotics.github.io), the public site for DAVIAN Robotics, the robotics research group of DAVIAN Lab at KAIST AI. It is a build-free static page: `index.html` plus `css/style.css`, `js/render.js`, `js/i18n.js`, and the data files under `data/` render everything — no bundler, no npm install, no dependencies. GitHub Pages serves the repository root as-is.
+This is the source for [davian-robotics.github.io](https://davian-robotics.github.io), the public site for DAVIAN Robotics, the robotics research group of DAVIAN Lab at KAIST AI. It is a build-free static page: `index.html` plus `css/style.css`, `js/render.js`, and the data files under `data/` render everything — no bundler, no npm install, no dependencies. GitHub Pages serves the repository root as-is.
 
 ## Add a project
 
@@ -20,7 +20,7 @@ This is the source for [davian-robotics.github.io](https://davian-robotics.githu
        src: 'assets/media/slug.mp4',
        poster: 'assets/media/slug.jpg',      // required when type is 'video'
      },
-     summary: { en: 'One or two sentences.', ko: '한두 문장.' },  // en required, ko optional
+     summary: { en: 'One or two sentences.' },  // English summary
      links: {                                // optional; a missing key renders no button
        paper: 'https://arxiv.org/abs/...',
        code: 'https://github.com/DAVIAN-Robotics/...',
@@ -37,6 +37,32 @@ This is the source for [davian-robotics.github.io](https://davian-robotics.githu
    None of the six projects currently on the site set `media`, so every card today falls back to a plain typographic tile (see `mediaHTML` in `js/render.js`). Adding a demo clip is the single most visible improvement a contributor can make.
 
 3. If an author is new, decide whether they belong in `data/people.js`. An `authors` entry that matches a key in `window.PEOPLE` renders as a link everywhere the project appears; anything else renders as plain text (e.g. `'Jane Doe (SNU)'`). Only add someone to `PEOPLE` when you can point at a page that actually ties them to KAIST / DAVIAN / one of the lab's papers — Korean names collide constantly, and a wrong link under a real person's name is a real error, while leaving a name unlinked costs nothing. When in doubt, leave it as a plain string.
+
+## Add a person to People
+
+1. If they are not in `window.PEOPLE` yet, add them there first (same rule as above: only with a page that ties them to the lab).
+2. Add an entry to `window.MEMBERS` at the bottom of `data/people.js`:
+
+   ```js
+   { person: 'githubid', role: 'phd', interests: 'Reinforcement Learning, VLA' },
+   ```
+
+   - `role` is one of `'professor'`, `'postdoc'`, `'phd'`, `'ms'`, `'alumni-phd'`, `'alumni-ms'`.
+   - `affiliation` is optional and is printed after the role: `role: 'alumni-ms', affiliation: 'Holiday Robotics'` reads "M.S. Alumni · Holiday Robotics".
+   - Copy `interests` from the lab page (https://davian.kaist.ac.kr/people) when the person is listed there.
+3. Put a **300x400 (3:4) JPEG** at `assets/people/<person>.jpg`, the face in the upper half. Many phone photos are stored sideways with an EXIF rotation flag, so straighten the pixels before saving (e.g. PIL `ImageOps.exif_transpose`). If there is no photo yet, set `photo: false` and the card shows the person's initials.
+
+## Ordering — do not sort by hand
+
+Every list on the page is sorted in code, so the order you write things in a data file does **not** decide what readers see (it only breaks ties):
+
+| List | Rule | Function (`js/render.js`) |
+|---|---|---|
+| Research cards | `date` newest first; same month keeps the order of `data/projects.js` | `sortProjects` |
+| News rows | `date` newest first; same month keeps the order of `data/news.js` | `sortNews` |
+| People | the professor first, then by number of papers in `data/projects.js` that list the person as an author, most first; a tie goes to whoever joined the lab first, which is the order `window.MEMBERS` is written in | `sortMembers` |
+
+So keep `window.MEMBERS` in joining order (insert a new member where they joined, not at the end), and to move someone up in People, add the paper — never reorder `MEMBERS` to fake it. A person only counts for a paper when `authors` uses their `PEOPLE` key (`'pmh9960'`), not a plain-text name. `node --test tests/` checks these rules.
 
 ## Media rules
 
@@ -57,7 +83,7 @@ Over 2 MB, raise `-crf` (e.g. to 30 or 32) and re-encode.
 
 ## Preview
 
-Open `index.html` directly in a browser — no server needed. The data files (`data/people.js`, `data/projects.js`, `data/strings.js`) are loaded as plain `<script>` tags, not fetched, so `file://` works with no CORS issues. If you ever change that to a `fetch()`, this stops working from `file://` and a local server becomes mandatory.
+Open `index.html` directly in a browser — no server needed. The data files (`data/people.js`, `data/projects.js`) are loaded as plain `<script>` tags, not fetched, so `file://` works with no CORS issues. If you ever change that to a `fetch()`, this stops working from `file://` and a local server becomes mandatory.
 
 If you'd rather use one anyway:
 
@@ -77,9 +103,9 @@ node --test tests/
 
 Node is needed only to run these tests — the site itself has no build step and no dependencies, and there is no `package.json`.
 
-## Translations
+## Language
 
-The English text lives in `index.html` as the literal content of each node. To translate a string, add it to `data/strings.js` under `window.STRINGS.ko`, keyed by the matching `data-i18n="<key>"` attribute in `index.html`. A key that's missing from `strings.js` simply leaves the English text in place — nothing breaks.
+The site is English-only and follows the system light or dark theme. Edit static text in `index.html` and research summaries and news notes in `data/projects.js` and `data/news.js`.
 
 ## Deploy
 

@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <title>DAVIAN Robotics — KAIST AI</title>
     <meta
       name="description"
@@ -25,24 +26,28 @@
   </head>
 
   <body>
-    <a class="skip-link" href="#main" data-i18n="a11y.skipLink">Skip to main content</a>
+    <a class="skip-link" href="#main">Skip to main content</a>
 
     <header class="site-header">
       <div class="container site-header__inner">
         <!-- A vector logo already cut to its ink; its height is --logo-h in
              css/style.css and the width follows the file's aspect ratio. -->
         <a class="site-header__logo" href="#top">
-          <img
-            src="assets/logo/davian-robotics.svg"
-            alt="DAVIAN Robotics"
-            width="1169"
-            height="295"
-          />
+          <picture>
+            <source srcset="assets/logo/davian-robotics-dark.svg" media="(prefers-color-scheme: dark)" />
+            <img
+              src="assets/logo/davian-robotics.svg"
+              alt="DAVIAN Robotics"
+              width="1169"
+              height="295"
+            />
+          </picture>
         </a>
 
         <nav class="site-nav" aria-label="Sections">
-          <a href="#news" data-i18n="nav.news">News</a>
-          <a href="#research" data-i18n="nav.research">Research</a>
+          <a href="#news">News</a>
+          <a href="#research">Research</a>
+          <a href="#people">People</a>
         </nav>
 
         <div class="site-header__actions">
@@ -65,47 +70,11 @@
             aria-label="DAVIAN Robotics on Hugging Face"
             title="Hugging Face"
           >
-            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-              <circle
-                cx="8"
-                cy="8"
-                r="6.4"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.2"
-              />
-              <circle cx="5.8" cy="6.6" r="0.95" fill="currentColor" />
-              <circle cx="10.2" cy="6.6" r="0.95" fill="currentColor" />
-              <path
-                d="M5.2 9.6a3.1 3.1 0 0 0 5.6 0"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.2"
-                stroke-linecap="round"
-              />
+            <!-- Hugging Face mark, from Simple Icons (CC0). -->
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="currentColor" d="M12.025 1.13c-5.77 0-10.449 4.647-10.449 10.378 0 1.112.178 2.181.503 3.185.064-.222.203-.444.416-.577a.96.96 0 0 1 .524-.15c.293 0 .584.124.84.284.278.173.48.408.71.694.226.282.458.611.684.951v-.014c.017-.324.106-.622.264-.874s.403-.487.762-.543c.3-.047.596.06.787.203s.31.313.4.467c.15.257.212.468.233.542.01.026.653 1.552 1.657 2.54.616.605 1.01 1.223 1.082 1.912.055.537-.096 1.059-.38 1.572.637.121 1.294.187 1.967.187.657 0 1.298-.063 1.921-.178-.287-.517-.44-1.041-.384-1.581.07-.69.465-1.307 1.081-1.913 1.004-.987 1.647-2.513 1.657-2.539.021-.074.083-.285.233-.542.09-.154.208-.323.4-.467a1.08 1.08 0 0 1 .787-.203c.359.056.604.29.762.543s.247.55.265.874v.015c.225-.34.457-.67.683-.952.23-.286.432-.52.71-.694.257-.16.547-.284.84-.285a.97.97 0 0 1 .524.151c.228.143.373.388.43.625l.006.04a10.3 10.3 0 0 0 .534-3.273c0-5.731-4.678-10.378-10.449-10.378M8.327 6.583a1.5 1.5 0 0 1 .713.174 1.487 1.487 0 0 1 .617 2.013c-.183.343-.762-.214-1.102-.094-.38.134-.532.914-.917.71a1.487 1.487 0 0 1 .69-2.803m7.486 0a1.487 1.487 0 0 1 .689 2.803c-.385.204-.536-.576-.916-.71-.34-.12-.92.437-1.103.094a1.487 1.487 0 0 1 .617-2.013 1.5 1.5 0 0 1 .713-.174m-10.68 1.55a.96.96 0 1 1 0 1.921.96.96 0 0 1 0-1.92m13.838 0a.96.96 0 1 1 0 1.92.96.96 0 0 1 0-1.92M8.489 11.458c.588.01 1.965 1.157 3.572 1.164 1.607-.007 2.984-1.155 3.572-1.164.196-.003.305.12.305.454 0 .886-.424 2.328-1.563 3.202-.22-.756-1.396-1.366-1.63-1.32q-.011.001-.02.006l-.044.026-.01.008-.03.024q-.018.017-.035.036l-.032.04a1 1 0 0 0-.058.09l-.014.025q-.049.088-.11.19a1 1 0 0 1-.083.116 1.2 1.2 0 0 1-.173.18q-.035.029-.075.058a1.3 1.3 0 0 1-.251-.243 1 1 0 0 1-.076-.107c-.124-.193-.177-.363-.337-.444-.034-.016-.104-.008-.2.022q-.094.03-.216.087-.06.028-.125.063l-.13.074q-.067.04-.136.086a3 3 0 0 0-.135.096 3 3 0 0 0-.26.219 2 2 0 0 0-.12.121 2 2 0 0 0-.106.128l-.002.002a2 2 0 0 0-.09.132l-.001.001a1.2 1.2 0 0 0-.105.212q-.013.036-.024.073c-1.139-.875-1.563-2.317-1.563-3.203 0-.334.109-.457.305-.454m.836 10.354c.824-1.19.766-2.082-.365-3.194-1.13-1.112-1.789-2.738-1.789-2.738s-.246-.945-.806-.858-.97 1.499.202 2.362c1.173.864-.233 1.45-.685.64-.45-.812-1.683-2.896-2.322-3.295s-1.089-.175-.938.647 2.822 2.813 2.562 3.244-1.176-.506-1.176-.506-2.866-2.567-3.49-1.898.473 1.23 2.037 2.16c1.564.932 1.686 1.178 1.464 1.53s-3.675-2.511-4-1.297c-.323 1.214 3.524 1.567 3.287 2.405-.238.839-2.71-1.587-3.216-.642-.506.946 3.49 2.056 3.522 2.064 1.29.33 4.568 1.028 5.713-.624m5.349 0c-.824-1.19-.766-2.082.365-3.194 1.13-1.112 1.789-2.738 1.789-2.738s.246-.945.806-.858.97 1.499-.202 2.362c-1.173.864.233 1.45.685.64.451-.812 1.683-2.896 2.322-3.295s1.089-.175.938.647-2.822 2.813-2.562 3.244 1.176-.506 1.176-.506 2.866-2.567 3.49-1.898-.473 1.23-2.037 2.16c-1.564.932-1.686 1.178-1.464 1.53s3.675-2.511 4-1.297c.323 1.214-3.524 1.567-3.287 2.405.238.839 2.71-1.587 3.216-.642.506.946-3.49 2.056-3.522 2.064-1.29.33-4.568 1.028-5.713-.624" />
             </svg>
           </a>
-          <!-- js/i18n.js (Task 5): no aria-pressed to keep in sync here — the
-               control's state is already exposed via document.documentElement.lang,
-               which Task 5 sets on the <html> element, so a screen reader already
-               knows the page language without an invented ARIA state. The
-               aria-label itself is translated via data-i18n-aria (same
-               restore/swap mechanism as data-i18n, applied to an attribute
-               instead of textContent) and names which language is currently
-               active; it keeps the literal visible text "EN | KR" in both
-               languages so the accessible name still contains the visible
-               label (WCAG 2.5.3). -->
-          <button
-            id="lang-toggle"
-            class="lang-toggle"
-            type="button"
-            data-i18n-aria="toggle.lang"
-            aria-label="EN | KR language toggle, currently English"
-          >
-            <span class="lang-toggle__on">EN</span>
-            <span class="lang-toggle__sep" aria-hidden="true">|</span>
-            <span class="lang-toggle__off">KR</span>
-          </button>
         </div>
       </div>
     </header>
@@ -200,29 +169,25 @@
             </svg>
 
             <figcaption class="hero__plate-caption">
-              <span data-i18n="hero.figure">Fig. 1 — planned end-effector trajectory</span>
+              <span>Fig. 1 — planned end-effector trajectory</span>
             </figcaption>
           </figure>
         </div>
 
         <div class="hero__body">
-          <!-- The space before the span is load-bearing: .hero__title-line is a
-               block, so it collapses visually, but without it the accessible
-               name of the heading is "DAVIANRobotics". -->
+          <!-- The space before the span is load-bearing: without it the title
+               reads "DAVIANRobotics". -->
           <h1 class="hero__title">
             DAVIAN <span class="hero__title-line">Robotics</span>
           </h1>
-          <p class="hero__lead" data-i18n="hero.lead">
+          <p class="hero__lead">
             We develop learning-based approaches to robotic manipulation, with a focus on vision-language-action models and sim-to-real reinforcement learning.
           </p>
-          <!-- Split across spans because js/i18n.js translates by assigning
-               textContent, which would wipe out a child <a>. Each span is
-               translated on its own and the link between them is left alone. -->
           <!-- No whitespace between </a> and the second span: it starts with a comma
-               in English and with a particle (의) in Korean. -->
+               in English. -->
           <p class="hero__affiliation">
-            <span data-i18n="hero.affiliation.pre">DAVIAN Robotics is the robotics group within</span>
-            <a href="https://davian.kaist.ac.kr/">DAVIAN Lab</a><span data-i18n="hero.affiliation.post">, led by Prof. Jaegul Choo at KAIST AI.</span>
+            <span>DAVIAN Robotics is the robotics group within</span>
+            <a href="https://davian.kaist.ac.kr/">DAVIAN Lab</a><span>, led by Prof. Jaegul Choo at KAIST AI.</span>
           </p>
           <div class="hero__actions">
             <a
@@ -242,7 +207,7 @@
       <section id="news" class="section band">
         <div class="container">
           <header class="section__head">
-            <h2 class="section__title" data-i18n="section.news">News</h2>
+            <h2 class="section__title">News</h2>
           </header>
           <!-- Filled by js/render.js from window.NEWS (newest date first). -->
           <ol id="news-list" class="news"></ol>
@@ -252,8 +217,8 @@
       <section id="research" class="section">
         <div class="container">
           <header class="section__head">
-            <h2 class="section__title" data-i18n="section.research">Research</h2>
-            <p class="section__note" data-i18n="research.equal">* Equal contribution</p>
+            <h2 class="section__title">Research</h2>
+            <p class="section__note">* Equal contribution</p>
           </header>
           <!-- The tag filter is SHELVED, not removed: six projects are not worth
                filtering, and each card now carries its own tags as labels. The
@@ -266,6 +231,17 @@
           <div id="research-grid" class="grid"></div>
         </div>
       </section>
+
+      <section id="people" class="section band">
+        <div class="container">
+          <header class="section__head">
+            <h2 class="section__title">People</h2>
+            <p class="section__note">Listed in descending order of contributions to research papers.</p>
+          </header>
+          <!-- Filled by js/render.js from window.MEMBERS in data/people.js. -->
+          <ul id="people-list" class="people"></ul>
+        </div>
+      </section>
     </main>
 
     <footer class="site-footer">
@@ -274,7 +250,10 @@
           class="site-footer__kaist"
           href="https://gsai.kaist.ac.kr/"
         >
-          <img src="assets/logo/kaist-ai.svg" alt="KAIST AI" height="28" />
+          <picture>
+            <source srcset="assets/logo/kaist-ai-dark.svg" media="(prefers-color-scheme: dark)" />
+            <img src="assets/logo/kaist-ai.svg" alt="KAIST AI" height="24" />
+          </picture>
         </a>
 
         <nav class="site-footer__links" aria-label="Elsewhere">
@@ -294,8 +273,6 @@
     <script src="data/people.js"></script>
     <script src="data/projects.js"></script>
     <script src="data/news.js"></script>
-    <script src="data/strings.js"></script>
     <script src="js/render.js"></script>
-    <script src="js/i18n.js"></script>
   </body>
 </html>

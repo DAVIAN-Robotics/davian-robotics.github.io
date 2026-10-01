@@ -17,7 +17,7 @@
  *       src: 'assets/media/slug.mp4',
  *       poster: 'assets/media/slug.jpg',      // required when type is 'video'
  *     },
- *     summary: { en: 'One or two sentences.', ko: '한두 문장.' },  // en required, ko optional
+ *     summary: { en: 'One or two sentences.' },  // English summary
  *     links: {                                // optional; a missing key renders no button
  *       paper: 'https://arxiv.org/abs/...',
  *       code: 'https://github.com/DAVIAN-Robotics/...',
@@ -68,8 +68,6 @@ window.PROJECTS = [
     summary: {
       en:
         'A high-quality humanoid locomotion dataset built from large-scale human motion data, using careful curation and physics-constrained retargeting to eliminate physical artifacts.',
-      ko:
-        '대규모 인간 동작 데이터를 정교한 큐레이션과 물리 제약 리타겟팅으로 정제하여 물리적 아티팩트를 제거한 고품질 휴머노이드 보행 데이터셋입니다.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2510.26236',
@@ -87,10 +85,10 @@ window.PROJECTS = [
     authors: [
       'aiclaudev',
       'pmh9960',
-      'Jeonghoon Park',
+      'entiff',
       'godnpeter',
       'junhahyung',
-      'Sungwon Hwang',
+      'deepshwang',
       'lee15253',
       'jaegulchoo',
     ],
@@ -99,9 +97,7 @@ window.PROJECTS = [
     tags: ['vla', 'manipulation'],
     summary: {
       en:
-        'A proactive robot assistant that acts before it is asked: a VLM reads a Procedural Assistance Memory, a finite-state machine of the user\'s daily routine, to decide when and how to help, a VLA carries the task out, and a reflection VLM refines the memory after each day without any retraining.',
-      ko:
-        '요청받기 전에 먼저 돕는 능동형 로봇 어시스턴트입니다. VLM이 사용자의 일과를 유한 상태 기계로 정리한 Procedural Assistance Memory를 읽고 언제 어떻게 도울지 판단하면 VLA가 이를 실행하며, 하루가 끝날 때마다 reflection VLM이 재학습 없이 메모리를 다듬습니다.',
+        'A proactive robot assistant that helps before being asked. A VLM uses Procedural Assistance Memory, which represents the user\'s daily routine as a finite-state machine, to decide when and how to help. A VLA executes the task, and a reflection VLM refines the memory at the end of each day without retraining.',
     },
     links: {
       code: 'https://github.com/DAVIAN-Robotics/PAM',
@@ -125,9 +121,7 @@ window.PROJECTS = [
     tags: ['vla', 'reinforcement learning', 'sim2real'],
     summary: {
       en:
-        'A residual RL policy trained purely in simulation on object poses corrects a VLA\'s actions and transfers zero-shot to a real Franka robot, raising success from 42% to 76% across five manipulation tasks.',
-      ko:
-        '물체 자세만 관측으로 받아 시뮬레이션에서만 학습한 residual 강화학습 정책이 VLA의 행동을 보정하고, 실제 Franka 로봇에 zero-shot으로 전이되어 다섯 가지 조작 태스크의 성공률을 42%에서 76%로 높입니다.',
+        'A residual RL policy uses object poses to correct a VLA\'s actions. Trained entirely in simulation, it transfers to a real Franka robot without additional training, improving the success rate from 42% to 76% across five manipulation tasks.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2606.18953',
@@ -149,9 +143,7 @@ window.PROJECTS = [
     },
     summary: {
       en:
-        'Robot-centric pointmaps give a VLA per-pixel 3D in the frame where actions are defined, keeping the policy robust as training-time camera viewpoint variation grows, with one extra encoder and one element-wise addition.',
-      ko:
-        '로봇 좌표계 포인트맵으로 VLA에 픽셀 단위 3D를 제공해, 학습 시 카메라 시점 변화가 커져도 정책이 강건하게 유지됩니다. 인코더 하나와 element-wise 덧셈만 추가하면 됩니다.',
+        'Robot-centric pointmaps provide a VLA with per-pixel 3D coordinates in the same reference frame as its actions. With just one additional encoder and an element-wise addition, the policy remains robust as camera viewpoint variation increases during training.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2607.11498',
@@ -169,7 +161,7 @@ window.PROJECTS = [
       'k00dj19',
       'whit3snow',
       'myyzzzoooo',
-      'moon1x21',
+      'Jueun Mun',
       'pmh9960',
       'joonleesky',
       'mynsng',
@@ -186,9 +178,7 @@ window.PROJECTS = [
     },
     summary: {
       en:
-        'A depth-aware VLM planner that predicts metrically grounded 3D end-effector trajectories from a single RGB-D observation and a language instruction, feeding directly into a point-cloud low-level policy.',
-      ko:
-        '단일 RGB-D 관측과 언어 지시로부터 3D 종단 이펙터 궤적을 예측하는 깊이 인지 VLM 플래너로, 포인트 클라우드 기반 저수준 정책으로 바로 연결됩니다.',
+        'A depth-aware VLM planner predicts 3D end-effector trajectories at real-world scale from a single RGB-D observation and a language instruction. These trajectories directly guide a point-cloud-based low-level policy.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2606.31329',
@@ -214,8 +204,6 @@ window.PROJECTS = [
     summary: {
       en:
         'A video generation framework that produces first-person egocentric video from a single third-person exocentric video, built on large-scale video diffusion models and lightweight LoRA adaptation.',
-      ko:
-        '단일 3인칭 영상으로부터 1인칭 시점 영상을 생성하는 프레임워크로, 대규모 비디오 디퓨전 모델과 경량 LoRA 적응을 기반으로 합니다.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2512.08269',
@@ -251,8 +239,6 @@ window.PROJECTS = [
     summary: {
       en:
         'A training-free, test-time guidance algorithm that improves temporal and spatial action consistency in flow-based Vision-Language-Action models, reducing motion jitter and trajectory drift.',
-      ko:
-        '학습 없이 추론 시점에서 흐름 기반 VLA 모델의 시간적·공간적 행동 일관성을 개선하여 모션 지터와 궤적 이탈을 줄이는 가이던스 알고리즘입니다.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2510.22201',
@@ -280,8 +266,6 @@ window.PROJECTS = [
     summary: {
       en:
         'A reinforcement learning architecture that stabilizes training via hyperspherical normalization, achieving state-of-the-art results on 57 continuous control tasks by scaling model capacity and compute.',
-      ko:
-        '초구면 정규화를 통해 학습을 안정화하는 강화학습 아키텍처로, 모델 용량과 연산량을 확장하여 57개 연속 제어 태스크에서 최고 성능을 달성합니다.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2502.15280',
@@ -326,8 +310,6 @@ window.PROJECTS = [
     summary: {
       en:
         'FlashSAC is a fast and stable off-policy reinforcement learning algorithm built on Soft Actor-Critic that sharply reduces gradient updates while scaling up model size and data throughput, bounding weight, feature, and gradient norms to curb critic error accumulation. Across more than 60 tasks in 10 simulators it outperforms PPO and strong off-policy baselines, and in sim-to-real humanoid locomotion it cuts training time from hours to minutes.',
-      ko:
-        'FlashSAC는 Soft Actor-Critic 기반의 빠르고 안정적인 오프폴리시 강화학습 알고리즘으로, 그래디언트 업데이트 횟수를 크게 줄이는 대신 모델 크기와 데이터 처리량을 확장하고 가중치·특징·그래디언트 노름을 제한하여 크리틱 오차 누적을 억제합니다. 10개의 시뮬레이터에서 60개 이상의 태스크에 대해 PPO 및 강력한 오프폴리시 베이스라인을 능가하며, 시뮬레이션-실환경 휴머노이드 보행 전이에서는 학습 시간을 시간 단위에서 분 단위로 단축합니다.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2604.04539',

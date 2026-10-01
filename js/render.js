@@ -100,14 +100,8 @@
     return match ? cardHref(match.links) : '';
   }
 
-  /* A leaf that js/i18n.js swaps between languages. It holds plain text only:
-   * the swap assigns textContent, so the paper links sit BESIDE these spans,
-   * never inside one, and survive a language change. */
-  function i18nSpan(cls, en, ko) {
-    return (
-      '<span class="' + cls + '" data-news-en="' + escapeHTML(en) + '" data-news-ko="' +
-      escapeHTML(ko || '') + '">' + escapeHTML(en) + '</span>'
-    );
+  function textSpan(cls, text) {
+    return '<span class="' + cls + '">' + escapeHTML(text) + '</span>';
   }
 
   /* The words before the paper names, one pattern for every row: "1 paper
@@ -117,9 +111,9 @@
     if (item.lead && item.lead.en) return item.lead;
     var n = item.papers.length;
     if (item.kind === 'release') {
-      return { en: n + (n > 1 ? ' preprints' : ' preprint') + ' released:', ko: '프리프린트 ' + n + '편 공개:' };
+      return { en: n + (n > 1 ? ' preprints' : ' preprint') + ' released:' };
     }
-    return { en: n + (n > 1 ? ' papers' : ' paper') + ' accepted:', ko: '논문 ' + n + '편 채택:' };
+    return { en: n + (n > 1 ? ' papers' : ' paper') + ' accepted:' };
   }
 
   /* One paper inside a row: its short name, linked wherever its CARD links
@@ -132,8 +126,8 @@
       : '<span class="news__paper news__paper--static">' + name + '</span>';
     if (paper.note && paper.note.en) {
       // An honour note ("spotlight", "oral", ...) is printed in red.
-      html += ' ' + i18nSpan('news__note' + (paper.note.honor ? ' news__note--honor' : ''),
-        '(' + paper.note.en + ')', paper.note.ko ? '(' + paper.note.ko + ')' : '');
+      html += ' ' + textSpan('news__note' + (paper.note.honor ? ' news__note--honor' : ''),
+        '(' + paper.note.en + ')');
     }
     return html;
   }
@@ -144,7 +138,7 @@
   function newsRowHTML(item, projects) {
     var kind = NEWS_KINDS[item.kind] ? item.kind : '';
     var badge = kind
-      ? '<span class="news__kind" data-i18n="news.kind.' + kind + '">' + NEWS_KINDS[kind] + '</span>'
+      ? '<span class="news__kind">' + NEWS_KINDS[kind] + '</span>'
       : '';
     var lead = newsLead(item);
     var papers = item.papers
@@ -163,7 +157,7 @@
       '</time>' +
       '<h3 class="news__title">' + escapeHTML(item.title) + '</h3>' +
       '<p class="news__text">' +
-      i18nSpan('news__lead' + (item.kind === 'award' ? ' news__lead--honor' : ''), lead.en, lead.ko) +
+      textSpan('news__lead' + (item.kind === 'award' ? ' news__lead--honor' : ''), lead.en) +
       ' ' + papers + '.</p>' +
       badge +
       '</div>' +
@@ -189,21 +183,21 @@
       '<ol class="news news--earlier">' + rows.slice(limit).join('') + '</ol>' +
       '</div>' +
       '<button type="button" class="news__toggle" aria-expanded="false" aria-controls="news-earlier">' +
-      i18nSpan('news__toggle-label', NEWS_TOGGLE.more.en, NEWS_TOGGLE.more.ko) +
+      textSpan('news__toggle-label', NEWS_TOGGLE.more.en) +
       '</button>' +
       '</li>'
     );
   }
 
   var NEWS_TOGGLE = {
-    more: { en: 'Show more', ko: '더 보기' },
-    less: { en: 'Show less', ko: '접기' },
+    more: { en: 'Show more' },
+    less: { en: 'Show less' },
   };
 
   /* Opens or closes the folded rows. Pure DOM-in, DOM-out so a test can drive
    * it with plain objects: flips aria-expanded, the open class and `inert`, and
-   * relabels the button in the page's current language. */
-  function toggleNews(button, earlier, lang) {
+   * relabels the button. */
+  function toggleNews(button, earlier) {
     var open = button.getAttribute('aria-expanded') !== 'true';
     button.setAttribute('aria-expanded', open ? 'true' : 'false');
     if (open) {
@@ -216,9 +210,7 @@
     var label = open ? NEWS_TOGGLE.less : NEWS_TOGGLE.more;
     var span = button.querySelector('.news__toggle-label');
     if (span) {
-      span.setAttribute('data-news-en', label.en);
-      span.setAttribute('data-news-ko', label.ko);
-      span.textContent = lang === 'ko' ? label.ko : label.en;
+      span.textContent = label.en;
     }
     return open;
   }
@@ -229,9 +221,93 @@
     var earlier = doc.getElementById('news-earlier');
     if (!button || !earlier || !button.addEventListener) return;
     button.addEventListener('click', function () {
-      var lang = doc.documentElement && doc.documentElement.lang === 'ko' ? 'ko' : 'en';
-      toggleNews(button, earlier, lang);
+      toggleNews(button, earlier);
     });
+  }
+
+  /* --- people -------------------------------------------------------------- */
+
+  var MEMBER_ROLES = {
+    professor: 'Professor',
+    postdoc: 'Postdoc',
+    phd: 'Ph.D. Student',
+    ms: 'M.S. Student',
+    'alumni-phd': 'Ph.D. Alumni',
+    'alumni-ms': 'M.S. Alumni',
+  };
+
+  // "Youngdo Lee" -> "YL", for a member who has no photo yet.
+  function initials(name) {
+    return String(name)
+      .split(/\s+/)
+      .map(function (part) {
+        return part.charAt(0);
+      })
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+  }
+
+  /* The People order is computed, not hand-kept: the professor first, then
+   * everyone else by how many projects on this page list them as an author,
+   * most first. A tie keeps the order of window.MEMBERS (sort is stable), so
+   * adding a paper to data/projects.js re-orders the section by itself. */
+  function paperCount(person, projects) {
+    return (projects || []).filter(function (project) {
+      return (project.authors || []).indexOf(person) !== -1;
+    }).length;
+  }
+
+  function sortMembers(members, projects) {
+    return (members || []).slice().sort(function (a, b) {
+      var ap = a.role === 'professor' ? 1 : 0;
+      var bp = b.role === 'professor' ? 1 : 0;
+      if (ap !== bp) return bp - ap;
+      return paperCount(b.person, projects) - paperCount(a.person, projects);
+    });
+  }
+
+  /* One card per member, in the order given: photo, name (linked
+   * like the author names on the cards), role, interests. A member whose
+   * person key is not in PEOPLE is skipped — there is no name to print. */
+  function peopleHTML(members, people) {
+    var dict = people || {};
+    return (members || [])
+      .filter(function (member) {
+        return member && dict[member.person];
+      })
+      .map(function (member) {
+        var person = dict[member.person];
+        // The role is its own span so the language swap (which assigns
+        // textContent) leaves the affiliation after it alone.
+        var roleLabel = MEMBER_ROLES[member.role]
+          ? '<span>' + MEMBER_ROLES[member.role] + '</span>'
+          : '';
+        var affiliation = member.affiliation
+          ? (roleLabel ? ' · ' : '') + escapeHTML(member.affiliation)
+          : '';
+        var role = roleLabel || affiliation
+          ? '<p class="person__role">' + roleLabel + affiliation + '</p>'
+          : '';
+        var photo = member.photo === false
+          ? '<div class="person__photo person__photo--initials" aria-hidden="true">' +
+            escapeHTML(initials(person.name)) + '</div>'
+          : '<img class="person__photo" src="assets/people/' + escapeHTML(member.person) +
+            '.jpg" alt="" width="300" height="400" loading="lazy" />';
+        var interests = member.interests
+          ? '<p class="person__interests">' + escapeHTML(member.interests) + '</p>'
+          : '';
+        return (
+          '<li class="person">' +
+          photo +
+          '<p class="person__name"><a href="' + escapeHTML(person.url) + '">' +
+          escapeHTML(person.name) + '</a></p>' +
+          role +
+          interests +
+          '</li>'
+        );
+      })
+      .join('');
   }
 
   /* Newest first, by the SAME key and direction as sortNews — that is what keeps
@@ -292,7 +368,7 @@
       .map(function (key) {
         return (
           '<a class="btn btn--link" href="' + escapeHTML(links[key]) + '">' +
-          '<span data-i18n="links.' + key + '">' + LINK_LABELS[key] + '</span></a>'
+          '<span>' + LINK_LABELS[key] + '</span></a>'
         );
       })
       .join('');
@@ -416,8 +492,7 @@
       title +
       venue +
       '<p class="card__authors">' + authorsHTML(project.authors, people, project.equal) + '</p>' +
-      '<p class="card__summary" data-summary-en="' + escapeHTML(project.summary.en) + '" ' +
-      'data-summary-ko="' + escapeHTML(project.summary.ko || '') + '">' +
+      '<p class="card__summary">' +
       escapeHTML(project.summary.en) +
       '</p>' +
       tagsHTML(project.tags) +
@@ -435,7 +510,7 @@
   }
 
   function chipsHTML(tags) {
-    var all = '<button class="chip chip--active" data-tag="all" data-i18n="filter.all">All</button>';
+    var all = '<button class="chip chip--active" data-tag="all">All</button>';
     return (
       all +
       tags
@@ -696,6 +771,7 @@
     var projects = sortProjects(validProjects(global.PROJECTS));
     renderInto(doc, 'news-list', newsHTML(sortNews(validNews(global.NEWS)), projects));
     bindNewsToggle(doc);
+    renderInto(doc, 'people-list', peopleHTML(sortMembers(global.MEMBERS, projects), global.PEOPLE));
     // renderInto(doc, 'filter-chips', chipsHTML(collectTags(projects)));
     applyFilter(doc, 'all');
     bindCardClicks(doc, 'research-grid');
@@ -706,7 +782,7 @@
     // if (chips && chips.addEventListener && !(chips.dataset && chips.dataset.filterBound)) {
     //   chips.addEventListener('click', function (event) {
     //     // closest('.chip'), not a direct getAttribute on event.target: the
-    //     // click target can be a child of the chip button (e.g. an i18n
+    //     // click target can be a child of the chip button (e.g. a
     //     // <span> wrapping its label), which has no data-tag of its own.
     //     var chip = event.target && event.target.closest && event.target.closest('.chip');
     //     var tag = chip && chip.getAttribute && chip.getAttribute('data-tag');
@@ -744,6 +820,9 @@
     newsHTML: newsHTML,
     newsLead: newsLead,
     toggleNews: toggleNews,
+    peopleHTML: peopleHTML,
+    sortMembers: sortMembers,
+    paperCount: paperCount,
     mount: mount,
     applyFilter: applyFilter,
     // The page mounts one card grid today, but both attachers are keyed by

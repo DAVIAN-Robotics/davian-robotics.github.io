@@ -12,7 +12,7 @@ function loadData() {
   const sandbox = {};
   sandbox.window = sandbox;
   vm.createContext(sandbox);
-  for (const file of ['data/people.js', 'data/projects.js', 'data/news.js', 'data/strings.js']) {
+  for (const file of ['data/people.js', 'data/projects.js', 'data/news.js']) {
     const code = fs.readFileSync(path.join(ROOT, file), 'utf8');
     vm.runInContext(code, sandbox, { filename: file });
   }
@@ -189,6 +189,25 @@ test('every co-first count is a whole number between 2 and the author count', ()
   }
 });
 
+// Every People card needs a person to name, a known role and a photo on disk —
+// a missing file would render as an empty grey box under a real person's name —
+// unless the entry says photo: false, which shows initials instead.
+test('every member is a known person with a known role and a photo', () => {
+  const { MEMBERS, PEOPLE } = loadData();
+  assert.ok(Array.isArray(MEMBERS) && MEMBERS.length > 0, 'MEMBERS is empty');
+  assert.strictEqual(MEMBERS[0].role, 'professor', 'the professor comes first');
+  const seen = new Set();
+  for (const m of MEMBERS) {
+    assert.ok(PEOPLE[m.person], `${m.person}: not a key of PEOPLE`);
+    assert.ok(['professor', 'postdoc', 'phd', 'ms', 'alumni-phd', 'alumni-ms'].includes(m.role), `${m.person}: unknown role ${m.role}`);
+    if (m.photo !== false) {
+      assert.ok(fs.existsSync(path.join(ROOT, 'assets/people', m.person + '.jpg')), `${m.person}: assets/people/${m.person}.jpg is missing (or set photo: false)`);
+    }
+    assert.ok(!seen.has(m.person), `${m.person}: listed twice`);
+    seen.add(m.person);
+  }
+});
+
 // Adding a tag means adding it to TAG_TONES in js/render.js. Without this test
 // a new tag silently takes whatever colour the hashed fallback gives it, which
 // is stable but arbitrary — nobody chose it, and it may collide with a hue that
@@ -208,12 +227,4 @@ test('every tag used by a project has been given a colour on purpose', () => {
     [],
     `add these to TAG_TONES in js/render.js: ${missing.join(', ')}`
   );
-});
-
-test('every Korean string key is a string', () => {
-  const { STRINGS } = loadData();
-  assert.ok(STRINGS.ko, 'STRINGS.ko is missing');
-  for (const [key, value] of Object.entries(STRINGS.ko)) {
-    assert.strictEqual(typeof value, 'string', `STRINGS.ko.${key} must be a string`);
-  }
 });

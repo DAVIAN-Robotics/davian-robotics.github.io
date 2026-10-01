@@ -45,7 +45,7 @@
  *       {
  *         project: 'slug',                    // the id in data/projects.js
  *         name: 'PAPER',                      // the short name printed in the row
- *         note: { en: 'Spotlight', ko: 'Spotlight', honor: true },  // optional, shown
+ *         note: { en: 'Spotlight', honor: true },  // optional, shown
  *                                             // in ( ); honor: true prints it in red
  *       },
  *     ],
@@ -70,7 +70,7 @@ window.NEWS = [
     kind: 'acceptance',
     title: 'CoRL 2026',
     papers: [
-      { project: 'phuma', name: 'PHUMA', note: { en: 'Spotlight', ko: 'Spotlight', honor: true } },
+      { project: 'phuma', name: 'PHUMA', note: { en: 'Spotlight', honor: true } },
       { project: 'pam', name: 'PAM' },
       { project: 'residual-rl', name: 'OCRL' },
     ],
@@ -102,7 +102,7 @@ window.NEWS = [
       {
         project: 'flashsac',
         name: 'FlashSAC',
-        note: { en: 'Outstanding Paper Award', ko: 'Outstanding Paper Award', honor: true },
+        note: { en: 'Outstanding Paper Award', honor: true },
       },
     ],
   },
@@ -125,6 +125,6 @@ window.NEWS = [
     date: '2025-05',
     kind: 'acceptance',
     title: 'ICML 2025',
-    papers: [{ project: 'simbav2', name: 'SimbaV2', note: { en: 'Spotlight', ko: 'Spotlight', honor: true } }],
+    papers: [{ project: 'simbav2', name: 'SimbaV2', note: { en: 'Spotlight', honor: true } }],
   },
 ];
