@@ -424,8 +424,9 @@ window.PROJECTS = [
     date: '2023-09',
     tags: ['rl'],
     media: {
-      type: 'image',
-      src: 'assets/media/disco-dance.jpg',
+      type: 'video',
+      src: 'assets/media/disco-dance.mp4',
+      poster: 'assets/media/disco-dance.jpg',
     },
     summary: {
       en:
