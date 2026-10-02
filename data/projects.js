@@ -147,7 +147,7 @@ window.PROJECTS = [
       'joonleesky',
     ],
     year: 2026,
-    date: '2026-09',
+    date: '2026-10',
     tags: ['rl', 'manipulation', 'sim2real'],
     media: {
       type: 'video',
