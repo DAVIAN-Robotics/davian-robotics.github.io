@@ -471,7 +471,8 @@ test('a member card shows the photo, the linked name, the role and the interests
   const people = { a: { name: 'A Person', url: 'https://a.example' } };
   const html = DR.peopleHTML([{ person: 'a', role: 'phd', interests: 'RL, VLA' }, { person: 'ghost', role: 'ms' }], people);
   assert.match(html, /<img class="person__photo" src="assets\/people\/a\.jpg"/);
-  assert.match(html, /<p class="person__name"><a href="https:\/\/a\.example">A Person<\/a><\/p>/);
+  assert.match(html, /<a class="person__link" href="https:\/\/a\.example"><img class="person__photo"/);
+  assert.match(html, /<span class="person__name-text">A Person<\/span>/);
   assert.match(html, />Ph\.D\. Student</);
   assert.match(html, /<p class="person__interests">RL, VLA<\/p>/);
   assert.strictEqual((html.match(/class="person"/g) || []).length, 1, 'a member with no PEOPLE entry is skipped');
@@ -481,7 +482,7 @@ test('an affiliation follows the role, and photo: false shows initials instead o
   const { DR } = loadRenderer();
   const people = { y: { name: 'Youngdo Lee', url: 'https://y.example' } };
   const html = DR.peopleHTML([{ person: 'y', role: 'alumni-ms', affiliation: 'Holiday Robotics', photo: false }], people);
-  assert.match(html, /<p class="person__role"><span>M\.S\. Alumni<\/span> · Holiday Robotics<\/p>/);
+  assert.match(html, /<p class="person__role"><span>Alumni<\/span> · Holiday Robotics<\/p>/);
   assert.match(html, /person__photo--initials" aria-hidden="true">YL</);
   assert.doesNotMatch(html, /<img /);
 });
@@ -492,16 +493,18 @@ test('people sort with the professor first, then by paper count, keeping the lis
     { authors: ['prof', 'b', 'c'] },
     { authors: ['prof', 'c'] },
     { authors: ['prof', 'd'] },
+    { authors: ['collab', 'b', 'c'] },
   ];
   const members = [
     { person: 'a', role: 'phd' },
     { person: 'b', role: 'phd' },
     { person: 'c', role: 'postdoc' },
     { person: 'prof', role: 'professor' },
+    { person: 'collab', role: 'collaborator' },
     { person: 'd', role: 'alumni-ms' },
   ];
-  assert.deepStrictEqual(DR.sortMembers(members, projects).map((m) => m.person), ['prof', 'c', 'b', 'd', 'a']);
-  assert.strictEqual(DR.paperCount('c', projects), 2);
+  assert.deepStrictEqual(DR.sortMembers(members, projects).map((m) => m.person), ['prof', 'c', 'b', 'collab', 'd', 'a']);
+  assert.strictEqual(DR.paperCount('c', projects), 3);
 });
 
 test('a card with no venue says Preprint in the venue slot', () => {

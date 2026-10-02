@@ -11,7 +11,7 @@
  *     honor: 'Spotlight',                     // optional; Oral / Spotlight / an award, shown in red beside the venue
  *     year: 2025,                             // required, shown/implied by the badge; use venue year if present, else arXiv posting year
  *     date: '2025-09',                        // required, 'YYYY-MM', SORTS the grid (newest first)
- *     tags: ['manipulation', 'vla'],          // optional, drives the filter chips
+ *     tags: ['vla', 'manipulation'],          // optional; only: rl, vla, manipulation, locomotion, sim2real, generative model
  *     media: {                                // optional; omit until the file exists
  *       type: 'video',                        // 'video' | 'image'
  *       src: 'assets/media/slug.mp4',
@@ -59,7 +59,7 @@ window.PROJECTS = [
     ],
     year: 2026,
     date: '2026-09',
-    tags: ['humanoid', 'locomotion', 'dataset'],
+    tags: ['locomotion'],
     media: {
       type: 'video',
       src: 'assets/media/phuma.mp4',
@@ -118,7 +118,7 @@ window.PROJECTS = [
     ],
     year: 2026,
     date: '2026-09',
-    tags: ['vla', 'reinforcement learning', 'sim2real'],
+    tags: ['rl', 'vla', 'manipulation', 'sim2real'],
     summary: {
       en:
         'A residual RL policy uses object poses to correct a VLA\'s actions. Trained entirely in simulation, it transfers to a real Franka robot without additional training, improving the success rate from 42% to 76% across five manipulation tasks.',
@@ -126,6 +126,38 @@ window.PROJECTS = [
     links: {
       paper: 'https://arxiv.org/abs/2606.18953',
       project: 'https://www.microsoft.com/en-us/research/articles/object-centric-residual-rl/',
+    },
+  },
+  {
+    id: 'flashdexretarget',
+    equal: 4,
+    title: 'FlashDexRetarget: Accelerating Dexterous Manipulation Data Generation through Multi-Motion Retargeting',
+    authors: [
+      'kyungminn',
+      'sibisibi',
+      'godnpeter',
+      'yoonsangoh',
+      'iamproto',
+      'leeyngdo',
+      'anahrendra',
+      'jaegulchoo',
+      'joonleesky',
+    ],
+    year: 2026,
+    date: '2026-09',
+    tags: ['rl', 'manipulation', 'sim2real'],
+    media: {
+      type: 'video',
+      src: 'assets/media/flashdexretarget.mp4',
+      poster: 'assets/media/flashdexretarget.jpg',
+    },
+    summary: {
+      en:
+        'A single reference-conditioned RL policy, trained with FlashSAC across a whole collection of human hand-object demonstrations, retargets them into physically grounded dexterous robot trajectories. It reaches 90% success on a 50-motion benchmark with about 100x less compute than per-demonstration retargeting, and the retargeted motions replay on a real robot hand.',
+    },
+    links: {
+      paper: 'https://davian-robotics.github.io/FlashDexRetarget/static/FlashDexRetarget.pdf',
+      project: 'https://davian-robotics.github.io/FlashDexRetarget/',
     },
   },
   {
@@ -169,7 +201,7 @@ window.PROJECTS = [
     venue: 'IROS 2026',
     year: 2026,
     date: '2026-06',
-    tags: ['vla', 'manipulation', 'planning'],
+    tags: ['vla', 'manipulation'],
     media: {
       type: 'video',
       src: 'assets/media/3d-hamster.mp4',
@@ -194,7 +226,7 @@ window.PROJECTS = [
     venue: 'CVPR 2026',
     year: 2026,
     date: '2026-02',
-    tags: ['video generation', 'egocentric'],
+    tags: ['generative model'],
     media: {
       type: 'video',
       src: 'assets/media/egox.mp4',
@@ -229,7 +261,7 @@ window.PROJECTS = [
     venue: 'ICRA 2026',
     year: 2026,
     date: '2026-01',
-    tags: ['vla', 'manipulation', 'test-time guidance'],
+    tags: ['vla', 'manipulation', 'generative model'],
     media: {
       type: 'video',
       src: 'assets/media/acg.mp4',
@@ -251,12 +283,12 @@ window.PROJECTS = [
     id: 'simbav2',
     equal: 2,
     title: 'SimbaV2: Hyperspherical Normalization for Scalable Deep Reinforcement Learning',
-    authors: ['joonleesky', 'leeyngdo', 'Takuma Seno', 'iamproto', 'Peter Stone', 'jaegulchoo'],
+    authors: ['joonleesky', 'leeyngdo', 'takuseno', 'iamproto', 'Peter Stone', 'jaegulchoo'],
     venue: 'ICML 2025',
     honor: 'Spotlight',
     year: 2025,
     date: '2025-05',
-    tags: ['reinforcement learning'],
+    tags: ['rl'],
     media: {
       type: 'video',
       src: 'assets/media/simbav2.mp4',
@@ -286,8 +318,8 @@ window.PROJECTS = [
       'leeyngdo',
       'pmh9960',
       'kinam0252',
-      'I Made Aswin Nahendra',
-      'Takuma Seno',
+      'anahrendra',
+      'takuseno',
       'Sehee Min',
       'Daniel Palenicek',
       'Florian Vogt',
@@ -300,7 +332,7 @@ window.PROJECTS = [
     honor: 'Outstanding Paper Award',
     year: 2026,
     date: '2026-04',
-    tags: ['reinforcement learning', 'sim2real'],
+    tags: ['rl', 'locomotion', 'sim2real'],
     media: {
       type: 'video',
       src: 'assets/media/flashsac.mp4',
@@ -314,6 +346,95 @@ window.PROJECTS = [
       paper: 'https://arxiv.org/abs/2604.04539',
       code: 'https://github.com/Holiday-Robot/FlashSAC',
       project: 'https://holiday-robot.github.io/FlashSAC/',
+    },
+  },
+  {
+    id: 'simba',
+    equal: 2,
+    title: 'SimBa: Simplicity Bias for Scaling Up Parameters in Deep Reinforcement Learning',
+    authors: [
+      'joonleesky',
+      'godnpeter',
+      'iamproto',
+      'mynsng',
+      'Jun Jet Tai',
+      'Kaushik Subramanian',
+      'Peter R. Wurman',
+      'jaegulchoo',
+      'Peter Stone',
+      'takuseno',
+    ],
+    venue: 'ICLR 2025',
+    honor: 'Spotlight',
+    year: 2025,
+    date: '2025-01',
+    tags: ['rl'],
+    media: {
+      type: 'video',
+      src: 'assets/media/simba.mp4',
+      poster: 'assets/media/simba.jpg',
+    },
+    summary: {
+      en:
+        'A network architecture that injects a simplicity bias into deep RL, using observation normalization, a residual feedforward block, and layer normalization so that scaling up parameters steadily improves sample efficiency.',
+    },
+    links: {
+      paper: 'https://arxiv.org/abs/2410.09754',
+      code: 'https://github.com/SonyResearch/simba',
+      project: 'https://sonyresearch.github.io/simba/',
+    },
+  },
+  {
+    id: 'gt7-racing',
+    equal: 3,
+    title: 'A Champion-level Vision-based Reinforcement Learning Agent for Competitive Racing in Gran Turismo 7',
+    authors: [
+      'joonleesky',
+      'takuseno',
+      'Jun Jet Tai',
+      'Kaushik Subramanian',
+      'Kenta Kawamoto',
+      'Peter R. Wurman',
+      'Peter Stone',
+    ],
+    venue: 'RA-L & ICRA 2026',
+    year: 2026,
+    date: '2026-01',
+    tags: ['rl'],
+    media: {
+      type: 'video',
+      src: 'assets/media/gt7-racing.mp4',
+      poster: 'assets/media/gt7-racing.jpg',
+    },
+    summary: {
+      en:
+        'A vision-based RL racing agent for Gran Turismo 7 that drives from ego-centric camera images and onboard sensors alone, without global position information, and outperforms the best human drivers in competitive races.',
+    },
+    links: {
+      paper: 'https://arxiv.org/abs/2504.09021',
+    },
+  },
+  {
+    id: 'disco-dance',
+    equal: 2,
+    title: 'DISCO-DANCE: Learning to Discover Skills through Guidance',
+    authors: ['mynsng', 'lee15253', 'joonleesky', 'godnpeter', 'jaegulchoo'],
+    venue: 'NeurIPS 2023',
+    year: 2023,
+    date: '2023-09',
+    tags: ['rl'],
+    media: {
+      type: 'image',
+      src: 'assets/media/disco-dance.jpg',
+    },
+    summary: {
+      en:
+        'An unsupervised skill discovery algorithm that improves exploration by selecting a guide skill and steering unconverged skills toward it, then spreading them out to learn diverse, task-agnostic behaviors.',
+    },
+    links: {
+      paper: 'https://arxiv.org/abs/2310.20178',
+      code: 'https://github.com/dojeon-ai/discodance',
+      project: 'https://mynsng.github.io/discodance/',
     },
   },
 ];

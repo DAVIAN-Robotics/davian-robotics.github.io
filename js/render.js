@@ -232,8 +232,9 @@
     postdoc: 'Postdoc',
     phd: 'Ph.D. Student',
     ms: 'M.S. Student',
-    'alumni-phd': 'Ph.D. Alumni',
-    'alumni-ms': 'M.S. Alumni',
+    'alumni-phd': 'Alumni',
+    'alumni-ms': 'Alumni',
+    collaborator: 'Collaborator',
   };
 
   // "Youngdo Lee" -> "YL", for a member who has no photo yet.
@@ -267,8 +268,8 @@
     });
   }
 
-  /* One card per member, in the order given: photo, name (linked
-   * like the author names on the cards), role, interests. A member whose
+  /* One card per member, in the order given: photo and name (one link to the
+   * person's homepage), role, interests. A member whose
    * person key is not in PEOPLE is skipped — there is no name to print. */
   function peopleHTML(members, people) {
     var dict = people || {};
@@ -298,10 +299,12 @@
           ? '<p class="person__interests">' + escapeHTML(member.interests) + '</p>'
           : '';
         return (
-          '<li class="person">' +
+          // Photo and name share one link, and the name is underlined with an
+          // arrow at rest, so the card reads as clickable before any hover.
+          '<li class="person"><a class="person__link" href="' + escapeHTML(person.url) + '">' +
           photo +
-          '<p class="person__name"><a href="' + escapeHTML(person.url) + '">' +
-          escapeHTML(person.name) + '</a></p>' +
+          '<p class="person__name"><span class="person__name-text">' + escapeHTML(person.name) +
+          '</span><span class="person__arrow" aria-hidden="true">↗</span></p></a>' +
           role +
           interests +
           '</li>'
@@ -409,26 +412,21 @@
    * on every card it appears on, today and after the next paper lands.
    *
    * The values are the four logo hues, defined as --tag-N-ink / --tag-N-bg in
-   * css/style.css: 1 deep purple, 2 pink, 3 salmon/rust, 4 sand/bronze. Related
-   * tags deliberately share a hue (the two VLA-ish tags are purple, the two
-   * embodiment ones pink), so the colour carries a little meaning rather than
-   * being noise.
+   * css/style.css: 1 deep purple, 2 pink, 3 salmon/rust, 4 sand/bronze. The
+   * tag set is closed at six; the two embodiment tags share pink, and tags that
+   * appear together on a card (vla + manipulation, rl + sim2real) never share
+   * a hue.
    *
    * A tag that is NOT in this map still renders — it falls back to a hash of its
    * own name, so it is stable and it is one of the four, it just was not chosen.
    * That is the safety net, not the plan: put your tag in the map. */
   var TAG_TONES = {
     vla: 1,
-    'reinforcement learning': 1,
     manipulation: 2,
-    humanoid: 2,
-    sim2real: 2,
-    planning: 3,
-    locomotion: 3,
-    'video generation': 3,
-    dataset: 4,
-    egocentric: 4,
-    'test-time guidance': 4,
+    locomotion: 2,
+    rl: 3,
+    sim2real: 4,
+    'generative model': 4,
   };
 
   function tagTone(tag) {

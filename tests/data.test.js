@@ -138,10 +138,11 @@ test('news ids are unique', () => {
 });
 
 // Papers at the same venue share one row. Two acceptance rows titled
-// 'CoRL 2026' would split the venue back into per-paper rows.
+// 'CoRL 2026' would split the venue back into per-paper rows. 'Preprint' is
+// not a venue, so release rows are one per month instead.
 test('one row per venue and kind', () => {
   const { NEWS } = loadData();
-  const keys = NEWS.map((n) => `${n.title}|${n.kind}`);
+  const keys = NEWS.map((n) => `${n.title}|${n.kind}` + (n.kind === 'release' ? `|${n.date}` : ''));
   assert.strictEqual(new Set(keys).size, keys.length, 'two rows share a venue and kind — merge their papers');
 });
 
@@ -199,7 +200,7 @@ test('every member is a known person with a known role and a photo', () => {
   const seen = new Set();
   for (const m of MEMBERS) {
     assert.ok(PEOPLE[m.person], `${m.person}: not a key of PEOPLE`);
-    assert.ok(['professor', 'postdoc', 'phd', 'ms', 'alumni-phd', 'alumni-ms'].includes(m.role), `${m.person}: unknown role ${m.role}`);
+    assert.ok(['professor', 'postdoc', 'phd', 'ms', 'alumni-phd', 'alumni-ms', 'collaborator'].includes(m.role), `${m.person}: unknown role ${m.role}`);
     if (m.photo !== false) {
       assert.ok(fs.existsSync(path.join(ROOT, 'assets/people', m.person + '.jpg')), `${m.person}: assets/people/${m.person}.jpg is missing (or set photo: false)`);
     }
