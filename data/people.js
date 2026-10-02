@@ -62,14 +62,8 @@ window.MEMBERS = [
     affiliation: 'Samsung',
     interests: 'VLA, Generative Models',
   },
-  // M.S., graduated February 2023 (lab page). His GitHub avatar is a placeholder, so initials.
-  {
-    person: 'choyi0521',
-    role: 'alumni-ms',
-    affiliation: 'KRAFTON',
-    interests: 'Embodied AI',
-    photo: false,
-  },
+  // M.S., graduated February 2023 (lab page). Photo from youngincho.com.
+  { person: 'choyi0521', role: 'alumni-ms', affiliation: 'KRAFTON', interests: 'Embodied AI' },
   { person: 'junhahyung', role: 'postdoc', interests: 'VLA, Generative Models' },
   { person: 'lee15253', role: 'phd', interests: 'VLA, Manipulation' },
   {
