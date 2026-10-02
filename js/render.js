@@ -415,7 +415,7 @@
    *
    * The values are the four logo hues, defined as --tag-N-ink / --tag-N-bg in
    * css/style.css: 1 deep purple, 2 pink, 3 salmon/rust, 4 sand/bronze. The
-   * tag set is closed at six; the two embodiment tags share pink, and tags that
+   * tag set is closed at seven; the two embodiment tags share pink, and tags that
    * appear together on a card (vla + manipulation, rl + sim2real) never share
    * a hue.
    *
@@ -429,6 +429,7 @@
     rl: 3,
     sim2real: 4,
     'generative model': 4,
+    'embodied ai': 3,
   };
 
   function tagTone(tag) {

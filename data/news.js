@@ -79,12 +79,15 @@ window.NEWS = [
     ],
   },
   {
-    // A preprint with no arXiv id, released October 2026.
+    // FlashDexRetarget (no arXiv id) and PUBG Ally, both released October 2026.
     id: 'preprint-2026-10',
     date: '2026-10',
     kind: 'release',
     title: 'Preprint',
-    papers: [{ project: 'flashdexretarget', name: 'FlashDexRetarget' }],
+    papers: [
+      { project: 'flashdexretarget', name: 'FlashDexRetarget' },
+      { project: 'pubg-ally', name: 'PUBG Ally' },
+    ],
   },
   {
     // No accepted venue yet: a preprint, so it is written as a release and dated
