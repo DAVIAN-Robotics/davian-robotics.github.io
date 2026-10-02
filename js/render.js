@@ -313,15 +313,17 @@
       .join('');
   }
 
-  /* Newest first, by the SAME key and direction as sortNews — that is what keeps
-   * the Research grid and the News list in one order. 'YYYY-MM' sorts correctly
-   * as a plain string; `year` is for the venue badge, not for ordering (sorting
-   * on it is what used to drop the four 2026 papers into alphabetical order).
-   * A tie keeps the order of data/projects.js (Array.prototype.sort is stable),
-   * so papers from the same month appear in the order they are written there —
-   * the same order their news row lists them in. */
+  /* Preprints (no venue) first, then everything newest first by `date`.
+   * 'YYYY-MM' sorts correctly as a plain string; `year` is for the venue badge,
+   * not for ordering (sorting on it is what used to drop the four 2026 papers
+   * into alphabetical order). A tie keeps the order of data/projects.js
+   * (Array.prototype.sort is stable), so papers from the same month appear in
+   * the order they are written there. The News list stays purely by date. */
   function sortProjects(projects) {
     return projects.slice().sort(function (a, b) {
+      var ap = a.venue ? 1 : 0;
+      var bp = b.venue ? 1 : 0;
+      if (ap !== bp) return ap - bp;
       if (a.date === b.date) return 0;
       return a.date < b.date ? 1 : -1;
     });

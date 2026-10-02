@@ -77,6 +77,18 @@ test('a project with no date is skipped rather than sorted unpredictably', () =>
   assert.match(warnings[0], /date/);
 });
 
+test('preprints sort above published papers, each group newest first', () => {
+  const { DR } = loadRenderer();
+  const { venue, ...preprint } = PROJECT;
+  const sorted = DR.sortProjects([
+    { ...PROJECT, id: 'pub-new', date: '2026-09' },
+    { ...preprint, id: 'pre-old', date: '2026-07' },
+    { ...PROJECT, id: 'pub-old', date: '2025-01' },
+    { ...preprint, id: 'pre-new', date: '2026-08' },
+  ]);
+  assert.deepStrictEqual(sorted.map((p) => p.id), ['pre-new', 'pre-old', 'pub-new', 'pub-old']);
+});
+
 test('filtering by a tag preserves the newest-first order', () => {
   const { DR } = loadRenderer();
   const sorted = DR.sortProjects([
