@@ -30,7 +30,7 @@ window.PEOPLE = {
   iamproto: { name: 'Donghu Kim', url: 'https://i-am-proto.github.io/' },
   yoonsangoh: { name: 'Yoonsang Oh', url: 'https://yoonsangoh.github.io/' },
   // Collaborators outside the lab; they sort into the People section like everyone else.
-  anahrendra: { name: 'I Made Aswin Nahrendra', url: 'https://anahrendra.github.io/' },
+  anahrendra: { name: 'Aswin Nahrendra', url: 'https://anahrendra.github.io/' },
   takuseno: { name: 'Takuma Seno', url: 'https://takuseno.github.io/' },
 };
 
