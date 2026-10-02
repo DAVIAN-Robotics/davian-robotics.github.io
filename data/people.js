@@ -37,7 +37,7 @@ window.PEOPLE = {
 /* DAVIAN Robotics members, rendered as the People section at the foot of the
  * page. Each entry names a key of window.PEOPLE above (so the name links the
  * same way it does under a paper), a role, and research interests. Interests
- * use only the six research-card tags, in this order: RL, VLA, Manipulation,
+ * are at most two of the six research-card tags, in this order: RL, VLA, Manipulation,
  * Locomotion, Sim2Real, Generative Models. The photo is assets/people/<person>.jpg, 300x400; `photo: false`
  * shows the person's initials until a photo is added.
  *
@@ -60,24 +60,24 @@ window.MEMBERS = [
     interests: 'VLA, Generative Models',
   },
   { person: 'junhahyung', role: 'postdoc', interests: 'VLA, Generative Models' },
-  { person: 'lee15253', role: 'phd', interests: 'RL, VLA, Manipulation' },
+  { person: 'lee15253', role: 'phd', interests: 'VLA, Manipulation' },
   {
     person: 'joonleesky',
     role: 'alumni-phd',
     affiliation: 'Holiday Robotics',
-    interests: 'RL, Manipulation, Sim2Real',
+    interests: 'RL, Manipulation',
   },
   { person: 'mynsng', role: 'phd', affiliation: 'KRAFTON', interests: 'RL, VLA' },
   { person: 'myyzzzoooo', role: 'phd', interests: 'VLA, Generative Models' },
-  { person: 'pmh9960', role: 'postdoc', interests: 'RL, VLA, Generative Models' },
-  { person: 'godnpeter', role: 'phd', interests: 'RL, VLA, Manipulation' },
+  { person: 'pmh9960', role: 'postdoc', interests: 'VLA, Generative Models' },
+  { person: 'godnpeter', role: 'phd', interests: 'RL, VLA' },
   {
     person: 'leeyngdo',
     role: 'alumni-ms',
     affiliation: 'Holiday Robotics',
-    interests: 'RL, Locomotion, Sim2Real',
+    interests: 'RL, Sim2Real',
   },
-  { person: 'kyungminn', role: 'phd', interests: 'RL, Locomotion, Generative Models' },
+  { person: 'kyungminn', role: 'phd', interests: 'RL, Locomotion' },
   { person: 'whit3snow', role: 'phd', interests: 'VLA, Generative Models' },
   { person: 'sibisibi', role: 'phd', interests: 'RL, Locomotion' },
   { person: 'k00dj19', role: 'phd', interests: 'VLA, Manipulation' },
@@ -87,15 +87,15 @@ window.MEMBERS = [
     person: 'iamproto',
     role: 'alumni-ms',
     affiliation: 'Holiday Robotics',
-    interests: 'RL, Manipulation, Sim2Real',
+    interests: 'RL, Manipulation',
   },
-  { person: 'kinam0252', role: 'phd', interests: 'VLA, Sim2Real, Generative Models' },
-  { person: 'yoonsangoh', role: 'ms', interests: 'RL, Manipulation, Generative Models' },
+  { person: 'kinam0252', role: 'phd', interests: 'VLA, Generative Models' },
+  { person: 'yoonsangoh', role: 'ms', interests: 'RL, Manipulation' },
   {
     person: 'anahrendra',
     role: 'collaborator',
     affiliation: 'Holiday Robotics',
-    interests: 'RL, Locomotion, Sim2Real',
+    interests: 'Locomotion, Sim2Real',
   },
   { person: 'takuseno', role: 'collaborator', affiliation: 'Turing', interests: 'RL' },
 ];
