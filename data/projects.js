@@ -11,7 +11,7 @@
  *     honor: 'Spotlight',                     // optional; Oral / Spotlight / an award, shown in red beside the venue
  *     year: 2025,                             // required, shown/implied by the badge; use venue year if present, else arXiv posting year
  *     date: '2025-09',                        // required, 'YYYY-MM', SORTS the grid (newest first)
- *     tags: ['vla', 'manipulation'],          // optional; only: rl, vla, manipulation, locomotion, sim2real, generative model
+ *     tags: ['vla', 'manipulation'],          // optional; only: rl, vla, manipulation, locomotion, sim2real, generative model, embodied ai
  *     media: {                                // optional; omit until the file exists
  *       type: 'video',                        // 'video' | 'image'
  *       src: 'assets/media/slug.mp4',
@@ -160,6 +160,53 @@ window.PROJECTS = [
     links: {
       paper: 'https://davian-robotics.github.io/FlashDexRetarget/static/FlashDexRetarget.pdf',
       project: 'https://davian-robotics.github.io/FlashDexRetarget/',
+    },
+  },
+  {
+    id: 'pubg-ally',
+    title: 'PUBG Ally: A Conversational Embodied Agent as an AI Teammate',
+    // arXiv order: the team, then everyone alphabetically.
+    authors: [
+      'PUBG Ally Team',
+      'Irene Chen',
+      'choyi0521',
+      'Seungjun Chung',
+      'jimin9401',
+      'Hyeonbin Hwang',
+      'Hyeojung Im',
+      'Insub Im',
+      'Jaeseung Jeon',
+      'Seohyeon Jung',
+      'Beomsoo Kim',
+      'Byeongju Kim',
+      'Dohyun Kim',
+      'Dongwon Kim',
+      'Eunchong Kim',
+      'Hongmin Kim',
+      'Hyeonghwan Kim',
+      'mynsng',
+      'Sungwoo Kim',
+      'Kangwook Lee',
+      'Minkyoung Park',
+      'Sue Hyun Park',
+      'Hyoseok Seol',
+      'Yujeong Son',
+      'Kiyoon Yoo',
+    ],
+    year: 2026,
+    date: '2026-10',
+    tags: ['embodied ai'],
+    // From NVIDIA GeForce's "Introducing PUBG Ally" trailer (youtu.be/wEKUSMqrbzQ, 0:35).
+    media: {
+      type: 'video',
+      src: 'assets/media/pubg-ally.mp4',
+      poster: 'assets/media/pubg-ally.jpg',
+    },
+    summary: {
+      en: 'A voice-enabled embodied agent that plays PUBG alongside players as a real-time AI teammate, deployed in live service.',
+    },
+    links: {
+      paper: 'https://arxiv.org/abs/2609.29837',
     },
   },
   {

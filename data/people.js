@@ -28,6 +28,9 @@ window.PEOPLE = {
   sibisibi: { name: 'Sibeen Kim', url: 'https://sibisibi.github.io/' },
   leeyngdo: { name: 'Youngdo Lee', url: 'https://leeyngdo.github.io/' },
   iamproto: { name: 'Donghu Kim', url: 'https://i-am-proto.github.io/' },
+  choyi0521: { name: 'Youngin Cho', url: 'https://youngincho.com/' },
+  // No homepage; the lab page links his GitHub.
+  jimin9401: { name: 'Jimin Hong', url: 'https://github.com/Jimin9401' },
   yoonsangoh: { name: 'Yoonsang Oh', url: 'https://yoonsangoh.github.io/' },
   // Collaborators outside the lab; they sort into the People section like everyone else.
   anahrendra: { name: 'Aswin Nahrendra', url: 'https://anahrendra.github.io/' },
@@ -38,7 +41,7 @@ window.PEOPLE = {
  * page. Each entry names a key of window.PEOPLE above (so the name links the
  * same way it does under a paper), a role, and research interests. Interests
  * are at most two of the six research-card tags, in this order: RL, VLA, Manipulation,
- * Locomotion, Sim2Real, Generative Models. The photo is assets/people/<person>.jpg, 300x400; `photo: false`
+ * Locomotion, Sim2Real, Generative Models, Embodied AI. The photo is assets/people/<person>.jpg, 300x400; `photo: false`
  * shows the person's initials until a photo is added.
  *
  *   role: 'professor' | 'postdoc' | 'phd' | 'ms' | 'alumni-phd' | 'alumni-ms' | 'collaborator'
@@ -59,6 +62,14 @@ window.MEMBERS = [
     affiliation: 'Samsung',
     interests: 'VLA, Generative Models',
   },
+  // M.S., graduated February 2023 (lab page). His GitHub avatar is a placeholder, so initials.
+  {
+    person: 'choyi0521',
+    role: 'alumni-ms',
+    affiliation: 'KRAFTON',
+    interests: 'Embodied AI',
+    photo: false,
+  },
   { person: 'junhahyung', role: 'postdoc', interests: 'VLA, Generative Models' },
   { person: 'lee15253', role: 'phd', interests: 'VLA, Manipulation' },
   {
@@ -67,7 +78,8 @@ window.MEMBERS = [
     affiliation: 'Holiday Robotics',
     interests: 'RL, Manipulation',
   },
-  { person: 'mynsng', role: 'phd', affiliation: 'KRAFTON', interests: 'RL, VLA' },
+  { person: 'mynsng', role: 'alumni-phd', affiliation: 'KRAFTON', interests: 'RL, Embodied AI' },
+  { person: 'jimin9401', role: 'alumni-phd', affiliation: 'KRAFTON', interests: 'Embodied AI' },
   { person: 'myyzzzoooo', role: 'phd', interests: 'VLA, Generative Models' },
   { person: 'pmh9960', role: 'postdoc', interests: 'VLA, Generative Models' },
   { person: 'godnpeter', role: 'phd', interests: 'RL, VLA' },
