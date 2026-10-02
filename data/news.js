@@ -79,10 +79,9 @@ window.NEWS = [
     ],
   },
   {
-    // A preprint with no arXiv id: dated by its project page, whose repo
-    // (DAVIAN-Robotics/FlashDexRetarget) has its first commit on 2026-09-23.
-    id: 'preprint-2026-09',
-    date: '2026-09',
+    // A preprint with no arXiv id, released October 2026.
+    id: 'preprint-2026-10',
+    date: '2026-10',
     kind: 'release',
     title: 'Preprint',
     papers: [{ project: 'flashdexretarget', name: 'FlashDexRetarget' }],
