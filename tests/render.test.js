@@ -504,6 +504,12 @@ test('people sort with the professor first, then by paper count, keeping the lis
   assert.strictEqual(DR.paperCount('c', projects), 2);
 });
 
+test('a card with no venue says Preprint in the venue slot', () => {
+  const { DR } = loadRenderer();
+  const html = DR.cardHTML({ id: 'p', title: 'P', authors: [], year: 2026, date: '2026-07', summary: { en: 'S' } }, {});
+  assert.match(html, /<div class="card__venue-row"><span class="card__venue">Preprint<\/span><\/div>/);
+});
+
 // Nothing on this site opens a new tab. The renderer emits most of the page's
 // links, so this is the test that keeps them in the same tab — a stray
 // target="_blank" copied into any one of these builders fails here.

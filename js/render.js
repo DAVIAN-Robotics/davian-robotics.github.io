@@ -462,11 +462,12 @@
     var honor = project.honor
       ? '<span class="card__honor">' + escapeHTML(project.honor) + '</span>'
       : '';
-    var venue = project.venue || honor
-      ? '<div class="card__venue-row">' +
-        (project.venue ? '<span class="card__venue">' + escapeHTML(project.venue) + '</span>' : '') +
-        honor + '</div>'
-      : '';
+    // A paper with no venue yet is a preprint: the row says so rather than
+    // leaving the slot empty, so every card has the same line.
+    var venue =
+      '<div class="card__venue-row">' +
+      '<span class="card__venue">' + escapeHTML(project.venue || 'Preprint') + '</span>' +
+      honor + '</div>';
     var href = cardHref(project.links);
     // The stretched-link pattern: the title is the only anchor, and CSS blows
     // its ::after up to cover the whole card. It is NOT an <a> wrapped around

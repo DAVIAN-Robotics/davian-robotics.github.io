@@ -7,7 +7,7 @@
  *     title: 'PAPER: Full Title',             // required
  *     authors: ['pmh9960', 'Jane Doe (SNU)'], // required; ids link, plain strings do not
  *     equal: 2,                               // optional; the first N authors are co-first authors (marked *)
- *     venue: 'NeurIPS 2025',                  // optional, shown as a badge
+ *     venue: 'NeurIPS 2025',                  // optional; leave it out for a preprint and the card says "Preprint"
  *     honor: 'Spotlight',                     // optional; Oral / Spotlight / an award, shown in red beside the venue
  *     year: 2025,                             // required, shown/implied by the badge; use venue year if present, else arXiv posting year
  *     date: '2025-09',                        // required, 'YYYY-MM', SORTS the grid (newest first)

@@ -12,7 +12,7 @@ This is the source for [davian-robotics.github.io](https://davian-robotics.githu
      id: 'short-slug',                       // required, unique, lowercase
      title: 'PAPER: Full Title',             // required
      authors: ['pmh9960', 'Jane Doe (SNU)'], // required; ids link, plain strings do not
-     venue: 'NeurIPS 2025',                  // optional, shown as a badge
+     venue: 'NeurIPS 2025',                  // optional; leave it out for a preprint and the card says "Preprint"
      year: 2025,                             // required, sorts the grid (newest first); use venue year if present, else arXiv posting year
      tags: ['manipulation', 'vla'],          // optional, drives the filter chips
      media: {                                // optional; omit until the file exists

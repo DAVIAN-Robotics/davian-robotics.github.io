@@ -1157,28 +1157,22 @@ a.news__paper:focus-visible {
 .card__venue-row {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 10px;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+
+/* The venue is plain text, written exactly as the venue writes itself
+ * (CoRL, not CORL): no box, no uppercase transform. */
+.card__venue {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--fg);
 }
 
 .card__honor {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--honor);
-}
-
-/* Venue badge: a micro-label, not a pill of color. */
-.card__venue {
-  padding: 3px 8px;
-  border: 1px solid var(--accent-line);
-  border-radius: 5px;
-  font-size: 0.6875rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--accent);
+  color: var(--honor);
 }
 
 /* Clamped for the same reason as the title and the summary: the body's track is
