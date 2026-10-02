@@ -66,8 +66,7 @@ window.PROJECTS = [
       poster: 'assets/media/phuma.jpg',
     },
     summary: {
-      en:
-        'A high-quality humanoid locomotion dataset built from large-scale human motion data, using careful curation and physics-constrained retargeting to eliminate physical artifacts.',
+      en: 'A large humanoid locomotion dataset, retargeted from human motion with physics constraints to remove artifacts.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2510.26236',
@@ -96,8 +95,7 @@ window.PROJECTS = [
     date: '2026-09',
     tags: ['vla', 'manipulation'],
     summary: {
-      en:
-        'A proactive robot assistant that helps before being asked. A VLM uses Procedural Assistance Memory, which represents the user\'s daily routine as a finite-state machine, to decide when and how to help. A VLA executes the task, and a reflection VLM refines the memory at the end of each day without retraining.',
+      en: "A proactive robot that remembers a user's daily routine and helps before being asked.",
     },
     links: {
       code: 'https://github.com/DAVIAN-Robotics/PAM',
@@ -120,8 +118,7 @@ window.PROJECTS = [
     date: '2026-09',
     tags: ['rl', 'vla', 'manipulation', 'sim2real'],
     summary: {
-      en:
-        'A residual RL policy uses object poses to correct a VLA\'s actions. Trained entirely in simulation, it transfers to a real Franka robot without additional training, improving the success rate from 42% to 76% across five manipulation tasks.',
+      en: "A sim-trained residual RL policy that corrects a VLA's actions, raising real-robot success from 42% to 76%.",
     },
     links: {
       paper: 'https://arxiv.org/abs/2606.18953',
@@ -152,8 +149,7 @@ window.PROJECTS = [
       poster: 'assets/media/flashdexretarget.jpg',
     },
     summary: {
-      en:
-        'A single reference-conditioned RL policy, trained with FlashSAC across a whole collection of human hand-object demonstrations, retargets them into physically grounded dexterous robot trajectories. It reaches 90% success on a 50-motion benchmark with about 100x less compute than per-demonstration retargeting, and the retargeted motions replay on a real robot hand.',
+      en: 'One RL policy retargets a whole collection of human hand-object demos to a robot hand, with about 100x less compute.',
     },
     links: {
       paper: 'https://davian-robotics.github.io/FlashDexRetarget/static/FlashDexRetarget.pdf',
@@ -174,8 +170,7 @@ window.PROJECTS = [
       poster: 'assets/media/pointmap.jpg',
     },
     summary: {
-      en:
-        'Robot-centric pointmaps provide a VLA with per-pixel 3D coordinates in the same reference frame as its actions. With just one additional encoder and an element-wise addition, the policy remains robust as camera viewpoint variation increases during training.',
+      en: 'Robot-centric pointmaps give a VLA 3D input in its action frame, making it robust to camera viewpoint changes.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2607.11498',
@@ -208,8 +203,7 @@ window.PROJECTS = [
       poster: 'assets/media/3d-hamster.jpg',
     },
     summary: {
-      en:
-        'A depth-aware VLM planner predicts 3D end-effector trajectories at real-world scale from a single RGB-D observation and a language instruction. These trajectories directly guide a point-cloud-based low-level policy.',
+      en: 'A VLM planner predicts 3D end-effector trajectories that guide a point-cloud low-level policy.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2606.31329',
@@ -233,8 +227,7 @@ window.PROJECTS = [
       poster: 'assets/media/egox.jpg',
     },
     summary: {
-      en:
-        'A video generation framework that produces first-person egocentric video from a single third-person exocentric video, built on large-scale video diffusion models and lightweight LoRA adaptation.',
+      en: 'Generates first-person video from a single third-person video with a video diffusion model.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2512.08269',
@@ -268,8 +261,7 @@ window.PROJECTS = [
       poster: 'assets/media/acg.jpg',
     },
     summary: {
-      en:
-        'A training-free, test-time guidance algorithm that improves temporal and spatial action consistency in flow-based Vision-Language-Action models, reducing motion jitter and trajectory drift.',
+      en: 'Training-free test-time guidance that makes flow-based VLA actions smoother and more consistent.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2510.22201',
@@ -295,8 +287,7 @@ window.PROJECTS = [
       poster: 'assets/media/simbav2.jpg',
     },
     summary: {
-      en:
-        'A reinforcement learning architecture that stabilizes training via hyperspherical normalization, achieving state-of-the-art results on 57 continuous control tasks by scaling model capacity and compute.',
+      en: 'Hyperspherical normalization stabilizes RL training so performance keeps improving as models and compute scale.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2502.15280',
@@ -339,8 +330,7 @@ window.PROJECTS = [
       poster: 'assets/media/flashsac.jpg',
     },
     summary: {
-      en:
-        'FlashSAC is a fast and stable off-policy reinforcement learning algorithm built on Soft Actor-Critic that sharply reduces gradient updates while scaling up model size and data throughput, bounding weight, feature, and gradient norms to curb critic error accumulation. Across more than 60 tasks in 10 simulators it outperforms PPO and strong off-policy baselines, and in sim-to-real humanoid locomotion it cuts training time from hours to minutes.',
+      en: 'A fast, stable off-policy RL algorithm that cuts sim-to-real humanoid training from hours to minutes.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2604.04539',
@@ -375,8 +365,7 @@ window.PROJECTS = [
       poster: 'assets/media/simba.jpg',
     },
     summary: {
-      en:
-        'A network architecture that injects a simplicity bias into deep RL, using observation normalization, a residual feedforward block, and layer normalization so that scaling up parameters steadily improves sample efficiency.',
+      en: 'An RL network architecture with a simplicity bias, so adding parameters steadily improves performance.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2410.09754',
@@ -407,8 +396,7 @@ window.PROJECTS = [
       poster: 'assets/media/gt7-racing.jpg',
     },
     summary: {
-      en:
-        'A vision-based RL racing agent for Gran Turismo 7 that drives from ego-centric camera images and onboard sensors alone, without global position information, and outperforms the best human drivers in competitive races.',
+      en: 'A vision-only RL agent that beats top human drivers in Gran Turismo 7.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2504.09021',
@@ -427,8 +415,7 @@ window.PROJECTS = [
       src: 'assets/media/dodont.jpg',
     },
     summary: {
-      en:
-        "A skill discovery algorithm that learns diverse behaviors while imitating the behaviors in a few \"do\" instruction videos and avoiding those in \"don't\" videos, so the agent acquires complex, safe skills such as walking and running instead of tripping or rolling.",
+      en: "Skill discovery guided by \"do\" and \"don't\" videos, learning desirable skills while avoiding unsafe ones.",
     },
     links: {
       paper: 'https://arxiv.org/abs/2406.00324',
@@ -450,8 +437,7 @@ window.PROJECTS = [
       poster: 'assets/media/disco-dance.jpg',
     },
     summary: {
-      en:
-        'An unsupervised skill discovery algorithm that improves exploration by selecting a guide skill and steering unconverged skills toward it, then spreading them out to learn diverse, task-agnostic behaviors.',
+      en: 'Skill discovery that explores better by guiding unconverged skills toward a chosen guide skill.',
     },
     links: {
       paper: 'https://arxiv.org/abs/2310.20178',
