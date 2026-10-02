@@ -415,6 +415,27 @@ window.PROJECTS = [
     },
   },
   {
+    id: 'dodont',
+    title: "Do's and Don'ts: Learning Desirable Skills with Instruction Videos",
+    authors: ['mynsng', 'lee15253', 'joonleesky', 'godnpeter', 'iamproto', 'jaegulchoo'],
+    venue: 'NeurIPS 2024',
+    year: 2024,
+    date: '2024-09',
+    tags: ['rl', 'locomotion'],
+    media: {
+      type: 'image',
+      src: 'assets/media/dodont.jpg',
+    },
+    summary: {
+      en:
+        "A skill discovery algorithm that learns diverse behaviors while imitating the behaviors in a few \"do\" instruction videos and avoiding those in \"don't\" videos, so the agent acquires complex, safe skills such as walking and running instead of tripping or rolling.",
+    },
+    links: {
+      paper: 'https://arxiv.org/abs/2406.00324',
+      project: 'https://mynsng.github.io/dodont/',
+    },
+  },
+  {
     id: 'disco-dance',
     equal: 2,
     title: 'DISCO-DANCE: Learning to Discover Skills through Guidance',

@@ -21,6 +21,9 @@
  *   CVPR 2026   2026-02-21   https://cvpr.thecvf.com/Conferences/2026/Dates
  *   ICRA 2026   2026-01-31   https://2026.ieee-icra.org/contribute/call-for-icra-2026-papers-now-accepting-submissions/
  *   ICML 2025   2025-05-01   https://icml.cc/Conferences/2025/Dates
+ *   ICLR 2025   2025-01-22   https://iclr.cc/Conferences/2025/Dates
+ *   NeurIPS 2024 2024-09-26  https://neurips.cc/Conferences/2024/Dates
+ *   NeurIPS 2023 2023-09-22  https://neurips.cc/Conferences/2023/Dates
  *
  * Two rules follow, and tests enforce both:
  *
@@ -147,6 +150,13 @@ window.NEWS = [
     kind: 'acceptance',
     title: 'ICLR 2025',
     papers: [{ project: 'simba', name: 'SimBa', note: { en: 'Spotlight', honor: true } }],
+  },
+  {
+    id: 'neurips-2024',
+    date: '2024-09',
+    kind: 'acceptance',
+    title: 'NeurIPS 2024',
+    papers: [{ project: 'dodont', name: 'DoDont' }],
   },
   {
     id: 'neurips-2023',
