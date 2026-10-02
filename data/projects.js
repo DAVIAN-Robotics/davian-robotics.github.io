@@ -396,6 +396,7 @@ window.PROJECTS = [
     year: 2026,
     date: '2026-01',
     tags: ['rl'],
+    // In-car race footage from PlayStation's official GT7 trailer (youtu.be/1tBUsXIkG1A, 2:21).
     media: {
       type: 'video',
       src: 'assets/media/gt7-racing.mp4',
