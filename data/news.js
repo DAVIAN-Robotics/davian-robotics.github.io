@@ -76,6 +76,15 @@ window.NEWS = [
     ],
   },
   {
+    // A preprint with no arXiv id: dated by its project page, whose repo
+    // (DAVIAN-Robotics/FlashDexRetarget) has its first commit on 2026-09-23.
+    id: 'preprint-2026-09',
+    date: '2026-09',
+    kind: 'release',
+    title: 'Preprint',
+    papers: [{ project: 'flashdexretarget', name: 'FlashDexRetarget' }],
+  },
+  {
     // No accepted venue yet: a preprint, so it is written as a release and dated
     // by the arXiv posting (2607.11498 -> July 2026). Do not give it a venue.
     id: 'preprint-2026-07',
@@ -118,7 +127,12 @@ window.NEWS = [
     date: '2026-01',
     kind: 'acceptance',
     title: 'ICRA 2026',
-    papers: [{ project: 'acg', name: 'ACG' }],
+    // The GT7 racing paper is an RA-L paper presented at ICRA 2026; it rides on
+    // the ICRA row and its date, with 'RA-L' as a plain note.
+    papers: [
+      { project: 'acg', name: 'ACG' },
+      { project: 'gt7-racing', name: 'GT7 Racing Agent', note: { en: 'RA-L' } },
+    ],
   },
   {
     id: 'icml-2025',
@@ -126,5 +140,19 @@ window.NEWS = [
     kind: 'acceptance',
     title: 'ICML 2025',
     papers: [{ project: 'simbav2', name: 'SimbaV2', note: { en: 'Spotlight', honor: true } }],
+  },
+  {
+    id: 'iclr-2025',
+    date: '2025-01',
+    kind: 'acceptance',
+    title: 'ICLR 2025',
+    papers: [{ project: 'simba', name: 'SimBa', note: { en: 'Spotlight', honor: true } }],
+  },
+  {
+    id: 'neurips-2023',
+    date: '2023-09',
+    kind: 'acceptance',
+    title: 'NeurIPS 2023',
+    papers: [{ project: 'disco-dance', name: 'DISCO-DANCE' }],
   },
 ];

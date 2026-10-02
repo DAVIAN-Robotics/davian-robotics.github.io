@@ -808,15 +808,41 @@ a.news__paper:focus-visible {
   letter-spacing: -0.01em;
 }
 
-.person__name a {
+.person__link {
+  display: block;
   color: var(--fg);
-  border-bottom: 1px solid transparent;
+}
+
+.person__link .person__photo {
+  transition: opacity 0.15s var(--ease);
+}
+
+.person__name-text {
+  border-bottom: 1px solid var(--border);
   transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
 }
 
-.person__name a:hover {
+.person__arrow {
+  margin-left: 4px;
+  font-size: 0.8125rem;
+  color: var(--fg-muted);
+  transition: color 0.15s var(--ease);
+}
+
+.person__link:hover .person__photo,
+.person__link:focus-visible .person__photo {
+  opacity: 0.85;
+}
+
+.person__link:hover .person__name-text,
+.person__link:focus-visible .person__name-text {
   color: var(--accent);
   border-bottom-color: var(--accent);
+}
+
+.person__link:hover .person__arrow,
+.person__link:focus-visible .person__arrow {
+  color: var(--accent);
 }
 
 .person__role {
