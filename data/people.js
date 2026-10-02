@@ -56,7 +56,7 @@ window.MEMBERS = [
   {
     person: 'deepshwang',
     role: 'alumni-phd',
-    affiliation: 'Samsung Research',
+    affiliation: 'Samsung',
     interests: 'VLA, Generative Models',
   },
   { person: 'junhahyung', role: 'postdoc', interests: 'VLA, Generative Models' },
