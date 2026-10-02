@@ -117,6 +117,12 @@ window.PROJECTS = [
     year: 2026,
     date: '2026-09',
     tags: ['rl', 'vla', 'manipulation', 'sim2real'],
+    // "Stand Cup Up, Base VLA + Residual" from the project page.
+    media: {
+      type: 'video',
+      src: 'assets/media/residual-rl.mp4',
+      poster: 'assets/media/residual-rl.jpg',
+    },
     summary: {
       en: "A sim-trained residual RL policy that corrects a VLA's actions, raising real-robot success from 42% to 76%.",
     },
