@@ -234,7 +234,7 @@
     ms: 'M.S. Student',
     'alumni-phd': 'Alumni',
     'alumni-ms': 'Alumni',
-    collaborator: 'Collaborator',
+    collaborator: 'Collab',
   };
 
   // "Youngdo Lee" -> "YL", for a member who has no photo yet.
