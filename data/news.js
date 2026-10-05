@@ -79,7 +79,7 @@ window.NEWS = [
     ],
   },
   {
-    // FlashDexRetarget (no arXiv id) and PUBG Ally, both released October 2026.
+    // FlashDexRetarget (2610.01849) and PUBG Ally, both released October 2026.
     id: 'preprint-2026-10',
     date: '2026-10',
     kind: 'release',
