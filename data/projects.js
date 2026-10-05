@@ -159,7 +159,7 @@ window.PROJECTS = [
     },
     links: {
       paper: 'https://davian-robotics.github.io/FlashDexRetarget/static/FlashDexRetarget.pdf',
-      project: 'https://davian-robotics.github.io/FlashDexRetarget/',
+      project: 'https://holiday-robot.github.io/FlashDexRetarget/',
     },
   },
   {
