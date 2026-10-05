@@ -158,7 +158,7 @@ window.PROJECTS = [
       en: 'One RL policy retargets a whole collection of human hand-object demos to a robot hand, with about 100x less compute.',
     },
     links: {
-      paper: 'https://davian-robotics.github.io/FlashDexRetarget/static/FlashDexRetarget.pdf',
+      paper: 'https://arxiv.org/abs/2610.01849',
       project: 'https://holiday-robot.github.io/FlashDexRetarget/',
     },
   },
