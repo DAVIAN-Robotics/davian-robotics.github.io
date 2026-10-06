@@ -5,8 +5,8 @@
   'use strict';
 
   var REQUIRED = ['id', 'title', 'authors', 'year', 'date', 'summary.en'];
-  var LINK_LABELS = { paper: 'Paper', code: 'Code', model: 'Model', data: 'Data', project: 'Project' };
-  var LINK_ORDER = ['paper', 'code', 'model', 'data', 'project'];
+  var LINK_LABELS = { paper: 'Paper', post: 'Post', video: 'Video', code: 'Code', model: 'Model', data: 'Data', project: 'Project' };
+  var LINK_ORDER = ['paper', 'post', 'video', 'code', 'model', 'data', 'project'];
   var NEWS_REQUIRED = ['id', 'title', 'date', 'papers'];
   var NEWS_KINDS = { acceptance: 'Accepted', release: 'Released', award: 'Award' };
   // How many news rows show before the rest fold behind "Show more".

@@ -21,6 +21,8 @@
  *     summary: { en: 'One or two sentences.' },  // English summary
  *     links: {                                // optional; a missing key renders no button
  *       paper: 'https://arxiv.org/abs/...',
+ *       post: 'https://x.com/...',              // a blog post / thread about the paper
+ *       video: 'https://www.youtube.com/...',
  *       code: 'https://github.com/DAVIAN-Robotics/...',
  *       model: 'https://huggingface.co/DAVIAN-Robotics/...',
  *       data: 'https://huggingface.co/datasets/DAVIAN-Robotics/...',
@@ -214,6 +216,8 @@ window.PROJECTS = [
     },
     links: {
       paper: 'https://arxiv.org/abs/2609.29837',
+      post: 'https://x.com/Kangwook_Lee/status/2067686795882762494',
+      video: 'https://www.youtube.com/results?search_query=pubg+ai+teammate',
     },
   },
   {
