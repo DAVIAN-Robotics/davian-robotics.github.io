@@ -196,7 +196,7 @@ window.PROJECTS = [
     year: 2026,
     date: '2026-10',
     tags: ['embodied ai'],
-    // From NVIDIA GeForce's "Introducing PUBG Ally" trailer (youtu.be/wEKUSMqrbzQ, 0:35).
+    // From Kangwook Lee's "Building PUBG Ally" X article gameplay video (x.com/Kangwook_Lee/status/2067686795882762494, 0:14-0:20).
     media: {
       type: 'video',
       src: 'assets/media/pubg-ally.mp4',
