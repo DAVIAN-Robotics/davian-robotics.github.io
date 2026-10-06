@@ -1217,6 +1217,15 @@ a.news__paper:focus-visible {
   color: var(--fg-muted);
 }
 
+.author__label {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.author--member {
+  font-weight: 700;
+}
+
 .author__mark {
   margin-left: 1px;
 }

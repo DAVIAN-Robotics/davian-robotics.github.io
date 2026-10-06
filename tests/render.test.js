@@ -467,6 +467,23 @@ test('the first `equal` authors get a co-first mark, and nobody else does', () =
   assert.doesNotMatch(DR.authorsHTML(['a', 'B'], people), /author__mark/, 'no equal: no marks');
 });
 
+test('authorLines render labelled lines with lab members in bold', () => {
+  const { DR } = loadRenderer();
+  const people = { a: { name: 'A', url: 'https://a.example' } };
+  const html = DR.authorLinesHTML(
+    [
+      { label: 'Team', authors: ['...', 'a', '...'] },
+      { label: 'Lead', authors: ['B'] },
+    ],
+    people
+  );
+  assert.strictEqual(
+    html,
+    '<span class="author__label">Team:</span> ..., <strong><a class="author author--member" ' +
+      'href="https://a.example">A</a></strong>, ...<br><span class="author__label">Lead:</span> B'
+  );
+});
+
 test('a card prints its honour in red beside the venue badge', () => {
   const { DR } = loadRenderer();
   const html = DR.cardHTML(

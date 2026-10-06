@@ -7,6 +7,7 @@
  *     title: 'PAPER: Full Title',             // required
  *     authors: ['pmh9960', 'Jane Doe (SNU)'], // required; ids link, plain strings do not
  *     equal: 2,                               // optional; the first N authors are co-first authors (marked *)
+ *     authorLines: [{ label: 'Team', authors: ['...', 'pmh9960'] }],  // optional; card shows these labelled lines instead of `authors`
  *     venue: 'NeurIPS 2025',                  // optional; leave it out for a preprint and the card says "Preprint"
  *     honor: 'Spotlight',                     // optional; Oral / Spotlight / an award, shown in red beside the venue
  *     year: 2025,                             // required, shown/implied by the badge; use venue year if present, else arXiv posting year
@@ -192,6 +193,12 @@ window.PROJECTS = [
       'Hyoseok Seol',
       'Yujeong Son',
       'Kiyoon Yoo',
+    ],
+    // What the card shows instead of the full list above: the team line with
+    // only our members, then the leads. Member ids render bold.
+    authorLines: [
+      { label: 'PUBG Ally Team', authors: ['...', 'choyi0521', 'jimin9401', '...'] },
+      { label: 'Project Lead', authors: ['Kangwook Lee', 'mynsng'] },
     ],
     year: 2026,
     date: '2026-10',
