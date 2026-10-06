@@ -7,6 +7,7 @@
  *     title: 'PAPER: Full Title',             // required
  *     authors: ['pmh9960', 'Jane Doe (SNU)'], // required; ids link, plain strings do not
  *     equal: 2,                               // optional; the first N authors are co-first authors (marked *)
+ *     authorLines: [{ label: 'Team', authors: ['...', 'pmh9960'] }],  // optional; card shows these labelled lines instead of `authors`
  *     venue: 'NeurIPS 2025',                  // optional; leave it out for a preprint and the card says "Preprint"
  *     honor: 'Spotlight',                     // optional; Oral / Spotlight / an award, shown in red beside the venue
  *     year: 2025,                             // required, shown/implied by the badge; use venue year if present, else arXiv posting year
@@ -20,6 +21,8 @@
  *     summary: { en: 'One or two sentences.' },  // English summary
  *     links: {                                // optional; a missing key renders no button
  *       paper: 'https://arxiv.org/abs/...',
+ *       post: 'https://x.com/...',              // a blog post / thread about the paper
+ *       video: 'https://www.youtube.com/...',
  *       code: 'https://github.com/DAVIAN-Robotics/...',
  *       model: 'https://huggingface.co/DAVIAN-Robotics/...',
  *       data: 'https://huggingface.co/datasets/DAVIAN-Robotics/...',
@@ -193,10 +196,16 @@ window.PROJECTS = [
       'Yujeong Son',
       'Kiyoon Yoo',
     ],
+    // What the card shows instead of the full list above: the team line with
+    // only our members, then the leads. Member ids render bold.
+    authorLines: [
+      { label: 'PUBG Ally Team', authors: ['...', 'choyi0521', 'jimin9401', '...'] },
+      { label: 'Project Lead', authors: ['Kangwook Lee', 'mynsng'] },
+    ],
     year: 2026,
     date: '2026-10',
     tags: ['embodied ai'],
-    // From NVIDIA GeForce's "Introducing PUBG Ally" trailer (youtu.be/wEKUSMqrbzQ, 0:35).
+    // From Kangwook Lee's "Building PUBG Ally" X article gameplay video (x.com/Kangwook_Lee/status/2067686795882762494, 0:14-0:20).
     media: {
       type: 'video',
       src: 'assets/media/pubg-ally.mp4',
@@ -207,6 +216,8 @@ window.PROJECTS = [
     },
     links: {
       paper: 'https://arxiv.org/abs/2609.29837',
+      post: 'https://x.com/Kangwook_Lee/status/2067686795882762494',
+      video: 'https://www.youtube.com/results?search_query=pubg+ai+teammate',
     },
   },
   {

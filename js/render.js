@@ -5,8 +5,8 @@
   'use strict';
 
   var REQUIRED = ['id', 'title', 'authors', 'year', 'date', 'summary.en'];
-  var LINK_LABELS = { paper: 'Paper', code: 'Code', model: 'Model', data: 'Data', project: 'Project' };
-  var LINK_ORDER = ['paper', 'code', 'model', 'data', 'project'];
+  var LINK_LABELS = { paper: 'Paper', post: 'Post', video: 'Video', code: 'Code', model: 'Model', data: 'Data', project: 'Project' };
+  var LINK_ORDER = ['paper', 'post', 'video', 'code', 'model', 'data', 'project'];
   var NEWS_REQUIRED = ['id', 'title', 'date', 'papers'];
   var NEWS_KINDS = { acceptance: 'Accepted', release: 'Released', award: 'Award' };
   // How many news rows show before the rest fold behind "Show more".
@@ -365,6 +365,31 @@
       .join(', ');
   }
 
+  /* A team paper's card can replace its author list with labelled lines
+   * (`authorLines`), e.g. "PUBG Ally Team: ..., X, ..." / "Project Lead: ...".
+   * `authors` still holds the full list, so People ordering is unaffected.
+   * Here lab members (people ids) are bolded so they stand out among the
+   * plain-text names. */
+  function authorLinesHTML(lines, people) {
+    var dict = people || {};
+    return (lines || [])
+      .map(function (line) {
+        var names = (line.authors || [])
+          .map(function (entry) {
+            var person = dict[entry];
+            if (!person) return escapeHTML(entry);
+            return (
+              '<strong><a class="author author--member" href="' + escapeHTML(person.url) + '">' +
+              escapeHTML(person.name) +
+              '</a></strong>'
+            );
+          })
+          .join(', ');
+        return '<span class="author__label">' + escapeHTML(line.label) + ':</span> ' + names;
+      })
+      .join('<br>');
+  }
+
   function linksHTML(links) {
     if (!links) return '';
     return LINK_ORDER.filter(function (key) {
@@ -493,7 +518,11 @@
       '<div class="card__body">' +
       title +
       venue +
-      '<p class="card__authors">' + authorsHTML(project.authors, people, project.equal) + '</p>' +
+      '<p class="card__authors">' +
+      (project.authorLines
+        ? authorLinesHTML(project.authorLines, people)
+        : authorsHTML(project.authors, people, project.equal)) +
+      '</p>' +
       '<p class="card__summary">' +
       escapeHTML(project.summary.en) +
       '</p>' +
@@ -805,6 +834,7 @@
     // not deleted, and this keeps it reachable (and tested) until it returns.
     chipsHTML: chipsHTML,
     authorsHTML: authorsHTML,
+    authorLinesHTML: authorLinesHTML,
     linksHTML: linksHTML,
     mediaHTML: mediaHTML,
     cardHref: cardHref,
