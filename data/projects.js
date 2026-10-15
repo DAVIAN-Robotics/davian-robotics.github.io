@@ -82,7 +82,7 @@ window.PROJECTS = [
   {
     id: 'pam',
     equal: 2,
-    title: 'Procedural Assistance Memory for Proactive Robot',
+    title: 'An Agentic Framework for Proactive Robots with Procedural Assistance Memory',
     venue: 'CoRL 2026',
     authors: [
       'aiclaudev',
@@ -97,6 +97,11 @@ window.PROJECTS = [
     year: 2026,
     date: '2026-09',
     tags: ['vla', 'manipulation'],
+    media: {
+      type: 'video',
+      src: 'assets/media/pam.mp4',
+      poster: 'assets/media/pam.jpg',
+    },
     summary: {
       en: "A proactive robot that remembers a user's daily routine and helps before being asked.",
     },
