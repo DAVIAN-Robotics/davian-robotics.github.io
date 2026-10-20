@@ -99,8 +99,8 @@ window.PROJECTS = [
     tags: ['vla', 'manipulation'],
     media: {
       type: 'video',
-      src: 'assets/media/pam.mp4',
-      poster: 'assets/media/pam.jpg',
+      src: 'assets/media/pam-demo.mp4',
+      poster: 'assets/media/pam-demo.jpg',
     },
     summary: {
       en: "A proactive robot that remembers a user's daily routine and helps before being asked.",
