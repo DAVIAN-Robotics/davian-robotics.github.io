@@ -440,9 +440,9 @@
    *
    * The values are the four logo hues, defined as --tag-N-ink / --tag-N-bg in
    * css/style.css: 1 deep purple, 2 pink, 3 salmon/rust, 4 sand/bronze. The
-   * tag set is closed at seven; the two embodiment tags share pink, and tags that
-   * appear together on a card (vla + manipulation, rl + sim2real) never share
-   * a hue.
+   * tag set is closed at nine; the two embodiment tags share pink, and tags that
+   * appear together on a card (vla + manipulation, rl + sim2real, proactive +
+   * agentic framework + manipulation) never share a hue.
    *
    * A tag that is NOT in this map still renders — it falls back to a hash of its
    * own name, so it is stable and it is one of the four, it just was not chosen.
@@ -455,6 +455,8 @@
     sim2real: 4,
     'generative model': 4,
     'embodied ai': 3,
+    proactive: 1,
+    'agentic framework': 4,
   };
 
   function tagTone(tag) {

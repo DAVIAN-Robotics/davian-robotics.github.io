@@ -12,7 +12,7 @@
  *     honor: 'Spotlight',                     // optional; Oral / Spotlight / an award, shown in red beside the venue
  *     year: 2025,                             // required, shown/implied by the badge; use venue year if present, else arXiv posting year
  *     date: '2025-09',                        // required, 'YYYY-MM', SORTS the grid (newest first)
- *     tags: ['vla', 'manipulation'],          // optional; only: rl, vla, manipulation, locomotion, sim2real, generative model, embodied ai
+ *     tags: ['vla', 'manipulation'],          // optional; only: rl, vla, manipulation, locomotion, sim2real, generative model, embodied ai, proactive, agentic framework
  *     media: {                                // optional; omit until the file exists
  *       type: 'video',                        // 'video' | 'image'
  *       src: 'assets/media/slug.mp4',
@@ -96,7 +96,7 @@ window.PROJECTS = [
     ],
     year: 2026,
     date: '2026-09',
-    tags: ['vla', 'manipulation'],
+    tags: ['proactive', 'agentic framework', 'manipulation'],
     media: {
       type: 'video',
       src: 'assets/media/pam-milk.mp4',
